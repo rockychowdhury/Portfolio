@@ -13,30 +13,24 @@ Problem solving and competitive programming activities:
 - Codechef: https://www.codechef.com/users/rocky20809
 
 
-Coding activities analytics:
- - wakatime: https://wakatime.com/@Rocky20809 (Secret API Key: waka_93fdf1e2-d624-404d-8ef5-159bf9faf7ae) (see api docs for wakatime - https://wakatime.com/developers)
+Navbar: docs/navbar.md
+Hero Section: 
+
+Skills: group by (Top Skills, Backend, Frontend, Database, Devops, CS Fundaments) scroll able and clickable - selected group icons are in focus and organized rest will place at bottom
+
+Problem Solving and github stats: contents, ranks, solve count, github stats, mini graph in card etc
+
+Projects Section:
+
+Blogs Section:
+
+Journey: Timeline view (showing achievements)
+
+Educations & Courses:
+
+About & Contact:
+
+footer: simple minimal footer with all social links, documentation, resume link, email 
 
 
- Projects Section:
-
-
-
- Blogs Section:
-
-
- Educations & Courses:
-
-
-Contact:
-
-Journey:
-
-Skills: group by
-
-Hero Section:
-
-Navbar:
-
-Problem Solving and Competitive programming:
-
-footer:
+Quick Links: Skills, Projects, Blogs, Contact
