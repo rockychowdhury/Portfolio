@@ -1,16 +1,12 @@
-Problem Solving and github stats: contents, ranks, solve count, mini graph in card etc
 
+Github :
 
-Content of Problem Solving -
-- Total Problem Solved (Solved)
-- Total Contests participated (contest count)
-- Highest Rating (All time height)
-- Content Rating graph (Mini small graph, contest + rank)
-- All time best Rank (Pupil in Cf, 2* in CC, Knight on Leetcode etc)
-- Total active days
+ - Top Languages graph
+ - Total Repo
+ - total contribution + graph
+ - github achievements 
 
-**NOTE:**Focus on Leetcode as i'am gonna continue this, and less focus and compact information about other two.
-Showcasing your GitHub activity is a great way to provide "proof of work" to recruiters. Beyond the basic counts, you can pull specific insights that highlight your consistency, technical range, and community impact.
+ Showcasing your GitHub activity is a great way to provide "proof of work" to recruiters. Beyond the basic counts, you can pull specific insights that highlight your consistency, technical range, and community impact.
 
 Here is a breakdown of the information and stats you can extract, along with how to display them effectively.
 
@@ -63,4 +59,3 @@ If you were to build a "Stats" section in your portfolio, it might look like thi
 Recruiters care more about **quality over quantity**. 10 repositories where 8 are empty "Hello World" folders actually look worse than 3 repositories with clean code, a professional README, and a solid commit history.
 
 Would you like help setting up a **GitHub Profile README** to display these stats automatically?
-

@@ -12,9 +12,11 @@ Problem solving and competitive programming activities:
 - Codeforces: https://codeforces.com/profile/__Cipher__
 - Codechef: https://www.codechef.com/users/rocky20809
 
+Initial Colors: Primary (#222222), Secondary(#7B7B7B), Tertiary(#F8F8F8) and white (#FFFFFF) 
+
 
 Navbar: docs/navbar.md
-Hero Section: 
+Hero Section: asset ref
 
 Skills: group by (Top Skills, Backend, Frontend, Database, Devops, CS Fundaments) scroll able and clickable - selected group icons are in focus and organized rest will place at bottom
 
