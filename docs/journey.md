@@ -1,6 +1,9 @@
 Timeline view X-axis scroll (horizontal) and pop up achievements Notion
 
+Slow motion auto and scroll to move fast
 Sorted by time in descending order (latest 1st)
+Smooth scrolling
+
 
 Achievements: stor on db
  - Achieved Pupil On Codeforces

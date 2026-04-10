@@ -1,1 +1,5 @@
 Skills: group by (Top Skills, Backend, Frontend, Database, Devops, CS Fundaments) scroll able and clickable - selected group icons are in focus and organized rest will place at bottom
+
+
+3 column icon + name ( skill card)
+scroll opposite direction
