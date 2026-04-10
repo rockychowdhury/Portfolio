@@ -36,3 +36,24 @@ footer: simple minimal footer with all social links, documentation, resume link,
 
 
 Quick Links: Skills, Projects, Blogs, Contact
+
+
+
+Sections of portfolio -
+
+Experience - VP, Self Employed
+
+
+Navbar
+Hero Section
+Skills
+Projects
+Problem Solving Activities (Competitive programming profiles stats)
+Github Profile Stats
+Educations and Courses
+Journey - Timeline 
+Productivity and Time Management proof Section (Currently NO Idea how to present) - static animated section
+Blogs
+Testimonials
+Contact Section - Send Mail - Contact Info (skip the footer to keep it minimal)
+Footer
