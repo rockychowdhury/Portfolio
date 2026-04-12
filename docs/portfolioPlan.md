@@ -39,10 +39,8 @@ Quick Links: Skills, Projects, Blogs, Contact
 
 
 
-Sections of portfolio -
-
 Experience - VP, Self Employed
-
+Sections of portfolio -
 
 Navbar
 Hero Section

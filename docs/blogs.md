@@ -7,3 +7,5 @@ add tags, time posted, image, link
 
 two tabs - featured default, All card group with search paginated
 **ASSET**
+
+2 col layout - one for search line inbox another collection of blogs
