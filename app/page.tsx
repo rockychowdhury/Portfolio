@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "@/components/portfolio/Navbar";
 import HeroSection from "@/components/portfolio/HeroSection";
+import SkillsSection from "@/components/portfolio/SkillsSection";
 import SectionWrapper from "@/components/portfolio/SectionWrapper";
 import Preloader from "@/components/portfolio/Preloader";
 
@@ -14,7 +15,6 @@ export default function Home() {
   };
 
   const sections = [
-    { id: "skills", title: "Skills", bgColor: "bg-background" },
     { id: "projects", title: "Projects", bgColor: "bg-secondary/50" },
     { id: "problem-solving", title: "Problem Solving Activities", bgColor: "bg-background" },
     { id: "github-stats", title: "Github Profile Stats", bgColor: "bg-secondary/50" },
@@ -34,6 +34,7 @@ export default function Home() {
       <Navbar preloaderDone={preloaderDone} />
       <main>
         <HeroSection preloaderDone={preloaderDone} />
+        <SkillsSection />
         
         {sections.map((section) => (
           <SectionWrapper
