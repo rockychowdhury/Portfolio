@@ -15,7 +15,7 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ preloaderDone = true }: { preloaderDone?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -38,26 +38,47 @@ export default function Navbar() {
     >
       <nav className="flex w-full items-center justify-between px-6 py-5 md:px-12 lg:px-20">
         <div className="flex items-center gap-12">
-          {/* Logo */}
+          {/* Logo morph target */}
           <Link href="/" className="group flex items-center">
-            <span className="text-xl font-black tracking-tighter text-foreground">
-              ROCKY
-            </span>
+            {preloaderDone ? (
+              <motion.span 
+                layoutId="brand-logo"
+                className="text-xl font-black uppercase tracking-tighter text-foreground"
+                transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
+              >
+                ROCKY
+              </motion.span>
+            ) : (
+              <span className="text-xl font-black uppercase tracking-tighter opacity-0">
+                ROCKY
+              </span>
+            )}
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden items-center gap-8 lg:flex">
-            {navLinks.map((link) => (
-              <Link
+            {navLinks.map((link, i) => (
+              <a
                 key={link.label}
                 href={link.href}
-                className="text-[14px] font-medium tracking-tight text-muted-foreground transition-colors hover:text-foreground"
+                className="text-[14px] font-medium tracking-tight text-muted-foreground transition-colors hover:text-foreground opacity-0"
+                style={{
+                  animation: preloaderDone ? `fadeUp 400ms ease ${400 + i * 60}ms forwards` : "none",
+                }}
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
           </div>
         </div>
+
+        {/* Global Styles for the new animations */}
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+        `}} />
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-6 md:flex">

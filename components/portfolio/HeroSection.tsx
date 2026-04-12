@@ -24,7 +24,7 @@ const stagger = {
   visible: {
     transition: {
       staggerChildren: 0.15,
-      delayChildren: 0.3,
+      delayChildren: 0.3, // Handled naturally via conditional mount
     },
   },
 };
@@ -45,7 +45,7 @@ const slideLeft = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.9, ease: [0.25, 0.4, 0.25, 1] },
+    transition: { duration: 0.9, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] },
   },
 };
 
@@ -74,7 +74,7 @@ const lineGrow = {
   },
 };
 
-export default function HeroSection() {
+export default function HeroSection({ preloaderDone = true }: { preloaderDone?: boolean }) {
   const containerRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -119,7 +119,7 @@ export default function HeroSection() {
           <motion.div
             variants={stagger}
             initial="hidden"
-            animate="visible"
+            animate={preloaderDone ? "visible" : "hidden"}
             className="lg:pl-12"
           >
             {/* Stats Row */}
@@ -157,7 +157,7 @@ export default function HeroSection() {
                     custom={i}
                     variants={letterAnimation}
                     initial="hidden"
-                    animate="visible"
+                    animate={preloaderDone ? "visible" : "hidden"}
                     className="inline-block"
                   >
                     {letter}
@@ -168,7 +168,7 @@ export default function HeroSection() {
               <motion.div
                 variants={slideLeft}
                 initial="hidden"
-                animate="visible"
+                animate={preloaderDone ? "visible" : "hidden"}
                 className="mt-6 flex items-center gap-4"
               >
                 <div className="h-px w-8 bg-foreground" />
@@ -181,8 +181,8 @@ export default function HeroSection() {
             {/* Scroll Indicator */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
+              animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 1.5 }} 
               className="mt-20 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground"
             >
               Scroll down <ArrowDown className="size-3" />
@@ -194,8 +194,8 @@ export default function HeroSection() {
         <div className="relative flex flex-1 items-end justify-center lg:h-screen lg:justify-end">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            animate={preloaderDone ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.05 }}
+            transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }} 
             style={{ x: imageX, y: imageY }}
             className="relative h-[65vh] w-[110%] right-[-5%] transition-all md:h-[75vh] lg:h-[88vh] lg:w-full lg:right-0 xl:w-[105%] xl:right-[-2.5%]"
           >

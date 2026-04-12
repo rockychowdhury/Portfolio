@@ -1,8 +1,19 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import Navbar from "@/components/portfolio/Navbar";
 import HeroSection from "@/components/portfolio/HeroSection";
 import SectionWrapper from "@/components/portfolio/SectionWrapper";
+import Preloader from "@/components/portfolio/Preloader";
 
 export default function Home() {
+  const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
+
+  const handlePreloaderComplete = () => {
+    setPreloaderDone(true);
+  };
+
   const sections = [
     { id: "skills", title: "Skills", bgColor: "bg-background" },
     { id: "projects", title: "Projects", bgColor: "bg-secondary/50" },
@@ -18,9 +29,12 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
+      <AnimatePresence>
+        {!preloaderDone && <Preloader key="preloader" onComplete={handlePreloaderComplete} />}
+      </AnimatePresence>
+      <Navbar preloaderDone={preloaderDone} />
       <main>
-        <HeroSection />
+        <HeroSection preloaderDone={preloaderDone} />
         
         {sections.map((section) => (
           <SectionWrapper
