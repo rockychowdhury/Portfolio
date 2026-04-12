@@ -28,7 +28,7 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
       <motion.div
         exit={{ opacity: 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="fixed inset-0 z-[9998] bg-[#0A0A0A]"
+        className="fixed inset-0 z-[9998] bg-[#09090b]"
       />
 
       {/* Centered Logo Morph Target */}

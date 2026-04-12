@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import Image from "next/image";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, Download } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -125,7 +125,7 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
             {/* Stats Row */}
             <motion.div
               variants={fadeUp}
-              className="mb-16 flex flex-wrap items-start gap-12 md:gap-20"
+              className="mb-24 flex flex-wrap items-start gap-12 md:gap-20"
             >
               <div>
                 <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl">
@@ -169,12 +169,39 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
                 variants={slideLeft}
                 initial="hidden"
                 animate={preloaderDone ? "visible" : "hidden"}
-                className="mt-6 flex items-center gap-4"
+                className="mt-10 flex items-center gap-4"
               >
                 <div className="h-px w-8 bg-foreground" />
                 <p className="text-lg font-medium text-foreground md:text-xl">
                   It&apos;s Rocky Chowdhury a Software Engineer
                 </p>
+              </motion.div>
+
+              {/* Recruiter CTAs */}
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={preloaderDone ? "visible" : "hidden"}
+                className="mt-12 flex flex-wrap gap-4"
+              >
+                <a
+                  href="https://linkedin.com/in/rockychowdhury1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-full font-bold transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+                >
+                  <LinkedinIcon className="size-5 group-hover:rotate-12 transition-transform" />
+                  Connect on LinkedIn
+                </a>
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 px-8 py-4 bg-background border border-border text-foreground rounded-full font-bold transition-all hover:bg-secondary hover:shadow-lg active:scale-[0.98]"
+                >
+                  <Download className="size-5 group-hover:translate-y-0.5 transition-transform" />
+                  View Resume
+                </a>
               </motion.div>
             </div>
 
@@ -182,10 +209,23 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
             <motion.div
               initial={{ opacity: 0 }}
               animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: 1.5 }} 
-              className="mt-20 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground"
+              transition={{ delay: 2 }} 
+              className="mt-32 hidden lg:flex items-center gap-4"
             >
-              Scroll down <ArrowDown className="size-3" />
+              <div className="relative flex flex-col items-center">
+                <motion.div 
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-5 h-9 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-1.5"
+                >
+                  <motion.div 
+                    animate={{ opacity: [1, 0, 1], height: [4, 8, 4] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-1 bg-muted-foreground/40 rounded-full" 
+                  />
+                </motion.div>
+                <span className="absolute -bottom-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Scroll</span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
