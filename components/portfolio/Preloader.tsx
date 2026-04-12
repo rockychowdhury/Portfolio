@@ -41,10 +41,11 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
           {LETTERS.map((letter, i) => (
             <span
               key={i}
-              className="inline-block opacity-0"
+              className="inline-block opacity-0 relative"
               style={{
-                transform: "translateY(18px)",
-                animation: `letterIn 300ms ease-out forwards`,
+                zIndex: LETTERS.length - i,
+                transform: "translateX(-50px)",
+                animation: `letterIn 400ms cubic-bezier(0.25, 1, 0.5, 1) forwards`,
                 animationDelay: `${i * 120}ms`,
               }}
             >
@@ -56,7 +57,8 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
 
       <style>{`
         @keyframes letterIn {
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(-50px); }
+          to { opacity: 1; transform: translateX(0); }
         }
       `}</style>
     </>
