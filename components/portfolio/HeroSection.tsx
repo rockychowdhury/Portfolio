@@ -1,9 +1,16 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useSpring,
+  useInView,
+  animate,
+} from "framer-motion";
 import Image from "next/image";
-import { ArrowDown, Download } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ExternalLink } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -18,13 +25,37 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
+// ── Animated Counter Hook ──
+function useAnimatedCounter(target: number, duration = 2) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = rounded.on("change", (v) => setDisplay(v));
+    return () => unsubscribe();
+  }, [rounded]);
+
+  useEffect(() => {
+    if (target > 0) {
+      const controls = animate(count, target, {
+        duration,
+        ease: [0.25, 0.4, 0.25, 1],
+      });
+      return () => controls.stop();
+    }
+  }, [target, count, duration]);
+
+  return display;
+}
+
 // Stagger container
 const stagger = {
   hidden: {},
   visible: {
     transition: {
       staggerChildren: 0.15,
-      delayChildren: 0.3, // Handled naturally via conditional mount
+      delayChildren: 0.3,
     },
   },
 };
@@ -35,7 +66,7 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.4, 0.25, 1] },
+    transition: { duration: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
@@ -45,7 +76,7 @@ const slideLeft = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.9, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] },
+    transition: { duration: 0.9, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
@@ -60,7 +91,7 @@ const letterAnimation = {
     transition: {
       duration: 0.8,
       delay: 0.5 + i * 0.08,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as const,
     },
   }),
 };
@@ -70,14 +101,71 @@ const lineGrow = {
   hidden: { scaleX: 0 },
   visible: {
     scaleX: 1,
-    transition: { duration: 1, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] },
+    transition: { duration: 1, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
-export default function HeroSection({ preloaderDone = true }: { preloaderDone?: boolean }) {
+export default function HeroSection({
+  preloaderDone = true,
+}: {
+  preloaderDone?: boolean;
+}) {
   const containerRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+
+  // Real stats
+  const [stats, setStats] = useState({
+    totalSolved: 0,
+    projectCount: 0,
+  });
+  const [statsLoaded, setStatsLoaded] = useState(false);
+
+  const resumeUrl =
+    process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
+
+  // Animated counters
+  const solvedCount = useAnimatedCounter(
+    preloaderDone && statsLoaded ? stats.totalSolved : 0,
+    2.5
+  );
+  const projectCount = useAnimatedCounter(
+    preloaderDone && statsLoaded ? stats.projectCount : 0,
+    2
+  );
+
+  // Phase 1: Fetch cached stats from MongoDB (instant)
+  // Phase 2: Background refresh from live APIs, update UI smoothly
+  useEffect(() => {
+    // 1. Load cached stats
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.totalSolved > 0 || data.projectCount > 0) {
+          setStats({
+            totalSolved: data.totalSolved,
+            projectCount: data.projectCount,
+          });
+        }
+        setStatsLoaded(true);
+      })
+      .catch(() => {
+        setStatsLoaded(true);
+      });
+
+    // 2. Background refresh — update cache and UI
+    fetch("/api/stats?refresh=true")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.totalSolved > 0) {
+          setStats({
+            totalSolved: data.totalSolved,
+            projectCount: data.projectCount,
+          });
+        }
+      })
+      .catch(() => {}); // silent fail — cached data remains
+  }, []);
 
   // Smooth spring for subtle parallax on image
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
@@ -106,12 +194,12 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-1 flex-col justify-center py-12 lg:py-0">
           {/* Vertical Label — Desktop Only */}
-          <div className="absolute top-1/2 -left-12 hidden -translate-y-1/2 flex-col items-center gap-6 lg:flex">
-            <span className="text-[11px] font-medium tracking-[0.2em] uppercase text-muted-foreground [writing-mode:vertical-lr] rotate-180">
+          <div className="absolute top-1/2 -left-12 hidden -translate-y-1/2 flex-col items-center gap-8 lg:flex">
+            <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
               Problem Solver
             </span>
-            <div className="h-24 w-px border-l border-dashed border-border" />
-            <span className="text-[11px] font-medium tracking-[0.2em] uppercase text-muted-foreground [writing-mode:vertical-lr] rotate-180">
+            <div className="h-40 w-px border-l border-dashed border-border/60" />
+            <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
               2024
             </span>
           </div>
@@ -122,32 +210,32 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
             animate={preloaderDone ? "visible" : "hidden"}
             className="lg:pl-12"
           >
-            {/* Stats Row */}
+            {/* Stats Row — pushed down */}
             <motion.div
               variants={fadeUp}
-              className="mb-24 flex flex-wrap items-start gap-12 md:gap-20"
+              className="mb-24 mt-8 flex flex-wrap items-start gap-12 md:gap-20"
             >
               <div>
-                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl">
-                  +700
+                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                  +{solvedCount}
                 </span>
                 <p className="mt-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-                  DSA problems solved
+                  DSA Problems Solved
                 </p>
               </div>
               <div>
-                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl">
-                  +10
+                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                  {projectCount > 0 ? `+${projectCount}` : "—"}
                 </span>
                 <p className="mt-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-                  Projects Completed
+                  Full-Stack Projects Shipped
                 </p>
               </div>
             </motion.div>
 
             {/* Main Heading */}
             <div className="relative">
-              <h1 
+              <h1
                 className="flex text-[7rem] font-medium leading-[0.85] tracking-tighter text-foreground sm:text-[9rem] md:text-[11rem] lg:text-[12rem] xl:text-[14rem]"
                 style={{ perspective: "600px" }}
               >
@@ -164,7 +252,7 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
                   </motion.span>
                 ))}
               </h1>
-              
+
               <motion.div
                 variants={slideLeft}
                 initial="hidden"
@@ -188,43 +276,56 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
                   href="https://linkedin.com/in/rockychowdhury1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-full font-bold transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+                  className="group relative flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-full font-bold text-sm overflow-hidden transition-all hover:shadow-2xl active:scale-[0.98]"
                 >
-                  <LinkedinIcon className="size-5 group-hover:rotate-12 transition-transform" />
-                  Connect on LinkedIn
+                  <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <LinkedinIcon className="size-[18px] relative z-10" />
+                  <span className="relative z-10">Connect on LinkedIn</span>
+                  <span className="relative z-10 text-[10px] opacity-60 group-hover:opacity-100 transition-opacity">↗</span>
                 </a>
                 <a
-                  href="/resume.pdf"
+                  href={resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-8 py-4 bg-background border border-border text-foreground rounded-full font-bold transition-all hover:bg-secondary hover:shadow-lg active:scale-[0.98]"
+                  className="group relative flex items-center gap-3 px-8 py-4 bg-transparent border-2 border-foreground/15 text-foreground rounded-full font-bold text-sm overflow-hidden transition-all hover:border-foreground/40 hover:shadow-lg active:scale-[0.98]"
                 >
-                  <Download className="size-5 group-hover:translate-y-0.5 transition-transform" />
-                  View Resume
+                  <span className="absolute inset-0 bg-foreground/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <ExternalLink className="size-[18px] relative z-10 group-hover:rotate-12 transition-transform" />
+                  <span className="relative z-10">View Resume</span>
                 </a>
               </motion.div>
             </div>
 
-            {/* Scroll Indicator */}
+            {/* Scroll Indicator — pushed inward with pl-12 */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: 2 }} 
-              className="mt-32 hidden lg:flex items-center gap-4"
+              transition={{ delay: 2 }}
+              className="mt-28 hidden lg:flex items-center gap-4 pl-12"
             >
               <div className="relative flex flex-col items-center">
-                <motion.div 
-                  animate={{ y: [0, 12, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                <motion.div
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                   className="w-5 h-9 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-1.5"
                 >
-                  <motion.div 
+                  <motion.div
                     animate={{ opacity: [1, 0, 1], height: [4, 8, 4] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-1 bg-muted-foreground/40 rounded-full" 
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="w-1 bg-muted-foreground/40 rounded-full"
                   />
                 </motion.div>
-                <span className="absolute -bottom-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Scroll</span>
+                <span className="absolute -bottom-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
+                  Scroll
+                </span>
               </div>
             </motion.div>
           </motion.div>
@@ -234,8 +335,12 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
         <div className="relative flex flex-1 items-end justify-center lg:h-screen lg:justify-end">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
-            animate={preloaderDone ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.05 }}
-            transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }} 
+            animate={
+              preloaderDone
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 0, scale: 1.05 }
+            }
+            transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
             className="relative h-[65vh] w-[110%] right-[-5%] transition-all md:h-[75vh] lg:h-[88vh] lg:w-full lg:right-0 xl:w-[105%] xl:right-[-2.5%]"
           >
@@ -249,10 +354,10 @@ export default function HeroSection({ preloaderDone = true }: { preloaderDone?: 
               priority
             />
           </motion.div>
-          
+
           {/* Subtle decoration */}
           <div className="absolute -right-4 bottom-1/4 hidden h-8 w-8 items-center justify-center lg:flex">
-             <div className="size-3 border-r-2 border-b-2 border-border rotate-45" />
+            <div className="size-3 border-r-2 border-b-2 border-border rotate-45" />
           </div>
         </div>
       </div>

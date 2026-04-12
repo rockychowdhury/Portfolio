@@ -6,37 +6,123 @@ import { motion } from "framer-motion";
 const NAME = "ROCKY";
 const LETTERS = NAME.split("");
 
-export default function Preloader({ onComplete }: { onComplete?: () => void }) {
+export default function Preloader({
+  onComplete,
+}: {
+  onComplete?: () => void;
+}) {
+  const logoRef = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState<"letters" | "morph">("letters");
+  const [morph, setMorph] = useState({ x: 0, y: 0, scale: 1 });
+  const [themeTarget, setThemeTarget] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
-    // Wait for letters to stagger in + extra 400ms for safety
-    // Instantly afterwards, signal completion to trigger AnimatePresence exit
-    const totalLetterTime = LETTERS.length * 120 + 400; 
-    
-    const flyTimer = setTimeout(() => {
-      document.body.style.overflow = ""; 
-      onComplete?.();
+    const totalLetterTime = LETTERS.length * 120 + 400;
+
+    const timer = setTimeout(() => {
+      const logo = logoRef.current;
+      const navAnchor = document.getElementById("navbar-logo-anchor");
+      const themeBtn = document.getElementById("theme-toggle-btn");
+
+      if (logo && navAnchor) {
+        const logoRect = logo.getBoundingClientRect();
+        const navRect = navAnchor.getBoundingClientRect();
+
+        // center-to-center delta
+        const dx =
+          navRect.left +
+          navRect.width / 2 -
+          (logoRect.left + logoRect.width / 2);
+        const dy =
+          navRect.top +
+          navRect.height / 2 -
+          (logoRect.top + logoRect.height / 2);
+        const scale = navRect.height / logoRect.height;
+
+        setMorph({ x: dx, y: dy, scale });
+      }
+
+      if (themeBtn) {
+        const r = themeBtn.getBoundingClientRect();
+        setThemeTarget({
+          x: r.left + r.width / 2,
+          y: r.top + r.height / 2,
+        });
+      }
+
+      setPhase("morph");
     }, totalLetterTime);
 
-    return () => clearTimeout(flyTimer);
-  }, [onComplete]);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleMorphComplete = () => {
+    document.body.style.overflow = "";
+    onComplete?.();
+  };
 
   return (
     <>
-      {/* Black overlay — fades out gracefully via AnimatePresence */}
-      <motion.div
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="fixed inset-0 z-[9998] bg-[#09090b]"
-      />
+      {/* ── Dark overlay ── */}
+      {phase === "letters" && (
+        <div className="fixed inset-0 z-[9998] bg-[#09090b]" />
+      )}
+      {phase === "morph" && (
+        <motion.div
+          className="fixed inset-0 z-[9998] bg-[#09090b]"
+          initial={{
+            clipPath: `circle(${
+              typeof window !== "undefined"
+                ? Math.max(window.innerWidth, window.innerHeight) * 1.5
+                : 2000
+            }px at 50% 50%)`,
+          }}
+          animate={{
+            clipPath: themeTarget
+              ? `circle(0px at ${themeTarget.x}px ${themeTarget.y}px)`
+              : "circle(0px at 50% 50%)",
+          }}
+          transition={{
+            duration: 0.7,
+            ease: [0.76, 0, 0.24, 1] as const,
+          }}
+        />
+      )}
 
-      {/* Centered Logo Morph Target */}
+      {/* ── Logo — stays mounted across phases, morphs via transform ── */}
       <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
         <motion.div
-          layoutId="brand-logo"
-          className="flex gap-[0.02em] font-black uppercase text-white text-5xl md:text-7xl tracking-[0.2em]"
+          ref={logoRef}
+          className="flex gap-[0.02em] font-black uppercase text-5xl md:text-7xl tracking-[0.2em]"
           style={{ fontFamily: "var(--font-sans)" }}
+          animate={
+            phase === "morph"
+              ? {
+                  x: morph.x,
+                  y: morph.y,
+                  scale: morph.scale,
+                  color: "#1a1a1a",
+                }
+              : {
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                  color: "#ffffff",
+                }
+          }
+          transition={{
+            duration: 0.7,
+            ease: [0.76, 0, 0.24, 1] as const,
+            color: { duration: 0.35, ease: "easeOut" },
+          }}
+          onAnimationComplete={() => {
+            if (phase === "morph") handleMorphComplete();
+          }}
         >
           {LETTERS.map((letter, i) => (
             <span

@@ -84,21 +84,16 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
     >
       <nav className={`flex w-full max-w-[1400px] mx-auto items-center justify-between transition-all duration-500 ${scrolled ? 'px-4' : 'px-6 md:px-12 lg:px-20'}`}>
         <div className="flex items-center gap-10">
-          {/* Logo */}
+          {/* Logo — anchor for preloader morph target */}
           <Link href="/" className="group flex items-center">
-            {preloaderDone ? (
-              <motion.span 
-                layoutId="brand-logo"
-                className="text-xl font-black uppercase tracking-tighter text-foreground"
-                transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
-              >
-                ROCKY
-              </motion.span>
-            ) : (
-              <span className="text-xl font-black uppercase tracking-tighter opacity-0">
-                ROCKY
-              </span>
-            )}
+            <span
+              id="navbar-logo-anchor"
+              className={`text-xl font-black uppercase tracking-tighter text-foreground ${
+                preloaderDone ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              ROCKY
+            </span>
           </Link>
 
           {/* Desktop Nav with Sliding Pill */}

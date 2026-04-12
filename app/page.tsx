@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import Navbar from "@/components/portfolio/Navbar";
 import HeroSection from "@/components/portfolio/HeroSection";
 import SectionWrapper from "@/components/portfolio/SectionWrapper";
@@ -29,9 +28,9 @@ export default function Home() {
 
   return (
     <>
-      <AnimatePresence>
-        {!preloaderDone && <Preloader key="preloader" onComplete={handlePreloaderComplete} />}
-      </AnimatePresence>
+      {!preloaderDone && (
+        <Preloader key="preloader" onComplete={handlePreloaderComplete} />
+      )}
       <Navbar preloaderDone={preloaderDone} />
       <main>
         <HeroSection preloaderDone={preloaderDone} />

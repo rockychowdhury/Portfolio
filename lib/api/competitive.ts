@@ -21,6 +21,29 @@ export async function getCodeforcesStats(username: string) {
   }
 }
 
+export async function getCodeforcesSolvedCount(username: string): Promise<number> {
+  try {
+    const res = await fetch(
+      `https://codeforces.com/api/user.status?handle=${username}&from=1&count=10000`
+    );
+    if (!res.ok) throw new Error("Codeforces submissions fetch failed");
+    const data = await res.json();
+    if (data.status !== "OK") return 0;
+
+    // Count unique problems with verdict "OK"
+    const solvedSet = new Set<string>();
+    for (const sub of data.result) {
+      if (sub.verdict === "OK") {
+        solvedSet.add(`${sub.problem.contestId}-${sub.problem.index}`);
+      }
+    }
+    return solvedSet.size;
+  } catch (error) {
+    console.error("Codeforces solved count error:", error);
+    return 0;
+  }
+}
+
 export async function getCodechefStats(username: string) {
   try {
     // Using a community-maintained wrapper
