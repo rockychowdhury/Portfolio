@@ -66,10 +66,10 @@ export default function ProblemSolvingSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4">
             Algorithmic Thinking
           </h2>
-          <p className="text-lg text-[#7B7B7B] max-w-2xl">
+          <p className="text-lg text-muted-foreground max-w-2xl">
             A deep dive into complex data structures and algorithms across key benchmarks,
             fostering strong problem-solving skills and a competitive mindset.
           </p>

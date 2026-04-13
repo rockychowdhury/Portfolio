@@ -10,6 +10,8 @@ import ProblemSolvingSection from "@/components/portfolio/ProblemSolving";
 import GitHubSection from "@/components/portfolio/GitHub";
 import Footer from "@/components/portfolio/Footer";
 import ContactSection from "@/components/portfolio/ContactSection";
+import TestimonialsSection from "@/components/portfolio/Testimonials";
+import BlogsSection from "@/components/portfolio/Blogs";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
@@ -23,8 +25,6 @@ export default function Home() {
     { id: "education", title: "Educations and Courses", bgColor: "bg-background" },
     { id: "journey", title: "Journey - Timeline", bgColor: "bg-secondary/50" },
     { id: "productivity", title: "Productivity and Time Management", bgColor: "bg-background" },
-    { id: "blogs", title: "Blogs", bgColor: "bg-secondary/50" },
-    { id: "testimonials", title: "Testimonials", bgColor: "bg-background" },
   ];
 
   return (
@@ -60,6 +60,8 @@ export default function Home() {
           </SectionWrapper>
         ))}
 
+        <BlogsSection />
+        <TestimonialsSection />
         <ContactSection />
       </main>
 

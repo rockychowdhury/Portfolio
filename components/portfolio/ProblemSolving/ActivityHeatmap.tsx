@@ -83,14 +83,14 @@ export default function ActivityHeatmap({
           return (
             <motion.div
               key={idx}
-              className="group relative w-3 h-3 rounded-[2px]"
+              className={`group relative w-3 h-3 rounded-[2px] ${
+                cell.count === 0 ? "bg-secondary/20" : ""
+              }`}
               style={{
-                backgroundColor: cell.count === 0 
-                  ? "rgba(255,255,255,0.05)" 
-                  : isHex 
-                    ? accentColor 
-                    : "var(--accent)", // Fallback
-                opacity: cell.count === 0 ? 1 : cell.intensity, // We alter opacity if there's activity
+                backgroundColor: cell.count !== 0 
+                  ? (isHex ? accentColor : undefined) 
+                  : undefined,
+                opacity: cell.count === 0 ? 1 : cell.intensity,
               }}
               initial={{ opacity: 0, scale: 0.5 }}
               whileInView={{ 
@@ -105,9 +105,9 @@ export default function ActivityHeatmap({
               whileHover={{ scale: 1.25, zIndex: 10 }}
             >
               {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-[#222222] border border-white/10 rounded text-[10px] whitespace-nowrap text-[#F8F8F8] z-50 pointer-events-none shadow-xl">
-                <span className="font-semibold text-white">{cell.count}</span> submissions on {cell.date}
-                <svg className="absolute top-full left-1/2 -translate-x-1/2 text-[#222222] w-2 h-2" fill="currentColor" viewBox="0 0 8 8"><path d="M0 0l4 4 4-4z" /></svg>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-foreground text-background border border-border/10 rounded text-[10px] whitespace-nowrap z-50 pointer-events-none shadow-xl">
+                <span className="font-bold">{cell.count}</span> submissions on {cell.date}
+                <svg className="absolute top-full left-1/2 -translate-x-1/2 text-foreground w-2 h-2" fill="currentColor" viewBox="0 0 8 8"><path d="M0 0l4 4 4-4z" /></svg>
               </div>
             </motion.div>
           );
