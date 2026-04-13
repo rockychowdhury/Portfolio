@@ -26,7 +26,7 @@ export default function NarrativeBar({
 
   return (
     <motion.div 
-      className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-0 mt-8 mb-12 border border-white/10 rounded-2xl bg-[#111111] p-6 shadow-sm"
+      className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-0 mt-8 mb-12 border border-border/10 rounded-2xl bg-secondary/10 p-6 shadow-sm"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -36,10 +36,10 @@ export default function NarrativeBar({
         <div 
           key={i} 
           className={`relative flex flex-col items-center justify-center text-center ${
-            i !== stats.length - 1 ? 'md:border-r md:border-white/10' : ''
+            i !== stats.length - 1 ? 'md:border-r md:border-border/10' : ''
           } ${i === 4 ? 'col-span-2 md:col-span-1' : ''}`}
         >
-          <div className="text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 tracking-tight">
+          <div className="text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60 tracking-tight">
             {stat.prefix}
             {stat.value !== null ? (
               <CountUp to={stat.value} duration={2} delay={0.2 + i * 0.1} />
@@ -48,7 +48,7 @@ export default function NarrativeBar({
             )}
             {stat.suffix}
           </div>
-          <div className="text-sm text-[#7B7B7B] mt-1 font-medium">{stat.label}</div>
+          <div className="text-xs text-muted-foreground/60 mt-1 font-bold uppercase tracking-widest">{stat.label}</div>
         </div>
       ))}
     </motion.div>

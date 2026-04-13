@@ -27,20 +27,20 @@ export default function LanguageBreakdown({ languages }: LanguageBreakdownProps)
   return (
     <div 
       ref={ref} 
-      className="rounded-3xl bg-[#0a1120] p-8 md:p-10 border border-white/5 flex flex-col shadow-2xl"
+      className="rounded-[2rem] bg-secondary/10 p-6 md:p-8 border border-border/10 flex flex-col shadow-sm"
     >
-      <h3 className="text-white text-xl font-semibold mb-8">Top Languages</h3>
+      <h3 className="text-foreground text-lg font-bold mb-6">Top Languages</h3>
       
-      <div className="flex flex-col gap-6 mb-8">
+      <div className="flex flex-col gap-4 mb-6">
         {languages.map((lang, i) => (
-          <div key={lang.name} className="flex items-center gap-4">
+          <div key={lang.name} className="flex items-center gap-3">
             {/* Label on the left */}
-            <span className="w-24 text-right text-sm font-medium text-slate-400 shrink-0">
+            <span className="w-20 text-right text-xs font-bold uppercase tracking-widest text-muted-foreground/60 shrink-0">
               {lang.name}
             </span>
 
             {/* Thick Bar Container */}
-            <div className="relative flex-grow h-5 bg-white/5 rounded-full overflow-hidden">
+            <div className="relative flex-grow h-4 bg-background/50 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: "0%" }}
                 animate={isInView ? { width: `${Math.min(100, (lang.percentage / maxScale) * 100)}%` } : { width: "0%" }}
@@ -54,13 +54,13 @@ export default function LanguageBreakdown({ languages }: LanguageBreakdownProps)
       </div>
 
       {/* X-Axis Scale */}
-      <div className="flex items-center gap-4">
-        <div className="w-24 shrink-0" /> {/* Offset for labels */}
+      <div className="flex items-center gap-3">
+        <div className="w-20 shrink-0" /> {/* Offset for labels */}
         <div className="flex-grow flex justify-between px-1">
           {scalePoints.map((point) => (
-            <div key={point} className="flex flex-col items-center gap-2">
-              <div className="h-2 w-px bg-slate-700" />
-              <span className="text-[10px] font-medium text-slate-500">{point}</span>
+            <div key={point} className="flex flex-col items-center gap-1.5">
+              <div className="h-1.5 w-px bg-border" />
+              <span className="text-[9px] font-bold text-muted-foreground/40">{point}</span>
             </div>
           ))}
         </div>

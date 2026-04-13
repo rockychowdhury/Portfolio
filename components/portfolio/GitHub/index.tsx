@@ -94,27 +94,27 @@ export default function GitHubSection() {
   const activityWords = "Activity".split("");
 
   return (
-    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-[#030712] py-24 px-6 md:px-12 lg:px-20 text-white">
+    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
       {/* ── Background & Guidelines ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-white/5">
-          <div className="absolute top-0 left-12 h-full w-px border-l border-dashed border-white/5 hidden lg:block" />
+        <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
+          <div className="absolute top-0 left-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
         </div>
       </div>
 
       <div className="relative mx-auto max-w-[1400px]">
         {/* Vertical Side Label */}
         <div className="absolute top-0 -left-12 hidden flex-col items-center gap-8 lg:flex">
-          <span className="text-[10px] font-black tracking-[0.4em] uppercase text-white/20 [writing-mode:vertical-lr] rotate-180">
+          <span className="text-[10px] font-black tracking-[0.4em] uppercase text-muted-foreground/30 [writing-mode:vertical-lr] rotate-180">
             Telemetry // 2025
           </span>
-          <div className="h-24 w-px border-l border-dashed border-white/20" />
+          <div className="h-24 w-px border-l border-dashed border-border/20" />
         </div>
 
         {/* Section Headline */}
         <div className="mb-12 md:mb-32 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[0.8] tracking-tighter text-white sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[0.8] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4">
                   {word.split("").map((letter, i) => (
@@ -172,7 +172,7 @@ export default function GitHubSection() {
             {/* Top Row: Metrics Bar */}
             {isLoading ? <MetricsSkeleton /> : data && <MetricsBar metrics={data.metrics} />}
 
-            {/* Middle Row: Heatmap + Languages */}
+            {/* Middle Row: Heatmap + Languages & Pinned Repos */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
               {/* Left Column (8 cols): Heatmap + Streak */}
               <div className="lg:col-span-8">
@@ -187,22 +187,21 @@ export default function GitHubSection() {
                 )}
               </div>
 
-              {/* Right Column (4 cols): Languages */}
-              <div className="lg:col-span-4">
+              {/* Right Column (4 cols): Languages + Pinned Repos List */}
+              <div className="lg:col-span-4 flex flex-col gap-8">
                 {isLoading ? (
-                  <LanguagesSkeleton />
+                  <div className="flex flex-col gap-8">
+                    <LanguagesSkeleton />
+                    <PinnedReposSkeleton />
+                  </div>
                 ) : data && (
-                  <LanguageBreakdown languages={data.languages} />
+                  <>
+                    <LanguageBreakdown languages={data.languages} />
+                    <PinnedRepos repos={data.pinned} />
+                  </>
                 )}
               </div>
             </div>
-
-            {/* Bottom Row: Pinned Repos */}
-            {isLoading ? (
-              <PinnedReposSkeleton />
-            ) : data && (
-              <PinnedRepos repos={data.pinned} />
-            )}
           </div>
         )}
 

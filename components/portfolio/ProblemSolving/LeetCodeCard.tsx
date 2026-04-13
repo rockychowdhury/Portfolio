@@ -13,7 +13,7 @@ interface LeetCodeCardProps {
 export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
   if (loading || !data) {
     return (
-      <div className="h-full min-h-[400px] bg-white/[0.02] border border-white/5 rounded-2xl animate-pulse"></div>
+      <div className="h-full min-h-[400px] bg-secondary/5 border border-border/10 rounded-2xl animate-pulse"></div>
     );
   }
 
@@ -28,7 +28,7 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
 
   return (
     <motion.div
-      className="col-span-1 lg:col-span-7 w-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-white/10 rounded-2xl p-6 lg:p-8 hover:shadow-[0_8px_30px_rgba(255,192,30,0.05)] transition-shadow duration-500 relative overflow-hidden"
+      className="col-span-1 lg:col-span-7 w-full bg-secondary/10 border border-border/10 rounded-2xl p-6 lg:p-8 hover:shadow-[0_8px_30px_rgba(255,192,30,0.05)] transition-shadow duration-500 relative overflow-hidden"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -49,16 +49,16 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-lg text-white">LeetCode</h3>
-            <p className="text-sm text-[#7B7B7B]">{handle}</p>
+            <h3 className="font-bold text-lg text-foreground">LeetCode</h3>
+            <p className="text-sm text-muted-foreground/60">{handle}</p>
           </div>
         </div>
         <div className="text-right flex flex-col items-end">
-          <div className="text-sm text-[#7B7B7B]">
+          <div className="text-sm text-muted-foreground/60">
             {contests?.topPercentage ? `Top ${contests.topPercentage}% globally` : `Top ${Math.max(1, Math.floor(1000 / total))}% globally`}
           </div>
           {contests?.globalRanking > 0 && (
-            <div className="text-xs text-[#7B7B7B] mt-1 font-medium">
+            <div className="text-xs text-muted-foreground/40 mt-1 font-medium">
               Rank: <CountUp to={contests.globalRanking} />
             </div>
           )}
@@ -71,9 +71,9 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
         {/* Solved Donut */}
         <div className="md:col-span-4 flex flex-col justify-center relative">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-[#7B7B7B]">Solved</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/40">Solved</span>
           </div>
-          <div className="text-5xl font-extrabold text-white tracking-tighter shadow-sm mb-4">
+          <div className="text-5xl font-extrabold text-foreground tracking-tighter mb-4">
             <CountUp to={solved.all} />
           </div>
           
@@ -126,13 +126,13 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
         <div className="md:col-span-8 flex flex-col justify-center space-y-4">
           {bars.map((bar, i) => (
             <div key={bar.label}>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-[#7B7B7B] uppercase tracking-wider">{bar.label}</span>
-                <span className="text-white font-medium">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1.5">
+                <span className="text-muted-foreground/40">{bar.label}</span>
+                <span className="text-foreground">
                   <CountUp to={bar.count} delay={0.3 + i * 0.1} />
                 </span>
               </div>
-              <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-background/50 rounded-full h-1.5 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full relative"
                   style={{ backgroundColor: bar.color }}
@@ -152,7 +152,7 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
       {/* Header and Flex Container for Streak & Contests */}
       <div className="flex flex-wrap gap-4 mb-8">
         {/* Streak Pill */}
-        <div className="inline-flex items-center gap-4 bg-white/5 border border-white/10 rounded-full px-5 py-2.5">
+        <div className="inline-flex items-center gap-4 bg-secondary/10 border border-border/10 rounded-full px-5 py-2.5">
           <div className="flex items-center gap-2">
             <motion.span 
               className="text-lg"
@@ -161,39 +161,39 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
             >
               🔥
             </motion.span>
-            <span className="text-sm font-medium text-white/90 hidden sm:inline">
-              Current: <CountUp to={totalActiveDays} className="text-white font-bold" /> days
+            <span className="text-sm font-medium text-foreground/80 hidden sm:inline">
+              Current: <CountUp to={totalActiveDays} className="text-foreground font-bold" /> days
             </span>
-            <span className="text-sm font-medium text-white/90 sm:hidden">
-              <CountUp to={totalActiveDays} className="text-white font-bold" /> d
+            <span className="text-sm font-medium text-foreground/80 sm:hidden">
+              <CountUp to={totalActiveDays} className="text-foreground font-bold" /> d
             </span>
-            <span className="mx-2 text-white/20">|</span>
+            <span className="mx-2 text-border/20">|</span>
             <span className="text-lg">🏆</span>
-            <span className="text-sm font-medium text-white/90 hidden sm:inline">
-              Longest: <CountUp to={longestStreak || totalActiveDays} className="text-white font-bold" /> days
+            <span className="text-sm font-medium text-foreground/80 hidden sm:inline">
+              Longest: <CountUp to={longestStreak || totalActiveDays} className="text-foreground font-bold" /> days
             </span>
-            <span className="text-sm font-medium text-white/90 sm:hidden">
-              <CountUp to={longestStreak || totalActiveDays} className="text-white font-bold" /> d
+            <span className="text-sm font-medium text-foreground/80 sm:hidden">
+              <CountUp to={longestStreak || totalActiveDays} className="text-foreground font-bold" /> d
             </span>
           </div>
         </div>
 
         {/* Contest Pill */}
         {contests && contests.attended > 0 && (
-          <div className="inline-flex items-center gap-4 bg-white/5 border border-white/10 rounded-full px-5 py-2.5">
+          <div className="inline-flex items-center gap-4 bg-secondary/10 border border-border/10 rounded-full px-5 py-2.5">
             <div className="flex items-center gap-2">
                <span className="text-xl">⚔️</span>
-               <span className="text-sm font-medium text-white/90">
-                 Rating: <CountUp to={contests.rating} className="text-white font-bold" /> 
+               <span className="text-sm font-medium text-foreground/80">
+                 Rating: <CountUp to={contests.rating} className="text-foreground font-bold" /> 
                  {contests.maxRating > contests.rating && (
-                   <span className="text-white/40 text-xs ml-1 font-normal">
+                   <span className="text-muted-foreground/40 text-xs ml-1 font-normal">
                      (↑ {contests.maxRating})
                    </span>
                  )}
                </span>
-               <span className="mx-2 text-white/20">|</span>
-               <span className="text-sm font-medium text-white/90">
-                 Contests: <CountUp to={contests.attended} className="text-white font-bold" />
+               <span className="mx-2 text-border/20">|</span>
+               <span className="text-sm font-medium text-foreground/80">
+                 Contests: <CountUp to={contests.attended} className="text-foreground font-bold" />
                </span>
             </div>
           </div>
@@ -203,8 +203,8 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
       {/* Rating Curve */}
       {ratingGraph && ratingGraph.length > 0 && (
         <div className="mb-6">
-          <h4 className="text-xs text-[#7B7B7B] uppercase tracking-wider mb-3">Contest Rating Curve</h4>
-          <div className="p-4 pt-6 w-full bg-black/20 rounded-xl border border-white/5 relative h-28 flex items-center justify-center translate-x-[-1rem]">
+          <h4 className="text-xs text-muted-foreground/40 font-bold uppercase tracking-widest mb-3">Contest Rating Curve</h4>
+          <div className="p-4 pt-6 w-full bg-background/50 rounded-xl border border-border/10 relative h-28 flex items-center justify-center translate-x-[-1rem]">
              <MiniSparkline data={ratingGraph} color="#ffc01e" width={300} height={60} strokeWidth={3} />
           </div>
         </div>
@@ -213,13 +213,13 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
       {/* Top Tags */}
       {topTags && topTags.length > 0 && (
         <div>
-          <h4 className="text-xs text-[#7B7B7B] uppercase tracking-wider mb-3">Top Skills</h4>
+          <h4 className="text-xs text-muted-foreground/40 font-bold uppercase tracking-widest mb-3">Top Skills</h4>
           <div className="flex flex-wrap gap-2">
             {topTags.map((tag) => (
               <motion.span
                 key={tag}
                 whileHover={{ scale: 1.05 }}
-                className="px-3 py-1 bg-white/5 border border-white/10 rounded-md text-xs text-white/80 cursor-default"
+                className="px-3 py-1 bg-secondary/10 border border-border/10 rounded-md text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 cursor-default"
               >
                 {tag}
               </motion.span>
