@@ -24,7 +24,6 @@ export default function Home() {
     { id: "projects", title: "Projects", bgColor: "bg-secondary/50" },
     { id: "education", title: "Educations and Courses", bgColor: "bg-background" },
     { id: "journey", title: "Journey - Timeline", bgColor: "bg-secondary/50" },
-    { id: "productivity", title: "Productivity and Time Management", bgColor: "bg-background" },
   ];
 
   return (
@@ -36,10 +35,10 @@ export default function Home() {
       <main>
         <HeroSection preloaderDone={preloaderDone} />
         <SkillsSection />
-        
+
         {/* Render Problem Solving after Skills/Projects (adjust order later if needed, problem solving was 2nd initially) */}
         <ProblemSolvingSection />
-        
+
         {/* Render GitHub Activity Section */}
         <GitHubSection />
 
