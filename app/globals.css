@@ -173,3 +173,13 @@ html.theme-transitioning *::after {
     stroke 0.4s ease,
     box-shadow 0.6s ease !important;
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.mask-image-linear-right {
+  mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+}

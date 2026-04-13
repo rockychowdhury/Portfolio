@@ -6,6 +6,7 @@ import HeroSection from "@/components/portfolio/HeroSection";
 import SkillsSection from "@/components/portfolio/SkillsSection";
 import SectionWrapper from "@/components/portfolio/SectionWrapper";
 import Preloader from "@/components/portfolio/Preloader";
+import ProblemSolvingSection from "@/components/portfolio/ProblemSolving";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
@@ -16,8 +17,6 @@ export default function Home() {
 
   const sections = [
     { id: "projects", title: "Projects", bgColor: "bg-secondary/50" },
-    { id: "problem-solving", title: "Problem Solving Activities", bgColor: "bg-background" },
-    { id: "github-stats", title: "Github Profile Stats", bgColor: "bg-secondary/50" },
     { id: "education", title: "Educations and Courses", bgColor: "bg-background" },
     { id: "journey", title: "Journey - Timeline", bgColor: "bg-secondary/50" },
     { id: "productivity", title: "Productivity and Time Management", bgColor: "bg-background" },
@@ -35,6 +34,9 @@ export default function Home() {
       <main>
         <HeroSection preloaderDone={preloaderDone} />
         <SkillsSection />
+        
+        {/* Render Problem Solving after Skills/Projects (adjust order later if needed, problem solving was 2nd initially) */}
+        <ProblemSolvingSection />
         
         {sections.map((section) => (
           <SectionWrapper
