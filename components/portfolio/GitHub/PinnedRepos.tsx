@@ -42,7 +42,7 @@ export default function PinnedRepos({ repos }: PinnedReposProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: i * 0.1, ease: premiumEase }}
-            className="group relative flex flex-col justify-between rounded-[2rem] bg-secondary/10 p-8 md:p-10 border border-border/10 hover:border-foreground/20 hover:bg-secondary/20 transition-all duration-500 overflow-hidden"
+            className="group relative flex flex-col justify-between rounded-[2rem] bg-white/5 p-8 md:p-10 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-500 overflow-hidden"
           >
             {/* Header / Language */}
             <div className="flex items-center justify-between mb-8">

@@ -349,7 +349,7 @@ export default function HeroSection({
               alt="Rocky Chowdhury — Software Engineer"
               fill
               unoptimized
-              className="object-contain object-bottom scale-[1.0]  3xl:scale-[1.4] origin-bottom"
+              className="object-contain object-bottom scale-[1.0]  2xl:scale-[1.4] origin-bottom"
               sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />
