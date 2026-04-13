@@ -8,6 +8,8 @@ import SectionWrapper from "@/components/portfolio/SectionWrapper";
 import Preloader from "@/components/portfolio/Preloader";
 import ProblemSolvingSection from "@/components/portfolio/ProblemSolving";
 import GitHubSection from "@/components/portfolio/GitHub";
+import Footer from "@/components/portfolio/Footer";
+import ContactSection from "@/components/portfolio/ContactSection";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
@@ -23,7 +25,6 @@ export default function Home() {
     { id: "productivity", title: "Productivity and Time Management", bgColor: "bg-background" },
     { id: "blogs", title: "Blogs", bgColor: "bg-secondary/50" },
     { id: "testimonials", title: "Testimonials", bgColor: "bg-background" },
-    { id: "contact", title: "Contact", bgColor: "bg-secondary/50" },
   ];
 
   return (
@@ -58,21 +59,12 @@ export default function Home() {
             </div>
           </SectionWrapper>
         ))}
+
+        <ContactSection />
       </main>
 
       {/* Footer Section */}
-      <footer className="border-t border-border bg-background px-6 py-12 md:px-12 lg:px-20">
-        <div className="mx-auto max-w-[1400px] flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Rocky Chowdhury. Built with Next.js & Tailwind.
-          </p>
-          <div className="flex gap-8">
-             <a href="#" className="text-sm text-muted-foreground hover:text-foreground">LinkedIn</a>
-             <a href="#" className="text-sm text-muted-foreground hover:text-foreground">GitHub</a>
-             <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Twitter</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

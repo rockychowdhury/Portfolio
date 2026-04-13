@@ -43,7 +43,7 @@ export default function MetricsBar({ metrics }: MetricsBarProps) {
             transition={{ duration: 0.8, delay: i * 0.1, ease: premiumEase }}
             className="flex flex-col"
           >
-            <div className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums mb-1">
+            <div className="text-5xl font-light tracking-tight text-white md:text-6xl tabular-nums mb-1">
               {isInView ? (
                 <CountUp to={stat.value} duration={2} />
               ) : (
@@ -51,7 +51,7 @@ export default function MetricsBar({ metrics }: MetricsBarProps) {
               )}
             </div>
             
-            <p className="text-[11px] font-black tracking-[0.3em] uppercase text-muted-foreground">
+            <p className="text-[11px] font-black tracking-[0.3em] uppercase text-white/40">
               {stat.label}
             </p>
           </motion.div>
