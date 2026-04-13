@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import SectionWrapper from "../SectionWrapper";
 import FilterRow from "./FilterRow";
 import MasonryGrid from "./MasonryGrid";
+import SearchBar from "./SearchBar";
 import { IBlog } from "@/lib/db/models/Blog";
 import { Loader2 } from "lucide-react";
 
@@ -15,6 +16,7 @@ export default function BlogsSection() {
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
@@ -45,12 +47,28 @@ export default function BlogsSection() {
   }, [blogs]);
 
   const filteredBlogs = useMemo(() => {
-    if (activeFilters.length === 0) return blogs;
-    return blogs.filter((blog) => 
-      activeFilters.includes(blog.platform) || 
-      blog.tags.some(tag => activeFilters.includes(tag))
-    );
-  }, [blogs, activeFilters]);
+    let result = blogs;
+
+    // 1. apply search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter((blog) => 
+        blog.title.toLowerCase().includes(q) ||
+        blog.subtitle.toLowerCase().includes(q) ||
+        blog.tags.some(tag => tag.toLowerCase().includes(q))
+      );
+    }
+
+    // 2. apply platform/tag filters
+    if (activeFilters.length > 0) {
+      result = result.filter((blog) => 
+        activeFilters.includes(blog.platform) || 
+        blog.tags.some(tag => activeFilters.includes(tag))
+      );
+    }
+
+    return result;
+  }, [blogs, activeFilters, searchQuery]);
 
   const handleFilterToggle = (filter: string) => {
     setActiveFilters((prev) =>
@@ -63,6 +81,7 @@ export default function BlogsSection() {
 
   const handleClearAll = () => {
     setActiveFilters([]);
+    setSearchQuery("");
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
@@ -80,34 +99,29 @@ export default function BlogsSection() {
   return (
     <SectionWrapper id="blogs" className="py-32 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Headline */}
-        <div className="mb-20 text-center lg:text-left">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4"
-          >
-            Blogs & Resources
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-muted-foreground max-w-2xl"
-          >
-            Things I've written, shared, and built for the community.
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-sm text-muted-foreground/50 mt-4 italic"
-          >
-            Articles on LinkedIn · Tutorials on YouTube · Deep dives on Medium
-          </motion.p>
+        {/* Headline & Search */}
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-20 gap-8">
+          <div className="text-center lg:text-left">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4"
+            >
+              Blogs & Resources
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-muted-foreground max-w-2xl"
+            >
+              Things I've written, shared, and built for the community.
+            </motion.p>
+          </div>
+
+          <SearchBar query={searchQuery} setQuery={setSearchQuery} />
         </div>
 
         {/* Filters */}
