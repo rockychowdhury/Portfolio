@@ -1,25 +1,23 @@
-import * as cheerio from 'cheerio';
-import { ILeetCodeProfile, ICodeforcesProfile, ICodeChefProfile, IGitHubProfile } from '@/lib/db/models/ProblemSolvingProfile';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as cheerio from "cheerio";
+import {
+  ILeetCodeProfile,
+  ICodeforcesProfile,
+  ICodeChefProfile,
+} from "@/lib/db/models/ProblemSolvingProfile";
+import { IGitHubProfile as IGitHubStats } from "@/lib/db/models/GitHubProfile";
+import { fetchWithTimeout } from "../utils";
+
+// ── PROBLEM SOLVING FETCHERS ──────────────────────────────────────────────────
 
 export async function fetchLeetCodeProfile(username: string): Promise<ILeetCodeProfile | null> {
   try {
     const query = `
       query getUserProfile($username: String!) {
-        allQuestionsCount {
-          difficulty
-          count
-        }
+        allQuestionsCount { difficulty count }
         matchedUser(username: $username) {
-          submitStats {
-            acSubmissionNum {
-              difficulty
-              count
-            }
-          }
-          userCalendar {
-            totalActiveDays
-            submissionCalendar
-          }
+          submitStats { acSubmissionNum { difficulty count } }
+          userCalendar { totalActiveDays submissionCalendar }
           tagProblemCounts {
             advanced { tagName problemsSolved }
             intermediate { tagName problemsSolved }
@@ -27,57 +25,52 @@ export async function fetchLeetCodeProfile(username: string): Promise<ILeetCodeP
           }
         }
         userContestRanking(username: $username) {
-          attendedContestsCount
-          rating
-          globalRanking
-          topPercentage
+          attendedContestsCount rating globalRanking topPercentage
         }
         userContestRankingHistory(username: $username) {
-          attended
-          rating
+          attended rating
         }
       }
     `;
 
-    const response = await fetch('https://leetcode.com/graphql', {
-      method: 'POST',
+    const response = await fetchWithTimeout("https://leetcode.com/graphql", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Referer': 'https://leetcode.com',
+        "Content-Type": "application/json",
+        Referer: "https://leetcode.com",
       },
       body: JSON.stringify({ query, variables: { username } }),
-      cache: 'no-store'
+      timeout: 10000,
     });
 
     const body = await response.json();
-    if (body.errors || !body.data?.matchedUser) {
-      return null;
-    }
+    if (body.errors || !body.data?.matchedUser) return null;
 
     const matchedUser = body.data.matchedUser;
     const acSubmissionNum = matchedUser.submitStats.acSubmissionNum;
-    
+
     const solvedInfo = {
-      all: acSubmissionNum.find((s: any) => s.difficulty === 'All')?.count || 0,
-      easy: acSubmissionNum.find((s: any) => s.difficulty === 'Easy')?.count || 0,
-      medium: acSubmissionNum.find((s: any) => s.difficulty === 'Medium')?.count || 0,
-      hard: acSubmissionNum.find((s: any) => s.difficulty === 'Hard')?.count || 0,
+      all: acSubmissionNum.find((s: any) => s.difficulty === "All")?.count || 0,
+      easy: acSubmissionNum.find((s: any) => s.difficulty === "Easy")?.count || 0,
+      medium: acSubmissionNum.find((s: any) => s.difficulty === "Medium")?.count || 0,
+      hard: acSubmissionNum.find((s: any) => s.difficulty === "Hard")?.count || 0,
     };
 
     const tags = [
       ...(matchedUser.tagProblemCounts.advanced || []),
       ...(matchedUser.tagProblemCounts.intermediate || []),
-      ...(matchedUser.tagProblemCounts.fundamental || [])
-    ].sort((a: any, b: any) => b.problemsSolved - a.problemsSolved)
-     .slice(0, 6)
-     .map((t: any) => t.tagName);
+      ...(matchedUser.tagProblemCounts.fundamental || []),
+    ]
+      .sort((a: any, b: any) => b.problemsSolved - a.problemsSolved)
+      .slice(0, 6)
+      .map((t: any) => t.tagName);
 
     let heatmap = {};
     try {
       heatmap = JSON.parse(matchedUser.userCalendar.submissionCalendar || "{}");
-    } catch(e) {}
+    } catch (e) {}
 
-    let ratingGraph = [];
+    let ratingGraph: number[] = [];
     if (body.data.userContestRankingHistory) {
       ratingGraph = body.data.userContestRankingHistory
         .filter((c: any) => c.attended)
@@ -85,13 +78,14 @@ export async function fetchLeetCodeProfile(username: string): Promise<ILeetCodeP
     }
 
     const currentRating = Math.round(body.data.userContestRanking?.rating || 0);
-    const maxRating = ratingGraph.length > 0 ? Math.max(...ratingGraph, currentRating) : currentRating;
+    const maxRating =
+      ratingGraph.length > 0 ? Math.max(...ratingGraph, currentRating) : currentRating;
 
     return {
       handle: username,
       solved: solvedInfo,
       totalActiveDays: matchedUser.userCalendar.totalActiveDays || 0,
-      longestStreak: 0, // Using totalActiveDays on frontend as discussed
+      longestStreak: 0,
       contests: {
         attended: body.data.userContestRanking?.attendedContestsCount || 0,
         rating: currentRating,
@@ -101,7 +95,7 @@ export async function fetchLeetCodeProfile(username: string): Promise<ILeetCodeP
       },
       topTags: tags,
       heatmap: heatmap,
-      ratingGraph: ratingGraph
+      ratingGraph: ratingGraph,
     };
   } catch (error) {
     console.error("LeetCode Fetch Error", error);
@@ -112,36 +106,35 @@ export async function fetchLeetCodeProfile(username: string): Promise<ILeetCodeP
 export async function fetchCodeforcesProfile(username: string): Promise<ICodeforcesProfile | null> {
   try {
     const [infoRes, ratingRes, statusRes] = await Promise.all([
-      fetch(`https://codeforces.com/api/user.info?handles=${username}`, { cache: 'no-store' }),
-      fetch(`https://codeforces.com/api/user.rating?handle=${username}`, { cache: 'no-store' }),
-      fetch(`https://codeforces.com/api/user.status?handle=${username}`, { cache: 'no-store' })
+      fetchWithTimeout(`https://codeforces.com/api/user.info?handles=${username}`, { timeout: 10000 }),
+      fetchWithTimeout(`https://codeforces.com/api/user.rating?handle=${username}`, { timeout: 10000 }),
+      fetchWithTimeout(`https://codeforces.com/api/user.status?handle=${username}&from=1&count=5000`, {
+        timeout: 10000,
+      }),
     ]);
 
     const info = await infoRes.json();
     const ratingData = await ratingRes.json();
     const statusData = await statusRes.json();
 
-    if (info.status !== 'OK' || !info.result || info.result.length === 0) {
-      return null;
-    }
+    if (info.status !== "OK" || !info.result || info.result.length === 0) return null;
 
     const user = info.result[0];
-    const contests = ratingData.status === 'OK' ? ratingData.result : [];
-    
-    // Count unique solved problems
+    const contests = ratingData.status === "OK" ? ratingData.result : [];
+
     let totalSolved = 0;
-    if (statusData.status === 'OK') {
+    if (statusData.status === "OK") {
       const solvedSet = new Set();
       statusData.result.forEach((sub: any) => {
-        if (sub.verdict === 'OK') {
+        if (sub.verdict === "OK") {
           solvedSet.add(`${sub.problem.contestId}-${sub.problem.index}`);
         }
       });
       totalSolved = solvedSet.size;
     }
 
-    let bestRank = null;
-    let ratingGraph = [];
+    let bestRank: number | null = null;
+    let ratingGraph: number[] = [];
     if (contests && contests.length > 0) {
       bestRank = Math.min(...contests.map((c: any) => c.rank));
       ratingGraph = contests.map((c: any) => c.newRating);
@@ -154,7 +147,7 @@ export async function fetchCodeforcesProfile(username: string): Promise<ICodefor
       title: user.rank || "Unrated",
       totalContests: contests.length,
       bestRank,
-      totalSolved, // Add it to return object
+      totalSolved,
       ratingGraph,
     };
   } catch (error) {
@@ -165,22 +158,22 @@ export async function fetchCodeforcesProfile(username: string): Promise<ICodefor
 
 export async function fetchCodeChefProfile(username: string): Promise<ICodeChefProfile | null> {
   try {
-    const response = await fetch(`https://www.codechef.com/users/${username}`, {
+    const response = await fetchWithTimeout(`https://www.codechef.com/users/${username}`, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+        "User-Agent": "Mozilla/5.0",
+      },
+      timeout: 10000,
     });
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const ratingText = $('.rating-number').first().text();
+    const ratingText = $(".rating-number").first().text();
     const rating = parseInt(ratingText) || 0;
-    
-    // Parse highest rating
+    if (rating === 0) return null; // Scraper likely failed or user not found
+
     const highestRatingMatch = html.match(/Highest Rating (\d+)/i);
     const maxRating = highestRatingMatch ? parseInt(highestRatingMatch[1]) : rating;
 
-    // Calculate stars natively if parsing fails
     let stars = 1;
     if (rating >= 2500) stars = 7;
     else if (rating >= 2200) stars = 6;
@@ -189,15 +182,16 @@ export async function fetchCodeChefProfile(username: string): Promise<ICodeChefP
     else if (rating >= 1600) stars = 3;
     else if (rating >= 1400) stars = 2;
 
-    // Fully solved problems (we sum up partial and fully solved, or just fully solved)
-    const solvedMatch = html.match(/Fully Solved \((\d+)\)/i) || html.match(/Problems Solved: (\d+)/i);
+    const solvedMatch =
+      html.match(/Fully Solved \((\d+)\)/i) || html.match(/Problems Solved: (\d+)/i);
     const totalSolved = solvedMatch ? parseInt(solvedMatch[1]) : 0;
 
-    // Contests
-    const contestsMatch = html.match(/Contests \((.*?)\)/i) || html.match(/Contests Participated: (\d+)/i);
-    const totalContests = contestsMatch ? parseInt(contestsMatch[1].replace(/[^0-9]/g, '')) : 0;
+    const contestsMatch =
+      html.match(/Contests \((.*?)\)/i) || html.match(/Contests Participated: (\d+)/i);
+    const totalContests = contestsMatch
+      ? parseInt(contestsMatch[1].replace(/[^0-9]/g, ""))
+      : 0;
 
-    // Rating graph (if present in JS window.highcharts)
     let ratingGraph: number[] = [];
     try {
       const allRatingsMatch = html.match(/var all_rating = (.*?);/);
@@ -205,7 +199,7 @@ export async function fetchCodeChefProfile(username: string): Promise<ICodeChefP
         const ratingData = JSON.parse(allRatingsMatch[1]);
         ratingGraph = ratingData.map((d: any) => parseInt(d.rating));
       }
-    } catch(e) {}
+    } catch (e) {}
 
     return {
       handle: username,
@@ -222,59 +216,143 @@ export async function fetchCodeChefProfile(username: string): Promise<ICodeChefP
   }
 }
 
-export async function fetchGitHubProfile(username: string): Promise<IGitHubProfile | null> {
+// ── GITHUB & WAKATIME FETCHERS ────────────────────────────────────────────────
+
+const GITHUB_GRAPHQL_API = "https://api.github.com/graphql";
+
+export async function fetchGitHubStats(username: string): Promise<IGitHubStats | null> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return null;
+
   try {
-    const response = await fetch(`https://github.com/${username}`, {
+    const query = `
+      query($username: String!) {
+        user(login: $username) {
+          followers { totalCount }
+          repositories(ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, first: 100) {
+            totalCount
+            nodes {
+              stargazerCount
+              languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+                edges { size node { name color } }
+              }
+            }
+          }
+          pullRequests(states: MERGED) { totalCount }
+          contributionsCollection {
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays { contributionCount date }
+              }
+            }
+          }
+          pinnedItems(first: 6, types: REPOSITORY) {
+            nodes {
+              ... on Repository {
+                name description url stargazerCount forkCount pushedAt
+                primaryLanguage { name color }
+                repositoryTopics(first: 5) { nodes { topic { name } } }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const res = await fetchWithTimeout(GITHUB_GRAPHQL_API, {
+      method: "POST",
       headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
+        Authorization: `bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query, variables: { username } }),
+      timeout: 10000,
     });
-    const html = await response.text();
-    const $ = cheerio.load(html);
 
-    // Contribs
-    const contribText = $('h2').filter((i, el) => $(el).text().includes('contributions in the last year')).text();
-    const contributions = parseInt(contribText.replace(/[^0-9]/g, '')) || 0;
+    const json = await res.json();
+    if (json.errors || !json.data?.user) return null;
 
-    // Repos
-    const reposText = $('a[href$="tab=repositories"] .Counter').first().text();
-    const repos = parseInt(reposText.replace(/[^0-9]/g, '')) || 0;
+    const user = json.data.user;
 
-    // Followers
-    const followersText = $('a[href$="tab=followers"] .text-bold').first().text();
-    const followers = parseInt(followersText.replace(/[^0-9]/g, '')) || 0;
+    // Aggregates
+    let totalStars = 0;
+    const langMap: Record<string, { size: number; color: string }> = {};
 
-    // Heatmap via graphql-like toolit. GitHub uses component for heatmap, tricky to parse.
-    // Wait, GitHub API has a public endpoint for commits? It's better to just skip github heatmap if hard to get without token.
-    // Actually, we can get top languages via GitHub repos REST API over time, but for scraper, let's leave it minimal.
-    // For heatmap, github's svg might be readable from `https://github.com/users/${username}/contributions`
-    const contribHtmlResponse = await fetch(`https://github.com/users/${username}/contributions`);
-    const contribHtml = await contribHtmlResponse.text();
-    const $contrib = cheerio.load(contribHtml);
-    
-    let heatmap: { [date: string]: number } = {};
-    $contrib('td.ContributionCalendar-day').each((i, el) => {
-      const date = $contrib(el).attr('data-date');
-      const levelHtml = $contrib(el).text();
-      let count = 0;
-      if (levelHtml.toLowerCase().includes('no contributions')) {
-        count = 0;
-      } else {
-        const match = levelHtml.match(/^(\d+)/);
-        if (match) count = parseInt(match[1]);
-      }
-      if (date) heatmap[date] = count;
+    user.repositories.nodes.forEach((repo: any) => {
+      totalStars += repo.stargazerCount;
+      repo.languages?.edges?.forEach((edge: any) => {
+        const name = edge.node.name;
+        if (!langMap[name]) langMap[name] = { size: 0, color: edge.node.color };
+        langMap[name].size += edge.size;
+      });
     });
+
+    const totalLangSize = Object.values(langMap).reduce((sum, l) => sum + l.size, 0);
+    const languages = Object.entries(langMap)
+      .sort((a, b) => b[1].size - a[1].size)
+      .slice(0, 6)
+      .map(([name, data]) => ({
+        name,
+        color: data.color,
+        size: data.size,
+        percentage: totalLangSize > 0 ? Math.round((data.size / totalLangSize) * 100) : 0,
+      }));
+
+    // Heatmap & Streak
+    const calendar = user.contributionsCollection.contributionCalendar;
+    const heatmap: { date: string; count: number }[] = [];
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+
+    calendar.weeks.forEach((week: any) => {
+      week.contributionDays.forEach((day: any) => {
+        heatmap.push({ date: day.date, count: day.contributionCount });
+        if (day.contributionCount > 0) {
+          tempStreak++;
+          longestStreak = Math.max(longestStreak, tempStreak);
+        } else {
+          tempStreak = 0;
+        }
+      });
+    });
+
+    for (let i = heatmap.length - 1; i >= 0; i--) {
+      if (heatmap[i].count > 0) currentStreak++;
+      else if (i === heatmap.length - 1) continue;
+      else break;
+    }
+
+    const pinned = user.pinnedItems.nodes.map((repo: any) => ({
+      name: repo.name,
+      description: repo.description,
+      url: repo.url,
+      stars: repo.stargazerCount,
+      forks: repo.forkCount,
+      language: repo.primaryLanguage
+        ? { name: repo.primaryLanguage.name, color: repo.primaryLanguage.color }
+        : null,
+      topics: repo.repositoryTopics?.nodes.map((n: any) => n.topic.name) || [],
+      pushedAt: repo.pushedAt,
+    }));
 
     return {
       handle: username,
-      repos,
-      followers,
-      contributions,
-      topLanguage: "Unknown", // Will populate if using API, for now basic
-      heatmap
+      metrics: {
+        repos: user.repositories.totalCount,
+        stars: totalStars,
+        commits: calendar.totalContributions,
+        followers: user.followers.totalCount,
+        prs: user.pullRequests.totalCount,
+      },
+      heatmap,
+      streak: { current: currentStreak, longest: longestStreak },
+      languages,
+      pinned,
+      lastUpdated: new Date(),
     };
-  } catch(error) {
+  } catch (error) {
     console.error("GitHub Fetch Error", error);
     return null;
   }

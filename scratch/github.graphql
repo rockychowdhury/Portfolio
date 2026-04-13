@@ -1,0 +1,55 @@
+query($username: String!) {
+  user(login: $username) {
+    followers { totalCount }
+    repositories(ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, first: 100) {
+      totalCount
+      nodes {
+        stargazerCount
+        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+          edges {
+            size
+            node {
+              name
+              color
+            }
+          }
+        }
+      }
+    }
+    pullRequests(states: MERGED) { totalCount }
+    contributionsCollection {
+      contributionCalendar {
+        totalContributions
+        weeks {
+          contributionDays {
+            contributionCount
+            date
+          }
+        }
+      }
+    }
+    pinnedItems(first: 6, types: REPOSITORY) {
+      nodes {
+        ... on Repository {
+          name
+          description
+          url
+          stargazerCount
+          forkCount
+          pushedAt
+          primaryLanguage {
+            name
+            color
+          }
+          repositoryTopics(first: 5) {
+            nodes {
+              topic {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

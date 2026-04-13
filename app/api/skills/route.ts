@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db/connect";
 import Skill from "@/lib/db/models/Skill";
 
-export const revalidate = 3600; // cache for 1 hour
+export const revalidate = 0; // Purely MongoDB-driven
 
 export async function GET() {
   try {

@@ -21,7 +21,7 @@ export default function CodeforcesCard({ data, loading }: CodeforcesCardProps) {
 
   // Codeforces color mapping approximately
   let badgeColor = "#7B7B7B"; // default grey
-  let titleDisplay = title.toLowerCase();
+  const titleDisplay = title.toLowerCase();
   
   if (titleDisplay.includes('grandmaster')) badgeColor = "#ff0000"; // red
   else if (titleDisplay.includes('master')) badgeColor = "#ff8c00"; // orange

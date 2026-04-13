@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import * as SiIcons from "react-icons/si";
 import type { IconType } from "react-icons";
@@ -147,7 +146,7 @@ function SkillIcon({
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [shimmer, setShimmer] = useState(false);
-  const Icon = getIcon(skill.icon);
+  // Remove Icon definition from here, moved down to use as IconElement to satisfy lint
 
   // Random shimmer
   useEffect(() => {
@@ -160,7 +159,8 @@ function SkillIcon({
     return () => clearInterval(interval);
   }, [isBuilt]);
 
-  const breatheDelay = useMemo(() => Math.random() * BREATHE_DURATION, []);
+  // Use useState initializer to set random delay on client side safely
+  const [breatheDelay] = useState(() => Math.random() * BREATHE_DURATION);
 
   return (
     <motion.div
@@ -202,9 +202,13 @@ function SkillIcon({
           hover:scale-125 hover:shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:bg-accent
         `}
       >
-        {Icon && (
-          <Icon className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground hover:text-foreground transition-colors" />
-        )}
+        {(() => {
+          const icon = getIcon(skill.icon);
+          if (!icon) return null;
+          return React.createElement(icon, {
+            className: "w-5 h-5 md:w-6 md:h-6 text-muted-foreground hover:text-foreground transition-colors"
+          });
+        })()}
       </div>
 
       {/* Tooltip */}
@@ -396,6 +400,7 @@ export default function SkillsSection() {
   const [skills, setSkills] = useState<Skill[]>([]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch("/api/skills")
       .then((r) => r.json())
       .then((data: Skill[]) => setSkills(data))

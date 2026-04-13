@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Schema, model, models } from "mongoose";
 
 export interface ILeetCodeProfile {

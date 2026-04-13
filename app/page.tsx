@@ -7,6 +7,7 @@ import SkillsSection from "@/components/portfolio/SkillsSection";
 import SectionWrapper from "@/components/portfolio/SectionWrapper";
 import Preloader from "@/components/portfolio/Preloader";
 import ProblemSolvingSection from "@/components/portfolio/ProblemSolving";
+import GitHubSection from "@/components/portfolio/GitHub";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
@@ -38,6 +39,9 @@ export default function Home() {
         {/* Render Problem Solving after Skills/Projects (adjust order later if needed, problem solving was 2nd initially) */}
         <ProblemSolvingSection />
         
+        {/* Render GitHub Activity Section */}
+        <GitHubSection />
+
         {sections.map((section) => (
           <SectionWrapper
             key={section.id}
