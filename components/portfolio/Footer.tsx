@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const premiumEase = [0.25, 0.4, 0.25, 1];
+const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

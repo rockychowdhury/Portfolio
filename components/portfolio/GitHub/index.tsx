@@ -15,7 +15,7 @@ import {
 } from "./Skeletons";
 
 // Hero-style easing
-const premiumEase = [0.25, 0.4, 0.25, 1];
+const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
 const letterAnimation = {
   hidden: { opacity: 0, y: 80, rotateX: 40 },

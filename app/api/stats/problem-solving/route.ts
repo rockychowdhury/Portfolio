@@ -46,7 +46,7 @@ export async function GET() {
   }
 }
 
-async function performUpdate(existingProfile?: unknown) {
+async function performUpdate(existingProfile?: any) {
   // Parallel fetch from all platforms
   const [leetcode, codeforces, codechef] = await Promise.all([
     fetchLeetCodeProfile(process.env.LEETCODE_USERNAME || "Rocky20809"),

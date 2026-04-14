@@ -12,7 +12,7 @@ interface LanguageBreakdownProps {
   }[];
 }
 
-const premiumEase = [0.25, 0.4, 0.25, 1];
+const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
 export default function LanguageBreakdown({ languages }: LanguageBreakdownProps) {
   const ref = useRef<HTMLDivElement>(null);

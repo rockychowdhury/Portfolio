@@ -1,10 +1,11 @@
-
-import connectDB from './lib/db/connect';
-import { fetchLeetCodeProfile } from './lib/api/platforms/fetchers';
+import dbConnect from "./lib/db/connect";
+import Certification from "./lib/db/models/Certification";
 
 async function test() {
-  const data = await fetchLeetCodeProfile('Rocky20809');
-  console.log(JSON.stringify(data?.contests, null, 2));
+  await dbConnect();
+  const certs = await Certification.find().sort({ order: 1 }).limit(3).lean();
+  console.log(JSON.stringify(certs, null, 2));
+  process.exit(0);
 }
 
-test().then(() => process.exit(0));
+test();
