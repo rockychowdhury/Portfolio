@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
-const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
+const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) => {
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start center", "end center"],

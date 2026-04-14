@@ -5,7 +5,7 @@ import { ICertification } from "@/lib/db/models/Certification";
 import { ExternalLink, Calendar, Award, Trophy, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import CertificateLightbox from "./CertificateLightbox";
-import AnimatedBorder from "./AnimatedBorder";
+import AnimatedBorder from "../../common/AnimatedBorder";
 
 interface Props {
   item: ICertification;

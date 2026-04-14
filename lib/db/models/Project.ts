@@ -1,6 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 export interface IProject {
+  _id?: string;
   title: string;
   description: string;
   longDescription?: string;

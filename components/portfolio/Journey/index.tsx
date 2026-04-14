@@ -61,7 +61,7 @@ const JourneySection = () => {
 
           {/* Achievement Stream */}
           <div className="flex flex-col gap-8">
-            {groupedAchievements.map(([month, achs]) => (
+            {groupedAchievements.map(([month, achs], groupIdx) => (
               <div key={month} className="flex flex-col gap-2">
                 {/* Time Caption Header */}
                 <div className="flex items-center gap-4 py-2 opacity-40">
@@ -72,16 +72,18 @@ const JourneySection = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  {achs.map((achievement) => (
+                  {achs.map((achievement, achIdx) => (
                     <AchievementCard 
                       key={achievement._id} 
                       achievement={achievement} 
+                      index={achIdx}
                     />
                   ))}
                 </div>
               </div>
             ))}
           </div>
+
 
           {/* Closing Card inline */}
           <div className="mt-16 pt-16 border-t border-border/50">
