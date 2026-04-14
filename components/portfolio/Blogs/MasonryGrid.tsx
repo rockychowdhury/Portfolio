@@ -11,13 +11,14 @@ interface MasonryGridProps {
 }
 
 export default function MasonryGrid({ blogs, onTagClick }: MasonryGridProps) {
-  const [columns, setColumns] = useState(3);
+  const [columns, setColumns] = useState(4);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) setColumns(1);
+      if (window.innerWidth < 640) setColumns(1);
       else if (window.innerWidth < 1024) setColumns(2);
-      else setColumns(3);
+      else if (window.innerWidth < 1280) setColumns(3);
+      else setColumns(4);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -26,49 +27,54 @@ export default function MasonryGrid({ blogs, onTagClick }: MasonryGridProps) {
 
   if (!blogs || blogs.length === 0) return null;
 
-  // Header logic
-  const firstBlog = blogs[0];
-  const hasWideBanner = firstBlog.is_featured;
-  const headerCount = hasWideBanner ? (columns > 1 ? 2 : 1) : 0;
-  
-  const headerBlogs = blogs.slice(0, headerCount);
-  const masonryBlogs = blogs.slice(headerCount);
+  // Smart Distribution: Categorize by estimated height to balance columns
+  // Weights (approximate heights in pixels)
+  const getWeight = (blog: IBlog, index: number) => {
+    if (blog.is_featured && index === 0) return 600;
+    if (blog.thumbnail_url && (blog.platform === "Medium" || index % 8 === 4)) return 450; // Overlay
+    if (blog.platform === "YouTube") return 400;
+    if (blog.thumbnail_url) return 500; // Standard Hero
+    if (blog.platform === "LinkedIn" && !blog.thumbnail_url) return 350; // Dark Quote
+    return 250; // Micro/Minimal
+  };
 
-  // Distribute items into columns based on height/index
   const columnArrays = Array.from({ length: columns }, () => [] as IBlog[]);
-  masonryBlogs.forEach((blog, i) => {
-    columnArrays[i % columns].push(blog);
+  const columnHeights = Array(columns).fill(0);
+
+  blogs.forEach((blog, i) => {
+    // Find shortest column
+    const shortestColIdx = columnHeights.indexOf(Math.min(...columnHeights));
+    columnArrays[shortestColIdx].push(blog);
+    columnHeights[shortestColIdx] += getWeight(blog, i);
   });
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Top Row: Spanning Header */}
-      {hasWideBanner && columns > 1 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <CardRouter blog={blogs[0]} index={0} onTagClick={onTagClick} />
-          </div>
-          <div className="lg:col-span-1">
-            <CardRouter blog={blogs[1]} index={1} onTagClick={onTagClick} />
-          </div>
-        </div>
-      )}
-
-      {/* Grid columns */}
+    <div className="relative p-1 rounded-[3rem] border border-border/10 bg-secondary/[0.02] backdrop-blur-[2px]">
       <div 
-        className="grid gap-8" 
+        className="grid gap-5" 
         style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
       >
         {columnArrays.map((colItems, colIdx) => (
-          <div key={colIdx} className="flex flex-col gap-8">
+          <div key={colIdx} className="flex flex-col gap-5">
             <AnimatePresence mode="popLayout">
               {colItems.map((blog, itemIdx) => (
-                <CardRouter 
-                  key={blog._id} 
-                  blog={blog} 
-                  index={itemIdx * columns + colIdx + headerCount} 
-                  onTagClick={onTagClick} 
-                />
+                <motion.div
+                  key={blog._id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: itemIdx * 0.05,
+                    ease: [0.25, 0.4, 0.25, 1] 
+                  }}
+                >
+                  <CardRouter 
+                    blog={blog} 
+                    index={blogs.indexOf(blog)} 
+                    onTagClick={onTagClick} 
+                  />
+                </motion.div>
               ))}
             </AnimatePresence>
           </div>

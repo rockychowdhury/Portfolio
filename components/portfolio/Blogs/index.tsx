@@ -9,7 +9,7 @@ import SearchBar from "./SearchBar";
 import { IBlog } from "@/lib/db/models/Blog";
 import { Loader2 } from "lucide-react";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 12;
 
 export default function BlogsSection() {
   const [blogs, setBlogs] = useState<IBlog[]>([]);
@@ -97,27 +97,36 @@ export default function BlogsSection() {
   const hasMore = visibleCount < filteredBlogs.length;
 
   return (
-    <SectionWrapper id="blogs" className="py-32 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <SectionWrapper id="blogs" className="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10">
+      {/* Background Pattern Detail: Horizontal (X-axis) Lines */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none opacity-[0.05]" 
+        style={{
+          backgroundImage: `linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)`,
+          backgroundSize: "100% 80px",
+        }}
+      />
+
+      <div className="mx-auto max-w-[1400px] px-6  relative z-10">
         {/* Headline & Search */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-20 gap-8">
-          <div className="text-center lg:text-left">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-24 gap-8">
+          <div className="text-left">
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4"
+              className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground mb-6"
             >
               Blogs & Resources
             </motion.h2>
             <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground max-w-2xl"
+              className="text-lg md:text-xl text-muted-foreground/60 max-w-2xl font-medium"
             >
-              Things I've written, shared, and built for the community.
+              Technical writing, shared resources, and community builds.
             </motion.p>
           </div>
 
@@ -126,13 +135,15 @@ export default function BlogsSection() {
 
         {/* Filters */}
         {!loading && (
-          <FilterRow 
-            platforms={platforms}
-            tags={tags}
-            activeFilters={activeFilters}
-            onFilterToggle={handleFilterToggle}
-            onClearAll={handleClearAll}
-          />
+          <div className="mb-12">
+            <FilterRow 
+                platforms={platforms}
+                tags={tags}
+                activeFilters={activeFilters}
+                onFilterToggle={handleFilterToggle}
+                onClearAll={handleClearAll}
+            />
+          </div>
         )}
 
         {/* Content */}
@@ -151,7 +162,7 @@ export default function BlogsSection() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="px-8 py-3 rounded-full border border-border/50 text-xs font-black uppercase tracking-widest hover:bg-secondary/10 transition-all flex items-center gap-2 group"
+                  className="px-8 py-4 rounded-full border border-border/80 shadow-sm text-xs font-black uppercase tracking-widest hover:bg-secondary/10 transition-all flex items-center gap-2 group"
                 >
                   {loadingMore ? (
                     <>
@@ -165,16 +176,15 @@ export default function BlogsSection() {
                   )}
                 </button>
               ) : (
-                <p className="text-muted-foreground/30 text-xs font-bold uppercase tracking-[0.3em]">
-                  That's everything for now // 2025
+                <p className="text-muted-foreground/20 text-[10px] font-black uppercase tracking-[0.4em]">
+                  Live Stream Ended // End of content
                 </p>
               )}
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-64 border border-dashed border-border/20 rounded-[2.5rem]">
-             <p className="text-muted-foreground text-sm font-medium">Nothing published yet.</p>
-             <p className="text-muted-foreground/40 text-xs mt-1">Check back soon — content is on the way.</p>
+          <div className="flex flex-col items-center justify-center h-64 border border-border/80 rounded-3xl bg-white shadow-sm dark:bg-zinc-800/80">
+             <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">No entries found.</p>
           </div>
         )}
       </div>

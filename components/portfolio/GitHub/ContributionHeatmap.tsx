@@ -12,7 +12,7 @@ interface ContributionHeatmapProps {
   };
 }
 
-const premiumEase = [0.25, 0.4, 0.25, 1];
+const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
 // Monochromatic progression
 // Theme-aware monochromatic progression

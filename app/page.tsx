@@ -12,6 +12,7 @@ import Footer from "@/components/portfolio/Footer";
 import ContactSection from "@/components/portfolio/ContactSection";
 import TestimonialsSection from "@/components/portfolio/Testimonials";
 import BlogsSection from "@/components/portfolio/Blogs";
+import Education from "@/components/portfolio/Education";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
@@ -22,7 +23,6 @@ export default function Home() {
 
   const sections = [
     { id: "projects", title: "Projects", bgColor: "bg-secondary/50" },
-    { id: "education", title: "Educations and Courses", bgColor: "bg-background" },
     { id: "journey", title: "Journey - Timeline", bgColor: "bg-secondary/50" },
   ];
 
@@ -41,6 +41,8 @@ export default function Home() {
 
         {/* Render GitHub Activity Section */}
         <GitHubSection />
+
+        <Education />
 
         {sections.map((section) => (
           <SectionWrapper

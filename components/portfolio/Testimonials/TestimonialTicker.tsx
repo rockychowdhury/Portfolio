@@ -18,8 +18,7 @@ export default function TestimonialTicker({ testimonials }: TestimonialTickerPro
         transition={{
           duration: testimonials.length * 10,
           repeat: Infinity,
-          ease: "linear",
-          pauseOnHover: true // This is a framer-motion prop for some versions, or manually controlled
+          ease: "linear"
         }}
         className="flex space-x-12 whitespace-nowrap px-12"
       >
