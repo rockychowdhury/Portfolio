@@ -5,6 +5,7 @@ import {
   fetchLeetCodeProfile,
   fetchCodeforcesProfile,
   fetchCodeChefProfile,
+  fetchGitHubStats,
 } from "@/lib/api/platforms/fetchers";
 
 export const revalidate = 0; // Dynamic route
@@ -48,34 +49,51 @@ export async function GET() {
 
 async function performUpdate(existingProfile?: any) {
   // Parallel fetch from all platforms
-  const [leetcode, codeforces, codechef] = await Promise.all([
+  const [leetcode, codeforces, codechef, githubRaw] = await Promise.all([
     fetchLeetCodeProfile(process.env.LEETCODE_USERNAME || "Rocky20809"),
     fetchCodeforcesProfile(process.env.CODEFORCES_USERNAME || "__Cipher__"),
     fetchCodeChefProfile(process.env.CODECHEF_USERNAME || "rocky20809"),
+    fetchGitHubStats(process.env.GITHUB_USERNAME || "rockychowdhury"),
   ]);
 
   // SUCCESS-ONLY UPDATE:
   // We only update MongoDB if we got valid responses from ALL major platforms.
   // This prevents "zeroing out" the profile if an API flakes.
   
-  if (!leetcode || !codeforces || !codechef) {
+  if (!leetcode || !codeforces || !codechef || !githubRaw) {
     console.warn("One or more platforms failed to fetch. Skipping MongoDB update.", {
       leetcode: !!leetcode,
       codeforces: !!codeforces,
       codechef: !!codechef,
+      github: !!githubRaw,
     });
     // Return old profile if we have it, so the UI still has data
     return existingProfile;
   }
 
+  // Map GitHub data to ProblemSolvingProfile schema
+  const githubHeatmap: Record<string, number> = {};
+  githubRaw.heatmap.forEach((day: { date: string; count: number }) => {
+    githubHeatmap[day.date] = day.count;
+  });
+
+  const githubTransformed = {
+    handle: githubRaw.handle,
+    repos: githubRaw.metrics.repos,
+    followers: githubRaw.metrics.followers,
+    contributions: githubRaw.metrics.commits,
+    allTimeContributions: githubRaw.metrics.allTimeContributions,
+    currentYearContributions: githubRaw.metrics.currentYearContributions,
+    previousYearContributions: githubRaw.metrics.previousYearContributions,
+    topLanguage: githubRaw.languages[0]?.name || "",
+    heatmap: githubHeatmap,
+  };
+
   const profileData = {
     leetcode,
     codeforces,
     codechef,
-    github: existingProfile?.github || {
-        handle: process.env.GITHUB_USERNAME,
-        repos: 0, followers: 0, contributions: 0, topLanguage: '', heatmap: {}
-    },
+    github: githubTransformed,
     lastUpdated: new Date(),
   };
 

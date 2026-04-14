@@ -23,11 +23,15 @@ export async function GET() {
 
     // 3. Check for staleness
     const now = Date.now();
-    const lastUpdated = new Date(existingProfile.lastUpdated).getTime();
-    if (now - lastUpdated > REFRESH_INTERVAL_MS) {
-      console.log("GitHub profile is stale, triggering background refresh...");
+    const lastUpdatedRaw = existingProfile.lastUpdated || existingProfile.updatedAt;
+    const lastUpdated = new Date(lastUpdatedRaw).getTime();
+    const isStale = now - lastUpdated > REFRESH_INTERVAL_MS;
+
+    if (isStale) {
+      console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), triggering background refresh...`);
+      // Use background update but ensure errors are logged
       performUpdate(existingProfile).catch((err) =>
-        console.error("Background GitHub refresh failed:", err)
+        console.error("[API] Background GitHub refresh failed:", err)
       );
     }
 
@@ -42,23 +46,29 @@ export async function GET() {
   }
 }
 
-async function performUpdate(existingProfile?: unknown) {
-  const data = await fetchGitHubStats(process.env.GITHUB_USERNAME || "rockychowdhury");
+async function performUpdate(existingProfile?: any) {
+  const username = process.env.GITHUB_USERNAME || "rockychowdhury";
+  const data = await fetchGitHubStats(username);
 
   // SUCCESS-ONLY UPDATE:
   // Only update if we actually got a response from the GitHub GraphQL API.
   if (!data) {
-    console.warn("GitHub fetch failed. Skipping MongoDB update.");
+    console.warn("[API] GitHub fetch failed. Skipping MongoDB update.");
     return existingProfile;
   }
 
-  // Upsert into DB
-  const doc = await GitHubProfile.findOneAndUpdate(
-    {},
-    { $set: data },
-    { new: true, upsert: true }
-  );
+  try {
+    // Upsert into DB
+    const doc = await GitHubProfile.findOneAndUpdate(
+      {},
+      { $set: data },
+      { new: true, upsert: true }
+    );
 
-  console.log("GitHub MongoDB cache updated successfully.");
-  return doc;
+    console.log(`[API] GitHub MongoDB cache updated successfully for ${username}.`);
+    return doc;
+  } catch (dbError) {
+    console.error("[API] Failed to update GitHubProfile in MongoDB:", dbError);
+    return existingProfile;
+  }
 }

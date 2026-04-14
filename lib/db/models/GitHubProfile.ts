@@ -8,6 +8,9 @@ export interface IGitHubProfile {
     commits: number;
     followers: number;
     prs: number;
+    allTimeContributions: number;
+    currentYearContributions: number;
+    previousYearContributions: number;
   };
   heatmap: {
     date: string;
@@ -45,6 +48,9 @@ const GitHubProfileSchema = new Schema<IGitHubProfile>(
       commits: { type: Number, default: 0 },
       followers: { type: Number, default: 0 },
       prs: { type: Number, default: 0 },
+      allTimeContributions: { type: Number, default: 0 },
+      currentYearContributions: { type: Number, default: 0 },
+      previousYearContributions: { type: Number, default: 0 },
     },
     heatmap: [
       {

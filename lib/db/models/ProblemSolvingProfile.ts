@@ -49,6 +49,9 @@ export interface IGitHubProfile {
   repos: number;
   followers: number;
   contributions: number;
+  allTimeContributions: number;
+  currentYearContributions: number;
+  previousYearContributions: number;
   topLanguage: string;
   heatmap: { [date: string]: number }; // Maps YYYY-MM-DD to contribution count
 }
@@ -108,6 +111,9 @@ const ProblemSolvingSchema = new Schema<IProblemSolvingProfile>(
       repos: { type: Number, default: 0 },
       followers: { type: Number, default: 0 },
       contributions: { type: Number, default: 0 },
+      allTimeContributions: { type: Number, default: 0 },
+      currentYearContributions: { type: Number, default: 0 },
+      previousYearContributions: { type: Number, default: 0 },
       topLanguage: { type: String, default: "" },
       heatmap: { type: Schema.Types.Mixed, default: {} },
     },

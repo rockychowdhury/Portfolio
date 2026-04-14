@@ -222,9 +222,15 @@ const GITHUB_GRAPHQL_API = "https://api.github.com/graphql";
 
 export async function fetchGitHubStats(username: string): Promise<IGitHubStats | null> {
   const token = process.env.GITHUB_TOKEN;
-  if (!token) return null;
+  if (!token) {
+    console.error("[fetchGitHubStats] GITHUB_TOKEN is missing.");
+    return null;
+  }
 
   try {
+    const currentYear = new Date().getFullYear();
+    const prevYear = currentYear - 1;
+
     const query = `
       query($username: String!) {
         user(login: $username) {
@@ -240,6 +246,7 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
           }
           pullRequests(states: MERGED) { totalCount }
           contributionsCollection {
+            contributionYears
             contributionCalendar {
               totalContributions
               weeks {
@@ -271,9 +278,57 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
     });
 
     const json = await res.json();
-    if (json.errors || !json.data?.user) return null;
+    if (json.errors || !json.data?.user) {
+      console.error("[fetchGitHubStats] GraphQL Errors or No User Data:", {
+        errors: json.errors,
+        hasData: !!json.data,
+        hasUser: !!json.data?.user
+      });
+      return null;
+    }
 
     const user = json.data.user;
+    const contributionYears: number[] = user.contributionsCollection.contributionYears;
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // NEW: Fetch all-time contributions by aggregating yearly data
+    // ─────────────────────────────────────────────────────────────────────────────
+    let allTimeContributions = 0;
+    let currentYearContributions = 0;
+    let previousYearContributions = 0;
+
+    try {
+      // Build alias-based query for all years
+      let aliasQuery = "query($username: String!) { user(login: $username) {";
+      contributionYears.forEach((y) => {
+        aliasQuery += `y${y}: contributionsCollection(from: "${y}-01-01T00:00:00Z", to: "${y}-12-31T23:59:59Z") { contributionCalendar { totalContributions } } `;
+      });
+      aliasQuery += "} }";
+
+      const aliasRes = await fetchWithTimeout(GITHUB_GRAPHQL_API, {
+        method: "POST",
+        headers: {
+          Authorization: `bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: aliasQuery, variables: { username } }),
+        timeout: 10000,
+      });
+
+      const aliasJson = await aliasRes.json();
+      if (aliasJson.data?.user) {
+        Object.keys(aliasJson.data.user).forEach((key) => {
+          const yearTotal = aliasJson.data.user[key].contributionCalendar.totalContributions;
+          allTimeContributions += yearTotal;
+          if (key === `y${currentYear}`) currentYearContributions = yearTotal;
+          if (key === `y${prevYear}`) previousYearContributions = yearTotal;
+        });
+      }
+    } catch (err) {
+      console.error("[fetchGitHubStats] Failed to fetch all-time aggregation:", err);
+      // Fallback to current calendar if aggregation fails
+      allTimeContributions = user.contributionsCollection.contributionCalendar.totalContributions;
+    }
 
     // Aggregates
     let totalStars = 0;
@@ -337,6 +392,7 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
       pushedAt: repo.pushedAt,
     }));
 
+    console.log(`[fetchGitHubStats] Successfully fetched stats for ${username}`);
     return {
       handle: username,
       metrics: {
@@ -345,6 +401,9 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
         commits: calendar.totalContributions,
         followers: user.followers.totalCount,
         prs: user.pullRequests.totalCount,
+        allTimeContributions,
+        currentYearContributions,
+        previousYearContributions,
       },
       heatmap,
       streak: { current: currentStreak, longest: longestStreak },
@@ -353,7 +412,7 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
       lastUpdated: new Date(),
     };
   } catch (error) {
-    console.error("GitHub Fetch Error", error);
+    console.error(`[fetchGitHubStats] Critical Error for ${username}:`, error);
     return null;
   }
 }
