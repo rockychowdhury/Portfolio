@@ -36,3 +36,7 @@ Achievements: stor on db
 
 
 go back in time and see my journey
+
+
+Db fields:
+Title: 
