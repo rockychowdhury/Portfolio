@@ -5,7 +5,7 @@ export interface IProject {
   description: string;
   longDescription?: string;
   image: string;
-  tags: string[];
+  techStack: string[];
   githubUrl?: string;
   liveUrl?: string;
   isFeatured: boolean;
@@ -18,7 +18,7 @@ const ProjectSchema = new Schema<IProject>(
     description: { type: String, required: true },
     longDescription: { type: String },
     image: { type: String, required: true },
-    tags: [{ type: String }],
+    techStack: [{ type: String }],
     githubUrl: { type: String },
     liveUrl: { type: String },
     isFeatured: { type: Boolean, default: false },

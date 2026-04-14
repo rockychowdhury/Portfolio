@@ -38,6 +38,9 @@ interface GitHubStats {
     commits: number;
     followers: number;
     prs: number;
+    allTimeContributions: number;
+    currentYearContributions: number;
+    previousYearContributions: number;
   };
   heatmap: {
     date: string;

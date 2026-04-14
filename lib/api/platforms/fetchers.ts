@@ -235,7 +235,7 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
       query($username: String!) {
         user(login: $username) {
           followers { totalCount }
-          repositories(ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, first: 100) {
+          repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
             totalCount
             nodes {
               stargazerCount

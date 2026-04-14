@@ -11,7 +11,7 @@ export default function Education() {
   const [data, setData] = useState<ICertification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   useInView(sectionRef, { once: true, margin: "-10%" });
 
   useEffect(() => {
