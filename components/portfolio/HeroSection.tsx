@@ -332,7 +332,7 @@ export default function HeroSection({
         </div>
 
         {/* ── Right Content: Image ── */}
-        <div className="relative flex flex-1 items-center justify-center lg:h-screen lg:justify-end">
+        <div className="relative flex flex-1 items-end justify-center lg:h-screen lg:justify-end">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
             animate={
@@ -342,7 +342,7 @@ export default function HeroSection({
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
-            className="relative h-[65vh] w-[110%] right-[-5%] transition-all md:h-[75vh] lg:h-[80vh] lg:w-full lg:right-0 xl:h-[85vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
+            className="relative h-[75vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
           >
             <Image
               src="/profile.png"
