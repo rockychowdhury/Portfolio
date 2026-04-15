@@ -1,7 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useMotionValue, useMotionTemplate, AnimatePresence } from "framer-motion";
 import * as SiIcons from "react-icons/si";
+import * as LuIcons from "lucide-react";
+import { Search, Info } from "lucide-react";
+import * as FaIcons from "react-icons/fa6";
+import * as VscIcons from "react-icons/vsc";
 import type { IconType } from "react-icons";
 
 // ── Types ──
@@ -9,10 +13,13 @@ interface Skill {
   _id: string;
   name: string;
   icon: string;
+  icon_group: string;
+  icon_type: "icon" | "text";
   description: string;
   group: string;
   is_top_skill: boolean;
   order: number;
+  color?: string;
 }
 
 // ── Animation Constants ──
@@ -29,7 +36,7 @@ const SHAPE_GROUPS: Record<string, "circle" | "triangle" | "square"> = {
   devops: "square",
 };
 
-const TICKER_GROUPS = ["database", "cs-fundamentals", "tools"];
+const TICKER_GROUPS_ORDER = ["cs-fundamentals", "database", "tools", "frontend", "backend", "devops"];
 
 const GROUP_LABELS: Record<string, string> = {
   frontend: "Frontend",
@@ -41,9 +48,24 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 // ── Icon resolver ──
-function getIcon(iconName: string): IconType | null {
-  const icons = SiIcons as Record<string, IconType>;
-  return icons[iconName] || null;
+function getIcon(iconName: string, iconGroup: string): IconType | null {
+  if (iconGroup === "si") {
+    const icons = SiIcons as Record<string, IconType>;
+    return icons[iconName] || null;
+  }
+  if (iconGroup === "lu") {
+    const icons = LuIcons as unknown as Record<string, IconType>;
+    return icons[iconName] || null;
+  }
+  if (iconGroup === "fa") {
+    const icons = FaIcons as Record<string, IconType>;
+    return icons[iconName] || null;
+  }
+  if (iconGroup === "vsc") {
+    const icons = VscIcons as Record<string, IconType>;
+    return icons[iconName] || null;
+  }
+  return null;
 }
 
 // ── Geometric position calculators ──
@@ -136,6 +158,7 @@ function SkillIcon({
   index,
   isBuilt,
   floatPhase,
+  isHighlighted = false,
 }: {
   skill: Skill;
   x: number;
@@ -143,10 +166,11 @@ function SkillIcon({
   index: number;
   isBuilt: boolean;
   floatPhase: number;
+  isHighlighted?: boolean;
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const activeTooltip = showTooltip || isHighlighted;
   const [shimmer, setShimmer] = useState(false);
-  // Remove Icon definition from here, moved down to use as IconElement to satisfy lint
 
   // Random shimmer
   useEffect(() => {
@@ -159,12 +183,11 @@ function SkillIcon({
     return () => clearInterval(interval);
   }, [isBuilt]);
 
-  // Use useState initializer to set random delay on client side safely
   const [breatheDelay] = useState(() => Math.random() * BREATHE_DURATION);
 
   return (
     <motion.div
-      className="absolute flex items-center justify-center"
+      className="absolute flex items-center justify-center transform-gpu -translate-x-1/2 -translate-y-1/2"
       style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)` }}
       initial={{ scale: 0, opacity: 0 }}
       animate={
@@ -184,9 +207,9 @@ function SkillIcon({
                 delay: breatheDelay,
                 ease: "easeInOut",
               },
-              opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER },
+              opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 },
             }
-          : { duration: BUILD_DURATION, delay: index * BUILD_STAGGER }
+          : { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 }
       }
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
@@ -194,41 +217,88 @@ function SkillIcon({
       onBlur={() => setShowTooltip(false)}
       tabIndex={0}
       role="button"
-      aria-label={`${skill.name}: ${skill.description}`}
     >
       <div
-        className={`relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl transition-all duration-300 cursor-pointer
-          ${shimmer ? "ring-2 ring-primary/30 shadow-[0_0_12px_rgba(0,0,0,0.1)] dark:ring-white/30 dark:shadow-[0_0_12px_rgba(255,255,255,0.2)]" : ""}
-          hover:scale-125 hover:shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:bg-accent
+        className={`relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group
+          ${shimmer ? "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]" : "border border-border/50"}
+          hover:scale-125 hover:shadow-2xl hover:bg-accent/40 hover:border-border
         `}
       >
-        {(() => {
-          const icon = getIcon(skill.icon);
-          if (!icon) return null;
-          return React.createElement(icon, {
-            className: "w-5 h-5 md:w-6 md:h-6 text-muted-foreground hover:text-foreground transition-colors"
-          });
-        })()}
+        {skill.icon_type === "text" ? (
+          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${
+            skill.name === "TBA" ? "text-muted-foreground/30" : "text-muted-foreground group-hover:text-foreground"
+          }`}>
+            {skill.icon}
+          </span>
+        ) : (
+          (() => {
+            const Icon = getIcon(skill.icon, skill.icon_group);
+            if (!Icon) return null;
+            const isTBA = skill.name === "TBA";
+            return (
+              <Icon
+                style={{ color: activeTooltip ? skill.color : undefined }}
+                className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-500 
+                  ${activeTooltip ? "scale-125 grayscale-0 opacity-100" : ""}
+                  ${!activeTooltip && isTBA ? "text-muted-foreground/20 grayscale opacity-40" : ""}
+                  ${!activeTooltip && !isTBA ? "text-muted-foreground/80 grayscale opacity-80" : ""}
+                  group-hover:grayscale-0 group-hover:opacity-100
+                `}
+              />
+            );
+          })()
+        )}
+
+        {/* Brand highlight glow */}
+        {activeTooltip && skill.color && (
+          <motion.div
+            layoutId={`glow-${skill._id}`}
+            className="absolute inset-x-0 -inset-y-2 blur-2xl opacity-30 rounded-full"
+            style={{ backgroundColor: skill.color }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.3 }}
+          />
+        )}
       </div>
 
-      {/* Tooltip */}
-      {showTooltip && (
-        <div
-          role="tooltip"
-          className="absolute -top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none whitespace-nowrap"
-        >
-          <div className="bg-popover/90 backdrop-blur-md border border-border rounded-lg px-3 py-2 shadow-xl">
-            <p className="text-xs font-bold text-popover-foreground">{skill.name}</p>
-            <p className="text-[10px] text-popover-foreground/60 mt-0.5 max-w-[200px] whitespace-normal">
-              {skill.description}
-            </p>
-          </div>
-          <div className="w-2 h-2 bg-popover/90 border-b border-r border-border rotate-45 mx-auto -mt-1" />
-        </div>
-      )}
+      {/* Enhanced Tooltip with Line Animation */}
+      <AnimatePresence>
+        {activeTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="absolute -top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className="relative">
+              <div className="bg-popover/95 backdrop-blur-xl border border-border/50 rounded-xl px-4 py-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.3)] min-w-[140px]">
+                <div className="flex items-center gap-2 mb-1">
+                  {skill.color && (
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: skill.color }} />
+                  )}
+                  <p className="text-[10px] md:text-xs font-bold text-popover-foreground tracking-tight">
+                    {skill.name}
+                  </p>
+                </div>
+                <p className="text-[9px] md:text-[10px] leading-relaxed text-muted-foreground font-medium line-clamp-2">
+                  {skill.description}
+                </p>
+              </div>
+
+              {/* Connecting Line Animation */}
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: 12 }}
+                className="w-px bg-gradient-to-b from-border to-transparent mx-auto"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
+
 
 // ── Shape Group Component ──
 function ShapeGroup({
@@ -237,77 +307,105 @@ function ShapeGroup({
   skills,
   isInView,
   floatDelay,
+  highlightedIds,
 }: {
   groupName: string;
   shape: "circle" | "triangle" | "square";
   skills: Skill[];
   isInView: boolean;
   floatDelay: number;
+  highlightedIds: string[];
 }) {
   const [isBuilt, setIsBuilt] = useState(false);
 
   useEffect(() => {
     if (isInView && !isBuilt) {
-      const totalBuildTime = skills.length * BUILD_STAGGER * 1000 + BUILD_DURATION * 1000;
+      const totalBuildTime = skills.length * BUILD_STAGGER * 500 + BUILD_DURATION * 500;
       const timer = setTimeout(() => setIsBuilt(true), totalBuildTime);
       return () => clearTimeout(timer);
     }
   }, [isInView, isBuilt, skills.length]);
 
-  const shapeSize = 140; // radius for circle, side-length for triangle/square
+  // Higher density shapes optimized for label clearance
+  const shapeSize = 130; 
   const positions = useMemo(() => {
     switch (shape) {
       case "circle":
         return getCirclePositions(skills.length, shapeSize);
       case "triangle":
-        return getTrianglePositions(skills.length, shapeSize * 2.2);
+        return getTrianglePositions(skills.length, shapeSize * 2.1);
       case "square":
-        return getSquarePositions(skills.length, shapeSize * 2);
+        return getSquarePositions(skills.length, shapeSize * 1.8);
     }
   }, [shape, skills.length]);
 
   return (
-    <motion.div
-      className="relative flex-1 min-w-[280px] max-w-[400px] aspect-square flex items-center justify-center"
-      animate={
-        isBuilt
-          ? { y: [0, -8, 0] }
-          : {}
-      }
-      transition={
-        isBuilt
-          ? {
-              duration: FLOAT_DURATION,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: floatDelay,
-            }
-          : {}
-      }
-    >
-      {/* Group label at center */}
-      <div className="absolute z-10 flex flex-col items-center gap-1">
-        <span className="text-lg md:text-xl font-bold text-foreground/90 tracking-tight">
-          {GROUP_LABELS[groupName]}
-        </span>
-        <div className="h-px w-8 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-      </div>
+    <div className="flex flex-col items-center gap-12 flex-1 min-w-[300px] max-w-[400px]">
+      <motion.div
+        className="relative aspect-square w-full flex items-center justify-center transform-gpu"
+        animate={
+          isBuilt
+            ? { y: [0, -12, 0] }
+            : {}
+        }
+        transition={
+          isBuilt
+            ? {
+                duration: FLOAT_DURATION,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: floatDelay,
+              }
+            : {}
+        }
+      >
+        {/* Skill icons placed along the shape */}
+        {skills
+          .sort((a, b) => a.order - b.order)
+          .map((skill, i) => (
+            <SkillIcon
+              key={skill._id}
+              skill={skill}
+              x={positions[i]?.x ?? 0}
+              y={positions[i]?.y ?? 0}
+              index={i}
+              isBuilt={isInView}
+              floatPhase={floatDelay}
+              isHighlighted={highlightedIds.includes(skill._id)}
+            />
+          ))}
+      </motion.div>
 
-      {/* Skill icons placed along the shape */}
-      {skills.map((skill, i) => (
-        <SkillIcon
-          key={skill._id}
-          skill={skill}
-          x={positions[i]?.x ?? 0}
-          y={positions[i]?.y ?? 0}
-          index={i}
-          isBuilt={isInView}
-          floatPhase={floatDelay}
+      {/* Category Label Below - Grounded Design */}
+      <div className="flex flex-col items-center gap-2.5">
+        <motion.span 
+          initial={{ opacity: 0, y: 10 }}
+          animate={isBuilt ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="text-xs md:text-sm font-black uppercase tracking-[0.4em] text-foreground/80"
+        >
+          {GROUP_LABELS[groupName]}
+        </motion.span>
+        <motion.div 
+          initial={{ width: 0, opacity: 0 }}
+          animate={isBuilt ? { width: 40, opacity: 1 } : {}}
+          transition={{ duration: 1, delay: 0.8 }}
+          className="h-[1.5px] bg-primary/30 rounded-full"
         />
-      ))}
-    </motion.div>
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={isBuilt ? { opacity: 1 } : {}}
+          transition={{ duration: 1, delay: 1.2 }}
+          className="text-[10px] font-bold text-muted-foreground/30 uppercase tracking-[0.2em]"
+        >
+          {skills.filter(s => s.name !== "TBA").length} Stack Components
+        </motion.span>
+      </div>
+    </div>
   );
 }
+
+
 
 // ── Ticker Component ──
 function SkillTicker({ skills }: { skills: Skill[] }) {
@@ -352,28 +450,31 @@ function SkillTicker({ skills }: { skills: Skill[] }) {
           animationPlayState: isPaused ? "paused" : "running",
         }}
       >
-        {/* Duplicate content for seamless loop */}
-        {[0, 1].map((copy) => (
+        {/* Multiple duplicates to ensure it always fills any screen width immediately */}
+        {[0, 1, 2, 3].map((copy) => (
           <div key={copy} className="flex items-center gap-6 shrink-0">
             {items.map((item, i) => {
               if (item.type === "label") {
                 return (
                   <span
                     key={`${copy}-label-${i}`}
-                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 mx-2"
+                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/30 mx-2"
                   >
                     {item.value} ›
                   </span>
                 );
               }
-              const Icon = item.skill ? getIcon(item.skill.icon) : null;
+              const Icon = item.skill ? getIcon(item.skill.icon, item.skill.icon_group) : null;
               return (
                 <div
                   key={`${copy}-skill-${i}`}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-accent/20 hover:bg-accent/40 hover:border-border transition-all group cursor-default"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/50 bg-secondary/5 hover:bg-secondary/10 hover:border-border transition-all group cursor-default"
                 >
                   {Icon && (
-                    <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <Icon 
+                      className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" 
+                      style={{ color: item.skill?.color }}
+                    />
                   )}
                   <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     {item.value}
@@ -396,8 +497,10 @@ function SkillTicker({ skills }: { skills: Skill[] }) {
 export default function SkillsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const shapesRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(shapesRef, { once: true, margin: "-15% 0px -15% 0px" });
+  const isInView = useInView(shapesRef, { once: true, margin: "-10% 0px -10% 0px" });
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -406,6 +509,41 @@ export default function SkillsSection() {
       .then((data: Skill[]) => setSkills(data))
       .catch(() => {});
   }, []);
+
+  // Debounce logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Search logic - now uses debouncedQuery
+  const filteredSearch = useMemo(() => {
+    const query = debouncedQuery.trim();
+    if (!query) return [];
+    return skills.filter(
+      (s) => 
+        s.name.toLowerCase().includes(query.toLowerCase()) && 
+        s.name !== "TBA"
+    );
+  }, [debouncedQuery, skills]);
+
+  const searchStatus = useMemo(() => {
+    if (!searchQuery.trim()) return "idle";
+    
+    // Check if what the user CURRENTLY typed (not debounced) is matching
+    // This gives immediate visual feedback while the "lock on" (highlights) wait for debounce
+    const currentMatches = skills.filter(
+      (s) => 
+        s.name.toLowerCase().includes(searchQuery.trim().toLowerCase()) && 
+        s.name !== "TBA"
+    );
+
+    return currentMatches.length > 0 ? "found" : "not_found";
+  }, [searchQuery, skills]);
+
+  const highlightedIds = useMemo(() => filteredSearch.map(s => s._id), [filteredSearch]);
 
   // Group skills
   const shapeSkills = useMemo(() => {
@@ -416,48 +554,152 @@ export default function SkillsSection() {
     return result;
   }, [skills]);
 
-  const tickerSkills = useMemo(
-    () => skills.filter((s) => TICKER_GROUPS.includes(s.group)),
-    [skills]
-  );
+  const tickerSkills = useMemo(() => {
+    // Sort all skills based on the TICKER_GROUPS_ORDER
+    return [...skills].sort((a, b) => {
+      const idxA = TICKER_GROUPS_ORDER.indexOf(a.group);
+      const idxB = TICKER_GROUPS_ORDER.indexOf(b.group);
+      return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+    });
+  }, [skills]);
 
   const topSkills = useMemo(
     () => skills.filter((s) => s.is_top_skill),
     [skills]
   );
 
+  // Headline Animation Logic (Synced with blogs)
+  const title = "Technical".split("");
+  const subtitle = "Skillset".split("");
+  const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
+  
+  const letterAnimation = {
+    hidden: { opacity: 0, y: 100, rotateX: 60 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        duration: 1,
+        delay: 0.1 + i * 0.04,
+        ease: premiumEase,
+      },
+    }),
+  };
+
+  const titleRef = useRef(null);
+  const isTitleInView = useInView(titleRef, { once: true, margin: "-10%" });
+
   return (
     <section
       ref={sectionRef}
       id="skills"
-      className="relative w-full bg-background py-24 md:py-32 overflow-hidden"
+      className="relative w-full bg-background py-20 md:py-32 overflow-hidden"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
+        
         {/* Section Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground">
-            Technical Skills
+        <div className="flex flex-col items-center mb-10 md:mb-16" ref={titleRef}>
+          <h2 className="flex flex-wrap items-center justify-center text-5xl md:text-8xl lg:text-9xl font-light tracking-tighter text-foreground leading-none">
+            <span className="flex overflow-hidden pb-4 -mb-4 mr-4 md:mr-8">
+              {title.map((letter, i) => (
+                <motion.span
+                  key={i}
+                  custom={i}
+                  variants={letterAnimation}
+                  initial="hidden"
+                  animate={isTitleInView ? "visible" : "hidden"}
+                  className="inline-block origin-bottom"
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </span>
+            <span className="flex overflow-hidden pb-4 -mb-4">
+              {subtitle.map((letter, i) => (
+                <motion.span
+                  key={i}
+                  custom={i + 8}
+                  variants={letterAnimation}
+                  initial="hidden"
+                  animate={isTitleInView ? "visible" : "hidden"}
+                  className="inline-block origin-bottom text-muted-foreground/30"
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </span>
           </h2>
+          
+          {/* Minimal Skill Navigator - Ultra Compact */}
+          <div className="flex flex-col items-center mt-6 mb-10 w-full mx-auto" ref={titleRef}>
+            <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/40 hover:bg-secondary/50 border border-border/60 rounded-full px-4 py-1.5 transition-all duration-300">
+              <Search className="w-3.5 h-3.5 text-muted-foreground/40 mr-2.5" />
+              <input
+                type="text"
+                placeholder="Search competency..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent border-none py-0.5 text-[11px] font-medium focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
+              />
+              
+              <div className="flex items-center gap-2.5 ml-1.5">
+                {/* Shortcut Hint */}
+                <div className="hidden xs:flex items-center px-1.5 py-0.5 rounded border border-border/30 bg-background/50 shadow-sm">
+                  <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">⌘K</span>
+                </div>
+
+                {/* Info & Lamp Duo */}
+                <div className="flex items-center gap-2">
+                  <div className="relative group/info">
+                    <Info className="w-3.5 h-3.5 text-muted-foreground/30 hover:text-muted-foreground/50 cursor-help transition-colors" />
+                    <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-3 py-2 bg-popover/95 backdrop-blur-md border border-border/50 rounded-lg shadow-xl opacity-0 group-hover/info:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-popover-foreground">
+                        Quick check skill availability you are looking for?
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tiny Status Indicator */}
+                  <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-sm ${
+                    searchStatus === "idle" ? "bg-muted/10" :
+                    searchStatus === "found" ? "bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.4)]" :
+                    "bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                  }`} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Top Skills Bar */}
+        {/* Top Skills Prominent Bar */}
         {topSkills.length > 0 && (
-          <div className="flex items-center justify-center gap-2 flex-wrap mb-20 md:mb-28">
-            {topSkills.map((s, i) => (
-              <span key={s._id} className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-muted-foreground">{s.name}</span>
-                {i < topSkills.length - 1 && (
-                  <span className="text-border text-xs">·</span>
-                )}
-              </span>
-            ))}
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 1, delay: 1 }}
+            className="relative z-20 flex items-center justify-center gap-2 md:gap-4 flex-wrap mb-16 md:mb-20"
+          >
+            <span className="text-[10px] md:text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mr-2">Top Skills ›</span>
+            {topSkills.map((s) => {
+              const Icon = getIcon(s.icon, s.icon_group);
+              return (
+                <div 
+                  key={s._id} 
+                  className="flex items-center gap-2 px-2 py-1 transition-all duration-300 group hover:scale-110"
+                >
+                  {Icon && <Icon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-foreground transition-colors" style={{ color: s.color }} />}
+                  <span className="text-sm md:text-base font-medium text-muted-foreground group-hover:text-foreground transition-colors">{s.name}</span>
+                </div>
+              )
+            })}
+          </motion.div>
         )}
 
         {/* Shape Groups */}
         <div
           ref={shapesRef}
-          className="flex flex-wrap justify-center gap-8 md:gap-4 lg:gap-0 mb-20 md:mb-28"
+          className="flex flex-wrap justify-center gap-12 md:gap-20 lg:gap-32 mb-16 md:mb-20"
         >
           {Object.entries(SHAPE_GROUPS).map(([group, shape], i) => (
             <ShapeGroup
@@ -467,19 +709,19 @@ export default function SkillsSection() {
               skills={shapeSkills[group] || []}
               isInView={isInView}
               floatDelay={i * 0.8}
+              highlightedIds={highlightedIds}
             />
           ))}
         </div>
       </div>
 
-      {/* Ticker Row — full width */}
+      {/* Ticker Row */}
       <SkillTicker skills={tickerSkills} />
 
-      {/* Ticker animation keyframes */}
       <style>{`
         @keyframes tickerScroll {
           from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
+          to { transform: translateX(-25%); }
         }
       `}</style>
     </section>
