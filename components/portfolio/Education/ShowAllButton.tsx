@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Plus, Minus, MoveDown } from "lucide-react";
+import { ChevronsDown, ChevronsUp } from "lucide-react";
 
 interface ShowAllButtonProps {
   isExpanded: boolean;
@@ -11,34 +11,35 @@ interface ShowAllButtonProps {
 
 export default function ShowAllButton({ isExpanded, onClick, count }: ShowAllButtonProps) {
   return (
-    <div className="relative flex justify-center w-full py-12">
-      {/* Horizontal lines extending from the button to complete the visual spine */}
-      <div className="absolute top-1/2 left-0 right-1/2 h-px bg-border/20 -translate-y-1/2 -z-10" />
-      <div className="absolute top-1/2 left-1/2 right-0 h-px bg-border/20 -translate-y-1/2 -z-10" />
-
-      <button
-        onClick={onClick}
-        className="group relative flex items-center gap-3 px-8 py-4 bg-background border border-border/80 rounded-full shadow-lg hover:shadow-xl hover:border-primary/50 transition-all z-10"
-      >
-        <span className="text-xs font-bold tracking-widest uppercase text-foreground">
-          {isExpanded ? "Show Less" : `Show All Certifications (${count} more)`}
-        </span>
+    <div className="relative flex flex-col items-center justify-center py-32 w-full">
+      <div className="relative w-full flex items-center justify-center">
+        {/* Subtle Horizontal Line */}
+        <div className="absolute inset-x-0 h-px bg-border/10" />
         
-        <div className={`p-1.5 rounded-full bg-secondary/50 transition-transform duration-500 ${isExpanded ? "rotate-180" : ""}`}>
-           {isExpanded ? <Minus className="w-3.5 h-3.5 text-primary" /> : <Plus className="w-3.5 h-3.5 text-primary" />}
+        <div className="relative z-10 bg-background px-12">
+          <motion.button
+            onClick={onClick}
+            whileHover={{ scale: 1.02 }}
+            className="group flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/60 hover:text-foreground transition-all duration-500 cursor-pointer"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronsUp size={14} className="group-hover:-translate-y-1 transition-transform duration-500 opacity-60 group-hover:opacity-100 shrink-0" />
+                <span className="group-hover:tracking-[0.8em] transition-all duration-700 whitespace-nowrap">Collapse List</span>
+                <div className="w-6 h-px bg-muted-foreground/20 group-hover:w-10 group-hover:bg-primary transition-all duration-700 shrink-0" />
+              </>
+            ) : (
+              <>
+                <ChevronsDown size={14} className="group-hover:translate-y-1 transition-transform duration-500 opacity-60 group-hover:opacity-100 shrink-0" />
+                <span className="group-hover:tracking-[0.8em] transition-all duration-700 whitespace-nowrap">
+                   Show All Credentials ({count})
+                </span>
+                <div className="w-6 h-px bg-muted-foreground/20 group-hover:w-10 group-hover:bg-primary transition-all duration-700 shrink-0" />
+              </>
+            )}
+          </motion.button>
         </div>
-
-        {/* Floating Arrow Micro-animation */}
-        {!isExpanded && (
-           <motion.div
-             animate={{ y: [0, 4, 0] }}
-             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-             className="absolute -bottom-6 left-1/2 -translate-x-1/2 hidden lg:block"
-           >
-             <MoveDown className="w-4 h-4 text-primary opacity-50" />
-           </motion.div>
-        )}
-      </button>
+      </div>
     </div>
   );
 }

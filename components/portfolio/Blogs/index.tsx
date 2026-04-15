@@ -109,7 +109,7 @@ export default function BlogsSection() {
   const blogsTitle = "Blogs &".split(" ");
   const resourcesTitle = "Resources".split("");
 
-  const premiumEase = [0.25, 0.4, 0.25, 1];
+  const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
   const letterAnimation = {
     hidden: { opacity: 0, y: 100, rotateX: 60 },
     visible: (i: number) => ({
