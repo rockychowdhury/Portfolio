@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { name, role, relationship, quote, linkedin_url, rating } = body;
+    const { name, role, relationship, quote, linkedin_url } = body;
 
     // Server-side validation
     if (!name || !role || !relationship || !quote) {
@@ -31,7 +31,6 @@ export async function POST(req: Request) {
       relationship,
       quote,
       linkedin_url,
-      rating,
       is_approved: false, // Default to false for manual review
     });
 
@@ -54,7 +53,6 @@ export async function POST(req: Request) {
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Role:</strong> ${role}</p>
           <p><strong>Relationship:</strong> ${relationship}</p>
-          ${rating ? `<p><strong>Rating:</strong> ${rating}/5</p>` : ''}
           <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #000;">
             <p style="margin: 0; font-style: italic;">"${quote}"</p>
           </div>

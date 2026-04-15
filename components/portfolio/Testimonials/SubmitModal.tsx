@@ -19,7 +19,6 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
     relationship: "" as typeof relationships[number] | "",
     quote: "",
     linkedin_url: "",
-    rating: 5,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,7 +59,6 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
           relationship: "",
           quote: "",
           linkedin_url: "",
-          rating: 5,
         });
         onClose();
       }
@@ -164,23 +162,7 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Rating</label>
-                  <div className="flex gap-1 text-primary">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, rating: s })}
-                        className="transition-transform active:scale-90"
-                      >
-                        <Star size={18} fill={s <= formData.rating ? "currentColor" : "none"} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
+              <div className="flex justify-end">
                 <button
                   disabled={isSubmitting}
                   type="submit"

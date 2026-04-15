@@ -39,16 +39,6 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
         </motion.h2>
       </div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.3 }}
-        className="mb-10 text-sm md:text-base text-muted-foreground/60 leading-relaxed"
-      >
-        Kind words from colleagues, mentors, and collaborators <br className="hidden md:block" />
-        who&apos;ve seen my work firsthand.
-      </motion.p>
 
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}

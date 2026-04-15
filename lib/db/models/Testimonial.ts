@@ -6,7 +6,6 @@ export interface ITestimonial {
   relationship: "Colleague" | "Mentor" | "Classmate" | "Collaborator" | "Client";
   avatar_url?: string;
   quote: string;
-  rating?: number;
   platform: "LinkedIn" | "Direct" | "Email" | "GitHub";
   linkedin_url?: string;
   is_approved: boolean;
@@ -25,7 +24,6 @@ const TestimonialSchema = new Schema<ITestimonial>(
     },
     avatar_url: { type: String },
     quote: { type: String, required: true, maxlength: 300 },
-    rating: { type: Number, min: 1, max: 5 },
     platform: { 
       type: String, 
       required: true,

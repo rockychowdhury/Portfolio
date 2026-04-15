@@ -48,19 +48,19 @@ export default function FloatingCard({ testimonial, index, rotation = 0, isPause
           scale: 1.02,
           transition: { duration: 0.2 } 
         }}
-        className="group relative rounded-3xl border border-border/50 bg-background p-8 shadow-sm transition-all hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10"
+        className="group relative rounded-2xl border border-border/40 bg-background/50 backdrop-blur-md p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5"
       >
         {/* Decorative Quote Mark */}
-        <div className="absolute -top-4 left-6 text-6xl font-serif text-primary/10 transition-colors group-hover:text-primary/20">
+        <div className="absolute -top-3 left-4 text-5xl font-serif text-primary/5 transition-colors group-hover:text-primary/10">
           &ldquo;
         </div>
 
-        <p className="relative mb-8 text-sm leading-relaxed text-muted-foreground/80 md:text-base">
+        <p className="relative mb-6 text-sm leading-relaxed text-muted-foreground/90 md:text-base font-medium">
           {testimonial.quote}
         </p>
 
-        <div className="flex items-center gap-4 border-t border-border/50 pt-6">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+        <div className="flex items-center gap-3 border-t border-border/30 pt-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/5 text-[10px] font-bold text-primary border border-primary/10 transition-transform group-hover:scale-110">
             {testimonial.avatar_url ? (
               <img src={testimonial.avatar_url} alt={testimonial.name} className="h-full w-full rounded-full object-cover" />
             ) : (
@@ -68,29 +68,27 @@ export default function FloatingCard({ testimonial, index, rotation = 0, isPause
             )}
           </div>
           <div className="min-w-0">
-            <h4 className="truncate text-sm font-bold text-foreground">
+            <h4 className="truncate text-sm font-bold tracking-tight text-foreground">
               {testimonial.name}
             </h4>
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 uppercase tracking-widest truncate">
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/50 uppercase tracking-widest truncate font-semibold">
               <span>{testimonial.role}</span>
               {testimonial.linkedin_url && (
                 <a 
                   href={testimonial.linkedin_url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-primary transition-colors inline-flex"
                 >
-                  <FaLinkedin size={12} />
+                  <FaLinkedin size={10} />
                 </a>
               )}
-              {testimonial.platform === "GitHub" && <FaGithub size={12} />}
-              {testimonial.platform === "Email" && <FaEnvelope size={12} />}
             </div>
           </div>
         </div>
 
         {/* Relationship Badge */}
-        <div className="absolute top-6 right-6 text-[8px] font-bold uppercase tracking-widest text-muted-foreground/30 px-2 py-1 border border-border/50 rounded-full">
+        <div className="absolute top-4 right-4 text-[7px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 px-2 py-0.5 border border-border/30 rounded-full bg-secondary/10">
           {testimonial.relationship}
         </div>
       </motion.div>
