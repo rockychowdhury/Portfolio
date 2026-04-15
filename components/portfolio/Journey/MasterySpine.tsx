@@ -3,34 +3,41 @@
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
-const MasterySpine = ({ progress }: { progress: number }) => {
-  const pathLength = useSpring(progress, {
+const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) => {
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"],
+  });
+
+  const pathLength = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
 
+  const opacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+
   return (
-    <div className="absolute top-[24px] left-0 right-0 h-px pointer-events-none">
-      {/* Background Track */}
-      <div className="absolute inset-0 border-t border-black/[0.1] dark:border-white/[0.1]" />
+    <div className="absolute left-[20px] top-4 bottom-4 w-px pointer-events-none">
+      {/* Background Track (Groove) */}
+      <div className="absolute inset-0 w-[2px] -ml-[0.5px] bg-border/40" />
       
-      {/* Active Line (Drawing) */}
+      {/* Active Line (Glowing Path) */}
       <motion.div
-        style={{ scaleX: pathLength, originX: 0 }}
-        className="absolute inset-0 border-t border-primary z-10 shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]"
+        style={{ scaleY: pathLength, opacity, originY: 0 }}
+        className="absolute inset-0 w-[2px] -ml-[0.5px] bg-foreground shadow-[0_0_10px_rgba(var(--foreground),0.5)] z-10"
       />
 
-      {/* Subtle indicator at the tip */}
+      {/* Subtle indicator at the tip ( glowing spark ) */}
       <motion.div
         style={{ 
-          left: useTransform(pathLength, (p) => `${p * 100}%`),
+          top: useTransform(pathLength, (p) => `${p * 100}%`),
+          opacity 
         }}
-        className="absolute top-[-3.5px] w-2 h-2 rounded-full bg-primary z-20 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
+        className="absolute left-[-3.5px] w-[8px] h-[8px] rounded-full bg-background border-[2px] border-foreground shadow-[0_0_15px_rgba(var(--foreground),0.8)] z-20"
       />
     </div>
   );
 };
-
 
 export default MasterySpine;
