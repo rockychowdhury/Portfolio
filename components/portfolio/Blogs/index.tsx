@@ -148,9 +148,24 @@ export default function BlogsSection() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64">
-            <Loader2 className="animate-spin text-primary mb-4" size={40} />
-            <p className="text-muted-foreground animate-pulse font-bold tracking-widest uppercase text-xs">Synchronizing Knowledge Base...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div 
+                key={i} 
+                className="rounded-[2.5rem] bg-secondary/5 border border-border/10 overflow-hidden animate-pulse h-[400px]"
+              >
+                <div className="w-full h-48 bg-secondary/10" />
+                <div className="p-8 space-y-4">
+                  <div className="h-4 w-24 bg-secondary/10 rounded" />
+                  <div className="h-8 w-full bg-secondary/10 rounded" />
+                  <div className="h-8 w-3/4 bg-secondary/10 rounded" />
+                  <div className="space-y-2 pt-4">
+                    <div className="h-4 w-full bg-secondary/10 rounded" />
+                    <div className="h-4 w-2/3 bg-secondary/10 rounded" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : displayedBlogs.length > 0 ? (
           <div className="w-full">

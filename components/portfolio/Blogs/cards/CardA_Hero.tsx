@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Clock } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import { IBlog } from "@/lib/db/models/Blog";
+import OptimizedImage from "../OptimizedImage";
 
 interface CardProps {
   blog: IBlog;
@@ -16,16 +17,17 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      layout
       whileHover={{ y: -4 }}
       className="group relative flex flex-col rounded-[2.5rem] bg-white border border-border/60 overflow-hidden shadow-sm transition-all hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] dark:bg-zinc-800/80"
     >
       <div className={`relative ${isPriority ? 'aspect-[16/8]' : 'aspect-[16/10]'} overflow-hidden`}>
         {blog.thumbnail_url && (
-          <motion.img 
+          <OptimizedImage 
             src={blog.thumbnail_url} 
             alt={blog.title}
-            className="w-full h-full object-cover grayscale-[0.2] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+            fill
+            isPriority={isPriority}
+            className="object-cover grayscale-[0.2] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
           />
         )}
         

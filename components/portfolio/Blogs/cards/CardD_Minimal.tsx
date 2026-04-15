@@ -17,7 +17,6 @@ export default function CardD_Minimal({ blog, onTagClick }: CardProps) {
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      layout
       whileHover={{ y: -4 }}
       className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-8 shadow-sm transition-all hover:shadow-xl dark:bg-zinc-800/80"
     >

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import { IBlog } from "@/lib/db/models/Blog";
+import OptimizedImage from "../OptimizedImage";
 
 interface CardProps {
   blog: IBlog;
@@ -16,7 +17,6 @@ export default function CardE_WideBanner({ blog, onTagClick }: CardProps) {
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      layout
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -26,10 +26,11 @@ export default function CardE_WideBanner({ blog, onTagClick }: CardProps) {
       {/* Left / Top Image */}
       <div className="relative w-full md:w-[45%] aspect-video md:aspect-auto overflow-hidden">
         {blog.thumbnail_url && (
-          <motion.img 
+          <OptimizedImage 
             src={blog.thumbnail_url} 
             alt={blog.title}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            fill
+            className="object-cover transition-transform duration-1000 group-hover:scale-110"
           />
         )}
         <div className="absolute top-6 left-6 z-10">

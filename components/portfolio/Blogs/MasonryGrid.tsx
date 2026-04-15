@@ -56,17 +56,17 @@ export default function MasonryGrid({ blogs, onTagClick }: MasonryGridProps) {
       >
         {columnArrays.map((colItems, colIdx) => (
           <div key={colIdx} className="flex flex-col gap-5">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence>
               {colItems.map((blog, itemIdx) => (
                 <motion.div
                   key={blog._id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "100px" }}
                   transition={{ 
-                    duration: 0.5, 
-                    delay: itemIdx * 0.05,
-                    ease: [0.25, 0.4, 0.25, 1] 
+                    duration: 0.4, 
+                    delay: itemIdx * 0.02,
+                    ease: "easeOut" 
                   }}
                 >
                   <CardRouter 

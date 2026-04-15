@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import { IBlog } from "@/lib/db/models/Blog";
+import OptimizedImage from "../OptimizedImage";
 
 interface CardProps {
   blog: IBlog;
@@ -23,10 +24,11 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
       {/* Full-Bleed Background Image */}
       {blog.thumbnail_url && (
         <div className="absolute inset-0 z-0">
-          <motion.img 
+          <OptimizedImage 
             src={blog.thumbnail_url} 
             alt={blog.title}
-            className="w-full h-full object-cover grayscale-[0.5] opacity-60 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-80"
+            fill
+            className="object-cover grayscale-[0.5] opacity-60 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-80"
           />
           {/* Scrim Gradient for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent z-10" />

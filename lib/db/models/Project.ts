@@ -9,6 +9,7 @@ export interface IProject {
   techStack: string[];
   githubUrl?: string;
   liveUrl?: string;
+  videoUrl?: string;
   isFeatured: boolean;
   order: number;
 }
@@ -22,6 +23,7 @@ const ProjectSchema = new Schema<IProject>(
     techStack: [{ type: String }],
     githubUrl: { type: String },
     liveUrl: { type: String },
+    videoUrl: { type: String },
     isFeatured: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
   },

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Play, ArrowUpRight } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import { IBlog } from "@/lib/db/models/Blog";
+import OptimizedImage from "../OptimizedImage";
 
 interface CardProps {
   blog: IBlog;
@@ -16,16 +17,16 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      layout
       whileHover={{ y: -4 }}
       className="group relative flex flex-col rounded-[2.5rem] bg-white border border-border/80 overflow-hidden shadow-sm transition-all hover:shadow-xl dark:bg-zinc-800/80"
     >
       <div className="relative aspect-video overflow-hidden">
         {blog.thumbnail_url ? (
-          <motion.img 
+          <OptimizedImage 
             src={blog.thumbnail_url} 
             alt={blog.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full bg-secondary/20 flex items-center justify-center">
