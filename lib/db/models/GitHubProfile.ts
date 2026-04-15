@@ -11,6 +11,10 @@ export interface IGitHubProfile {
     allTimeContributions: number;
     currentYearContributions: number;
     previousYearContributions: number;
+    productivity?: {
+      mostActiveDay: string;
+      activePercentage: number;
+    };
   };
   heatmap: {
     date: string;
@@ -25,6 +29,7 @@ export interface IGitHubProfile {
     color: string;
     size: number;
     percentage: number;
+    repoCount?: number;
   }[];
   pinned: {
     name: string;
@@ -35,6 +40,7 @@ export interface IGitHubProfile {
     language: { name: string; color: string } | null;
     topics: string[];
     pushedAt: string;
+    sparkline?: number[];
   }[];
   lastUpdated: Date;
 }
@@ -51,6 +57,10 @@ const GitHubProfileSchema = new Schema<IGitHubProfile>(
       allTimeContributions: { type: Number, default: 0 },
       currentYearContributions: { type: Number, default: 0 },
       previousYearContributions: { type: Number, default: 0 },
+      productivity: {
+        mostActiveDay: { type: String, default: "Monday" },
+        activePercentage: { type: Number, default: 0 },
+      },
     },
     heatmap: [
       {
@@ -68,6 +78,7 @@ const GitHubProfileSchema = new Schema<IGitHubProfile>(
         color: { type: String },
         size: { type: Number },
         percentage: { type: Number },
+        repoCount: { type: Number, default: 0 },
       },
     ],
     pinned: [
@@ -83,6 +94,7 @@ const GitHubProfileSchema = new Schema<IGitHubProfile>(
         },
         topics: [String],
         pushedAt: { type: String },
+        sparkline: [Number],
       },
     ],
     lastUpdated: { type: Date, default: Date.now },

@@ -1,108 +1,142 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { format, startOfMonth, isSameMonth } from "date-fns";
+import { useTheme } from "next-themes";
+import HeatmapCell from "./HeatmapCell";
+import HeatmapTooltip from "./HeatmapTooltip";
 
-interface ContributionHeatmapProps {
+interface HeatmapProps {
   heatmap: { date: string; count: number }[];
-  totalContributions: number;
-  streak: {
-    current: number;
-    longest: number;
-  };
+  stats: any;
+  streak: { current: number; longest: number };
 }
 
-const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
+const colors = {
+  dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
+  light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
+};
 
-// Monochromatic progression
-// Theme-aware monochromatic progression
-function getHeatmapColor(count: number, maxCount: number): string {
-  if (count === 0) return "bg-secondary/10 border-transparent transition-colors";
-  
-  const intensity = Math.ceil((count / (maxCount || 1)) * 4);
-  
-  if (intensity === 1) return "bg-foreground/10 border-foreground/5";
-  if (intensity === 2) return "bg-foreground/30 border-foreground/10";
-  if (intensity === 3) return "bg-foreground/60 border-foreground/20";
-  return "bg-foreground border-foreground/30";
-}
+export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapProps) {
+  const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-export default function ContributionHeatmap({ heatmap, totalContributions, streak }: ContributionHeatmapProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
-  const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number } | null>(null);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const weeks: { date: string; count: number }[][] = [];
-  let currentWeek: { date: string; count: number }[] = [];
-  
-  heatmap.forEach((day, i) => {
-    currentWeek.push(day);
-    if (currentWeek.length === 7 || i === heatmap.length - 1) {
-      weeks.push(currentWeek);
-      currentWeek = [];
+  // Group heatmap into weeks (7 days each)
+  const weeks = useMemo(() => {
+    const result: { date: string; count: number }[][] = [];
+    for (let i = 0; i < heatmap.length; i += 7) {
+      result.push(heatmap.slice(i, i + 7));
     }
-  });
+    return result;
+  }, [heatmap]);
 
-  const maxCount = Math.max(...heatmap.map((d) => d.count));
+  // Calculate month labels and their positions
+  const monthLabels = useMemo(() => {
+    const labels: { label: string; offset: number }[] = [];
+    weeks.forEach((week, i) => {
+      const firstDay = new Date(week[0].date);
+      const label = format(firstDay, "MMM");
+      if (i === 0 || !isSameMonth(firstDay, new Date(weeks[i - 1][0].date))) {
+         labels.push({ label, offset: i });
+      }
+    });
+    return labels.filter((l, i) => i === 0 || l.offset - labels[i - 1].offset > 2);
+  }, [weeks]);
+
+  // Handle horizontal scroll to the end (today) on mount
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+    }
+  }, []);
+
+  const totalContributionsInLastYear = stats.commits; 
+  const mostActiveDay = stats.productivity?.mostActiveDay || "Tuesday";
+  const themeColors = mounted && resolvedTheme === "light" ? colors.light : colors.dark;
 
   return (
-    <div className="flex flex-col gap-10" ref={ref}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 px-2">
-        <div>
-          <h3 className="text-2xl font-light tracking-tight text-foreground mb-6 uppercase tracking-[0.1em]">Activity Data</h3>
-          <div className="flex gap-8">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground/40 mb-1">Current Streak</span>
-              <span className="text-2xl font-light text-foreground">{streak.current} days</span>
+    <div className="flex flex-col gap-4">
+      {/* 1. Summary Line (Top) */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] md:text-xs font-bold text-muted-foreground/80 uppercase tracking-widest italic"
+      >
+        <span>{totalContributionsInLastYear} contributions in the last year</span>
+        <span className="w-1 h-1 rounded-full bg-border/40" />
+        <span>Most active: {mostActiveDay}</span>
+        <span className="w-1 h-1 rounded-full bg-border/40" />
+        <span>Latest streak: {streak.current} days</span>
+      </motion.div>
+
+      {/* 2. Heatmap Grid Wrapper */}
+      <div className="relative">
+        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none md:hidden" />
+        
+        <div 
+          ref={scrollContainerRef}
+          className="scrollbar-hide overflow-x-auto overflow-y-hidden mask-fade-right"
+        >
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-[3px] min-w-max pr-12 lg:pr-0">
+              {weeks.map((week, weekIdx) => (
+                <div key={weekIdx} className="flex flex-col gap-[3px]">
+                  {week.map((day, dayIdx) => (
+                    <HeatmapCell
+                      key={day.date}
+                      day={day}
+                      weekIdx={weekIdx}
+                      onHover={(e) => setHoveredCell({ ...day, x: e.clientX, y: e.clientY })}
+                      onLeave={() => setHoveredCell(null)}
+                    />
+                  ))}
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground/40 mb-1">Peak Streak</span>
-              <span className="text-2xl font-light text-foreground">{streak.longest} days</span>
+
+            {/* 3. Month Labels (Bottom) */}
+            <div className="flex gap-[3px] min-w-max pr-12 lg:pr-0 relative h-4">
+              {monthLabels.map((m, i) => (
+                <div 
+                  key={i} 
+                  className="absolute text-[9px] font-bold text-muted-foreground/40 uppercase tracking-tighter"
+                  style={{ left: m.offset * 15 }} 
+                >
+                  {m.label}
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-end">
-             <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground/40 mb-1">Total in 2025</span>
-             <span className="text-5xl font-light tracking-tight text-foreground tabular-nums">{totalContributions}</span>
-        </div>
-      </div>
 
-      <div className="relative rounded-[2rem] bg-secondary/10 p-8 md:p-10 border border-border/10 overflow-x-auto scrollbar-hide group">
         {/* Tooltip */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 h-6 pointer-events-none">
-            {hoveredCell && (
-              <motion.div
-                 initial={{ opacity: 0, y: 5 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 className="bg-foreground text-background text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-sm shadow-2xl"
-              >
-                 {hoveredCell.count} Contributions // {hoveredCell.date}
-              </motion.div>
-            )}
-        </div>
-
-        <div className="min-w-[700px] mt-6 flex justify-between gap-[5px]">
-          {weeks.map((week, wIndex) => (
-            <div key={`week-${wIndex}`} className="flex flex-col gap-[5px]">
-              {week.map((day) => (
-                <motion.div
-                  key={day.date}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ 
-                    duration: 0.4, 
-                    delay: wIndex * 0.01 + Math.random() * 0.05, 
-                    ease: premiumEase 
-                  }}
-                  onMouseEnter={() => setHoveredCell(day)}
-                  onMouseLeave={() => setHoveredCell(null)}
-                  className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-[1px] border transition-all duration-300 cursor-none ${getHeatmapColor(day.count, maxCount)}`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+        <AnimatePresence>
+          {hoveredCell && (
+             <HeatmapTooltip cell={hoveredCell} />
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* 4. Legend (Bottom Right) */}
+      {mounted && (
+        <div className="mt-2 flex items-center justify-end gap-2 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest italic pr-1">
+          <span>Less</span>
+          <div className="flex gap-[3px]">
+            {themeColors.map(color => (
+              <div key={color} className="w-[11px] h-[11px] md:w-[13px] md:h-[13px] rounded-[2px] border border-border/5 shadow-sm" style={{ backgroundColor: color }} />
+            ))}
+          </div>
+          <span>More</span>
+        </div>
+      )}
     </div>
   );
 }

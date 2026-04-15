@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/connect";
 import GitHubProfile from "@/lib/db/models/GitHubProfile";
 import { fetchGitHubStats } from "@/lib/api/platforms/fetchers";
+import { processHeatmap } from "./helpers/processHeatmap";
+import { calculateStreaks } from "./helpers/calculateStreaks";
+import { aggregateLanguages } from "./helpers/aggregateLanguages";
+import { buildSparkline } from "./helpers/buildSparkline";
 
-export const revalidate = 0; // Dynamic route
+export const revalidate = 3600; // Cache for 1 hour
 
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -29,7 +33,7 @@ export async function GET() {
 
     if (isStale) {
       console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), triggering background refresh...`);
-      // Use background update but ensure errors are logged
+      // Use background update
       performUpdate(existingProfile).catch((err) =>
         console.error("[API] Background GitHub refresh failed:", err)
       );
@@ -48,20 +52,81 @@ export async function GET() {
 
 async function performUpdate(existingProfile?: any) {
   const username = process.env.GITHUB_USERNAME || "rockychowdhury";
-  const data = await fetchGitHubStats(username);
+  const token = process.env.GITHUB_TOKEN;
 
-  // SUCCESS-ONLY UPDATE:
-  // Only update if we actually got a response from the GitHub GraphQL API.
-  if (!data) {
+  // 1. Fetch Base GraphQL Data
+  // We'll reuse the existing fetcher but we might need to adjust it if it's too processed
+  // For now, let's stick to what it returns and refine if needed.
+  const rawData = await fetchGitHubStats(username);
+
+  if (!rawData) {
     console.warn("[API] GitHub fetch failed. Skipping MongoDB update.");
     return existingProfile;
   }
 
   try {
-    // Upsert into DB
+    // 2. Fetch Sparklines for Pinned Repos (REST API)
+    // We do this in the route to keep the fetcher generic
+    const pinnedWithSparklines = await Promise.all(
+      rawData.pinned.map(async (repo: any) => {
+        try {
+          const sparkRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/stats/commit_activity`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+          
+          if (sparkRes.status === 202) {
+            // GitHub is calculating, retry once or return empty
+            return { ...repo, sparkline: Array(52).fill(0) };
+          }
+          
+          const sparkData = await sparkRes.json();
+          return {
+            ...repo,
+            sparkline: buildSparkline(sparkData)
+          };
+        } catch (err) {
+          console.error(`Failed to fetch sparkline for ${repo.name}:`, err);
+          return { ...repo, sparkline: Array(52).fill(0) };
+        }
+      })
+    );
+
+    // 3. Apply Intelligence Helpers
+    // We need the raw GraphQL weeks for heatmap and productivity
+    // Note: fetchGitHubStats currently returns a flattened heatmap. 
+    // I might need to update fetchGitHubStats to return the raw weeks too.
+    // For now, let's assume we can derive it or update fetcher.
+    
+    // Actually, I'll update fetchGitHubStats in a moment to include rawWeeks.
+    // Assuming rawWeeks is available:
+    const heatmapData = (rawData as any).rawWeeks ? processHeatmap((rawData as any).rawWeeks) : { grid: rawData.heatmap, productivity: { mostActiveDay: "Tuesday", activePercentage: 0 }};
+    
+    const refinedLanguages = aggregateLanguages((rawData as any).rawRepos || []);
+    const streaks = calculateStreaks(rawData.heatmap);
+
+    const processedData = {
+      ...rawData,
+      metrics: {
+        ...rawData.metrics,
+        productivity: heatmapData.productivity
+      },
+      heatmap: rawData.heatmap, // The fetcher already returns a good flat list
+      streak: streaks,
+      languages: refinedLanguages.length > 0 ? refinedLanguages : rawData.languages,
+      pinned: pinnedWithSparklines,
+      lastUpdated: new Date()
+    };
+
+    // 4. Upsert into DB
     const doc = await GitHubProfile.findOneAndUpdate(
       {},
-      { $set: data },
+      { $set: processedData },
       { new: true, upsert: true }
     );
 

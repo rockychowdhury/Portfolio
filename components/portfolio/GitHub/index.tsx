@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionWrapper from "../SectionWrapper";
-import MetricsBar from "./MetricsBar";
+import MeaningfulStatsRow from "./MeaningfulStatsRow";
 import ContributionHeatmap from "./ContributionHeatmap";
-import LanguageBreakdown from "./LanguageBreakdown";
-import PinnedRepos from "./PinnedRepos";
+import LanguageIntelligence from "./LanguageIntelligence";
+import PinnedRepoGrid from "./PinnedRepoGrid";
 import {
   HeatmapSkeleton,
   LanguagesSkeleton,
@@ -14,7 +14,7 @@ import {
   PinnedReposSkeleton,
 } from "./Skeletons";
 
-// Hero-style easing
+// Premium easing for sections
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
 
 const letterAnimation = {
@@ -41,6 +41,10 @@ interface GitHubStats {
     allTimeContributions: number;
     currentYearContributions: number;
     previousYearContributions: number;
+    productivity: {
+      mostActiveDay: string;
+      activePercentage: number;
+    };
   };
   heatmap: {
     date: string;
@@ -55,6 +59,7 @@ interface GitHubStats {
     color: string;
     size: number;
     percentage: number;
+    repoCount: number;
   }[];
   pinned: {
     name: string;
@@ -65,7 +70,9 @@ interface GitHubStats {
     language: { name: string; color: string } | null;
     topics: string[];
     pushedAt: string;
+    sparkline: number[];
   }[];
+  contributionYears?: number[];
 }
 
 export default function GitHubSection() {
@@ -96,6 +103,11 @@ export default function GitHubSection() {
   const titleWords = "Open Source".split(" ");
   const activityWords = "Activity".split("");
 
+  // Derived subtext data
+  const years = data?.contributionYears || [];
+  const activeSince = years.length > 0 ? Math.min(...years) : 2022;
+  const primaryStack = data?.languages?.slice(0, 4).map(l => l.name).join(" · ") || "Python · FastAPI · JavaScript · TypeScript";
+
   return (
     <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
       {/* ── Background & Guidelines ── */}
@@ -106,8 +118,6 @@ export default function GitHubSection() {
       </div>
 
       <div className="relative mx-auto max-w-[1400px]">
-        {/* Vertical Side Label Removed */}
-
         {/* Section Headline */}
         <div className="mb-12 md:mb-32 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
@@ -153,50 +163,63 @@ export default function GitHubSection() {
             className="mt-12 flex items-center gap-4"
           >
             <div className="h-px w-8 bg-foreground/40" />
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
               {isLoading
                 ? "Synchronizing Live Telemetry..."
                 : error || !data 
                 ? "Live stats temporarily unavailable."
-                : `${data.metrics.repos} repositories. Consistent commits. Real projects.`}
+                : `${data.metrics.repos} repositories · Active since ${activeSince} · Primary stack: ${primaryStack}`}
             </p>
           </motion.div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main Content Sections */}
         {!error && (
-          <div className="flex flex-col gap-12 md:gap-20 lg:pl-16">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
-              {/* Left Column: Stats & Heatmap */}
-              <div className="lg:col-span-8 flex flex-col gap-12 md:gap-20">
-                {isLoading ? <MetricsSkeleton /> : data && <MetricsBar metrics={data.metrics} />}
-                
+          <div className="flex flex-col gap-12 md:gap-32 lg:pl-16">
+            {/* 1. Meaningful Stats Row */}
+            {isLoading ? (
+              <MetricsSkeleton />
+            ) : (
+              data && <MeaningfulStatsRow metrics={data.metrics} streak={data.streak} heatmap={data.heatmap} />
+            )}
+
+            {/* 2. Two-column Layout: Heatmap & Language Intelligence */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20">
+              {/* Left Column: Heatmap */}
+              <div className="lg:col-span-8 flex flex-col gap-12">
                 {isLoading ? (
                   <HeatmapSkeleton />
-                ) : data && (
-                  <ContributionHeatmap 
-                    heatmap={data.heatmap} 
-                    totalContributions={data.metrics.commits}
-                    streak={data.streak}
-                  />
+                ) : (
+                  data && (
+                    <ContributionHeatmap 
+                      heatmap={data.heatmap} 
+                      stats={data.metrics}
+                      streak={data.streak}
+                    />
+                  )
                 )}
+
+                {/* Pinned Repositories Moved Here */}
+                <div className="flex flex-col gap-8 pt-8 border-t border-border/10">
+                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/40">Featured Repositories</h3>
+                   {isLoading ? (
+                     <PinnedReposSkeleton />
+                   ) : (
+                     data && <PinnedRepoGrid repos={data.pinned} />
+                   )}
+                </div>
               </div>
 
-              {/* Right Column: Top Languages & Pinned Repos */}
-              <div className="lg:col-span-4 flex flex-col gap-8">
+              {/* Right Column: Language Intelligence */}
+              <div className="lg:col-span-4">
                 {isLoading ? (
-                  <div className="flex flex-col gap-8">
-                    <LanguagesSkeleton />
-                    <PinnedReposSkeleton />
-                  </div>
-                ) : data && (
-                  <>
-                    <LanguageBreakdown languages={data.languages} />
-                    <PinnedRepos repos={data.pinned} />
-                  </>
+                  <LanguagesSkeleton />
+                ) : (
+                  data && <LanguageIntelligence languages={data.languages} />
                 )}
               </div>
             </div>
+
           </div>
         )}
 

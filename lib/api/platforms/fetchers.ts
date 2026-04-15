@@ -410,7 +410,10 @@ export async function fetchGitHubStats(username: string): Promise<IGitHubStats |
       languages,
       pinned,
       lastUpdated: new Date(),
-    };
+      contributionYears,
+      rawWeeks: calendar.weeks,
+      rawRepos: user.repositories.nodes,
+    } as any;
   } catch (error) {
     console.error(`[fetchGitHubStats] Critical Error for ${username}:`, error);
     return null;
