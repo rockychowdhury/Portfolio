@@ -203,7 +203,11 @@ export default function BlogsSection() {
             </motion.p>
           </div>
 
-          <SearchBar query={searchQuery} setQuery={setSearchQuery} />
+          <SearchBar 
+            query={searchQuery} 
+            setQuery={setSearchQuery} 
+            hasResults={searchQuery.trim() === "" || filteredBlogs.length > 0} 
+          />
         </div>
 
         {/* Filters */}
