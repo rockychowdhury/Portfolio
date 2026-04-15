@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
   query: string;
@@ -17,16 +18,16 @@ export default function SearchBar({ query, setQuery }: SearchBarProps) {
       className="relative w-full lg:w-96 group"
     >
       <div className="relative flex items-center">
-        <div className="absolute left-0 text-muted-foreground/30 group-focus-within:text-foreground transition-colors">
-          <Search size={16} strokeWidth={3} />
+        <div className="absolute left-4 z-10 text-muted-foreground/30 group-focus-within:text-foreground transition-colors pointer-events-none">
+          <Search size={16} strokeWidth={2.5} />
         </div>
         
-        <input
+        <Input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="SEARCH ARTICLES //"
-          className="w-full bg-transparent border-b border-border/20 py-4 pl-8 pr-10 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-foreground/40 transition-all placeholder:text-muted-foreground/20"
+          placeholder="Search your database..."
+          className="h-12 w-full bg-background/50 dark:bg-zinc-900/50 border border-primary/20 pl-12 pr-12 text-sm font-medium transition-all placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/10 focus-visible:border-primary/40 focus-visible:bg-background rounded-full shadow-sm"
         />
 
         <AnimatePresence>
@@ -36,7 +37,7 @@ export default function SearchBar({ query, setQuery }: SearchBarProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setQuery("")}
-              className="absolute right-0 text-muted-foreground/40 hover:text-foreground transition-colors"
+              className="absolute right-4 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
             >
               <X size={14} />
             </motion.button>

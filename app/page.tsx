@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/portfolio/Navbar";
 import HeroSection from "@/components/portfolio/HeroSection";
 import SkillsSection from "@/components/portfolio/SkillsSection";
@@ -18,11 +18,24 @@ import ProjectsSection from "@/sections/ProjectsSection";
 import JourneySection from "@/components/portfolio/Journey";
 
 export default function Home() {
-  const [preloaderDone, setPreloaderDone] = useState(false); // MUST be false initially so it renders the Preloader on SSR/first load
+  const [preloaderDone, setPreloaderDone] = useState(false);
 
   const handlePreloaderComplete = () => {
     setPreloaderDone(true);
   };
+
+  useEffect(() => {
+    if (preloaderDone && window.location.hash) {
+      const id = window.location.hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        // Wait a small bit for any final layout shifts (like hydration)
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    }
+  }, [preloaderDone]);
 
   return (
     <>

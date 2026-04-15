@@ -4,11 +4,13 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import AchievementCard, { Achievement } from "./AchievementCard";
 import ClosingCard from "./ClosingCard";
 import MasterySpine from "./MasterySpine";
+import { JourneySkeleton } from "./JourneySkeleton";
 
 
 const JourneySection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchJourney = async () => {
@@ -20,6 +22,8 @@ const JourneySection = () => {
         }
       } catch (error) {
         console.error("Failed to fetch journey:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchJourney();
@@ -60,8 +64,10 @@ const JourneySection = () => {
           <MasterySpine containerRef={containerRef} />
 
           {/* Achievement Stream */}
-          <div className="flex flex-col gap-8">
-            {groupedAchievements.map(([month, achs], groupIdx) => (
+          <div className="flex flex-col gap-8 min-h-[400px]">
+            {loading ? (
+              <JourneySkeleton />
+            ) : groupedAchievements.map(([month, achs], groupIdx) => (
               <div key={month} className="flex flex-col gap-2">
                 {/* Time Caption Header */}
                 <div className="flex items-center gap-4 py-2 opacity-40">

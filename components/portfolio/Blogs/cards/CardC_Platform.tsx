@@ -35,9 +35,9 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
         )}
         
         {/* Play Button Overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-xl transform scale-90 group-hover:scale-100 transition-transform duration-300">
-             <Play fill="currentColor" size={20} />
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[4px]">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-zinc-900 shadow-2xl transform scale-90 group-hover:scale-100 transition-transform duration-500">
+             <Play fill="currentColor" size={24} className="ml-1" />
           </div>
         </div>
 
@@ -47,7 +47,7 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
       </div>
 
       <div className="p-6 md:p-8">
-        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mb-6 group-hover:text-primary transition-colors line-clamp-2">
+        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mb-6 line-clamp-2">
           {blog.title}
         </h3>
         

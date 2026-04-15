@@ -27,7 +27,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
             alt={blog.title}
             fill
             isPriority={isPriority}
-            className="object-cover grayscale-[0.2] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+            className="object-cover transition-all duration-700"
           />
         )}
         
@@ -52,7 +52,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
             ))}
         </div>
 
-        <h3 className={`font-bold tracking-tight text-foreground leading-tight group-hover:text-primary transition-colors ${isPriority ? 'text-3xl md:text-4xl mb-6' : 'text-xl md:text-2xl mb-4'}`}>
+        <h3 className={`font-bold tracking-tight text-foreground leading-tight ${isPriority ? 'text-3xl md:text-4xl mb-6' : 'text-xl md:text-2xl mb-4'}`}>
           {blog.title}
         </h3>
         
@@ -66,7 +66,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
               <Clock size={12} strokeWidth={3} /> {blog.etr} MIN
             </span>
           </div>
-          <ArrowUpRight size={16} className="text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+          <ArrowUpRight size={16} className="text-muted-foreground/20 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
         </div>
       </div>
     </motion.a>

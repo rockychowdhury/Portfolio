@@ -38,7 +38,7 @@ export default function CardD_Minimal({ blog, onTagClick }: CardProps) {
         <PlatformBadge platform={blog.platform} className="!bg-transparent !text-muted-foreground/40 !p-0 !text-[8px]" />
       </div>
 
-      <h3 className="text-xl font-bold text-foreground leading-tight mb-6 group-hover:text-primary transition-colors">
+      <h3 className="text-xl font-bold text-foreground leading-tight mb-6">
         {blog.title}
       </h3>
 

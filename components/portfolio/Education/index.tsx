@@ -6,6 +6,7 @@ import { ICertification } from "@/lib/db/models/Certification";
 import SectionWrapper from "../SectionWrapper";
 import BentoGrid from "./BentoGrid";
 import ShowAllButton from "./ShowAllButton";
+import { EducationSkeleton } from "./EducationSkeleton";
 
 export default function Education() {
   const [data, setData] = useState<ICertification[]>([]);
@@ -28,8 +29,6 @@ export default function Education() {
     };
     fetchData();
   }, []);
-
-  if (isLoading && data.length === 0) return null;
 
   // Initial set: Hero (Education) + 2 Certifications
   const heroItem = data.find(item => item.type === "education");
@@ -76,21 +75,26 @@ export default function Education() {
         </motion.div>
 
         {/* Bento Grid Container */}
-        <div className="relative" ref={sectionRef}>
-          <BentoGrid data={visibleData} />
-          
-          {/* Show All Trigger */}
-          {remainingCerts.length > 0 && (
-             <ShowAllButton 
-                isExpanded={showAll} 
-                onClick={() => {
-                  setShowAll(!showAll);
-                  if (showAll) {
-                    sectionRef.current?.scrollIntoView({ behavior: "smooth" });
-                  }
-                }} 
-                count={remainingCerts.length} 
-             />
+        <div className="relative min-h-[400px]" ref={sectionRef}>
+          {isLoading ? (
+            <EducationSkeleton />
+          ) : (
+            <>
+              <BentoGrid data={visibleData} />
+              
+              {remainingCerts.length > 0 && (
+                 <ShowAllButton 
+                    isExpanded={showAll} 
+                    onClick={() => {
+                      setShowAll(!showAll);
+                      if (showAll) {
+                        sectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }} 
+                    count={remainingCerts.length} 
+                 />
+              )}
+            </>
           )}
         </div>
       </div>

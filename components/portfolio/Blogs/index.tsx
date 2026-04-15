@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { motion, AnimatePresence, useMotionTemplate, useMotionValue, useInView } from "framer-motion";
 import SectionWrapper from "../SectionWrapper";
 import FilterRow from "./FilterRow";
 import MasonryGrid from "./MasonryGrid";
 import SearchBar from "./SearchBar";
 import { IBlog } from "@/lib/db/models/Blog";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronsDown } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -18,6 +18,16 @@ export default function BlogsSection() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
+
+  // Spotlight Logic
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -52,7 +62,7 @@ export default function BlogsSection() {
     // 1. apply search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      result = result.filter((blog) => 
+      result = result.filter((blog) =>
         blog.title.toLowerCase().includes(q) ||
         blog.subtitle.toLowerCase().includes(q) ||
         blog.tags.some(tag => tag.toLowerCase().includes(q))
@@ -61,8 +71,8 @@ export default function BlogsSection() {
 
     // 2. apply platform/tag filters
     if (activeFilters.length > 0) {
-      result = result.filter((blog) => 
-        activeFilters.includes(blog.platform) || 
+      result = result.filter((blog) =>
+        activeFilters.includes(blog.platform) ||
         blog.tags.some(tag => activeFilters.includes(tag))
       );
     }
@@ -96,37 +106,100 @@ export default function BlogsSection() {
   const displayedBlogs = filteredBlogs.slice(0, visibleCount);
   const hasMore = visibleCount < filteredBlogs.length;
 
+  const blogsTitle = "Blogs &".split(" ");
+  const resourcesTitle = "Resources".split("");
+
+  const premiumEase = [0.25, 0.4, 0.25, 1];
+  const letterAnimation = {
+    hidden: { opacity: 0, y: 100, rotateX: 60 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        duration: 1,
+        delay: 0.2 + i * 0.04,
+        ease: premiumEase,
+      },
+    }),
+  };
+
+  const titleRef = useRef(null);
+  const isTitleInView = useInView(titleRef, { once: true, margin: "-10%" });
+
   return (
-    <SectionWrapper id="blogs" className="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10">
+    <SectionWrapper
+      id="blogs"
+      className="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
+      onMouseMove={handleMouseMove}
+    >
       {/* Background Pattern Detail: Horizontal (X-axis) Lines */}
-      <div 
-        className="absolute inset-0 z-0 pointer-events-none opacity-[0.05]" 
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-[0.05]"
         style={{
           backgroundImage: `linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)`,
           backgroundSize: "100% 80px",
         }}
       />
 
-      <div className="mx-auto max-w-[1400px] px-6  relative z-10">
+      {/* Spotlight Effect */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 hover:opacity-100" // Note: Section no longer has group, using hover internally where possible or just leaving it
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              650px circle at ${mouseX}px ${mouseY}px,
+              rgba(var(--primary-rgb), 0.05),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+
+      <div className="mx-auto max-w-[1400px] px-6 relative z-10">
         {/* Headline & Search */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-24 gap-8">
-          <div className="text-left">
-            <motion.h2 
+          <div className="flex flex-col gap-12" ref={titleRef}>
+            <h2 className="flex flex-wrap items-end text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[0.9]">
+              {blogsTitle.map((word, wordIdx) => (
+                <div key={wordIdx} className="flex overflow-hidden mr-6">
+                  {word.split("").map((letter, i) => (
+                    <motion.span
+                      key={i}
+                      custom={i + (wordIdx * 5)}
+                      variants={letterAnimation}
+                      initial="hidden"
+                      animate={isTitleInView ? "visible" : "hidden"}
+                      className="inline-block origin-bottom"
+                    >
+                      {letter}
+                    </motion.span>
+                  ))}
+                </div>
+              ))}
+              <div className="flex overflow-hidden">
+                {resourcesTitle.map((letter, i) => (
+                  <motion.span
+                    key={i}
+                    custom={i + 10}
+                    variants={letterAnimation}
+                    initial="hidden"
+                    animate={isTitleInView ? "visible" : "hidden"}
+                    className="inline-block origin-bottom text-muted-foreground/20"
+                  >
+                    {letter}
+                  </motion.span>
+                ))}
+              </div>
+            </h2>
+
+            <motion.p
               initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground mb-6"
+              animate={isTitleInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 1, delay: 0.8 }}
+              className="text-xs md:text-sm font-medium italic text-muted-foreground/50 max-w-xl"
             >
-              Blogs & Resources
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-lg md:text-xl text-muted-foreground/60 max-w-2xl font-medium"
-            >
-              Technical writing, shared resources, and community builds.
+              Technical writing, explored concepts, and community resources.
             </motion.p>
           </div>
 
@@ -136,12 +209,12 @@ export default function BlogsSection() {
         {/* Filters */}
         {!loading && (
           <div className="mb-12">
-            <FilterRow 
-                platforms={platforms}
-                tags={tags}
-                activeFilters={activeFilters}
-                onFilterToggle={handleFilterToggle}
-                onClearAll={handleClearAll}
+            <FilterRow
+              platforms={platforms}
+              tags={tags}
+              activeFilters={activeFilters}
+              onFilterToggle={handleFilterToggle}
+              onClearAll={handleClearAll}
             />
           </div>
         )}
@@ -150,8 +223,8 @@ export default function BlogsSection() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="rounded-[2.5rem] bg-secondary/5 border border-border/10 overflow-hidden animate-pulse h-[400px]"
               >
                 <div className="w-full h-48 bg-secondary/10" />
@@ -170,36 +243,44 @@ export default function BlogsSection() {
         ) : displayedBlogs.length > 0 ? (
           <div className="w-full">
             <MasonryGrid blogs={displayedBlogs} onTagClick={handleFilterToggle} />
-            
-            {/* Load More */}
-            <div className="mt-20 flex justify-center">
-              {hasMore ? (
-                <button
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  className="px-8 py-4 rounded-full border border-border/80 shadow-sm text-xs font-black uppercase tracking-widest hover:bg-secondary/10 transition-all flex items-center gap-2 group"
-                >
-                  {loadingMore ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Loading...
-                    </>
+
+            <div className="flex flex-col items-center justify-center py-32">
+              <div className="relative w-full flex items-center justify-center">
+                {/* Subtle Divider Line */}
+                <div className="absolute inset-x-0 h-px bg-border/10" />
+                
+                <div className="relative z-10 bg-background px-12">
+                  {hasMore ? (
+                    <motion.button
+                      onClick={handleLoadMore}
+                      disabled={loadingMore}
+                      whileHover={{ scale: 1.02 }}
+                      className="group flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/60 hover:text-foreground transition-all duration-500 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      {loadingMore ? (
+                        <Loader2 size={14} className="animate-spin text-primary" />
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-3 transition-all duration-700">
+                            <ChevronsDown size={14} className="group-hover:translate-y-1 transition-transform duration-500 opacity-60 group-hover:opacity-100 shrink-0" />
+                            <span className="group-hover:tracking-[0.8em] transition-all duration-700 whitespace-nowrap">Load More</span>
+                            <div className="w-6 h-px bg-muted-foreground/20 group-hover:w-10 group-hover:bg-primary transition-all duration-700 shrink-0" />
+                          </div>
+                        </>
+                      )}
+                    </motion.button>
                   ) : (
-                    <>
-                      Load More Articles <span className="group-hover:translate-y-1 transition-transform">↓</span>
-                    </>
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/10">
+                      End of technical archive // 2026
+                    </p>
                   )}
-                </button>
-              ) : (
-                <p className="text-muted-foreground/20 text-[10px] font-black uppercase tracking-[0.4em]">
-                  Live Stream Ended // End of content
-                </p>
-              )}
+                </div>
+              </div>
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 border border-border/80 rounded-3xl bg-white shadow-sm dark:bg-zinc-800/80">
-             <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">No entries found.</p>
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">No entries found.</p>
           </div>
         )}
       </div>
