@@ -64,8 +64,8 @@ export default function TestimonialsSection() {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
 
-  // Select top 10 for the cloud layout
-  const topTestimonials = testimonials.slice(0, 10);
+  // Select top 14 for the cloud layout (matching GRID_ZONES count)
+  const topTestimonials = testimonials.slice(0, 14);
 
   return (
     <section id="testimonials" className="relative w-full bg-background pt-32 pb-24 overflow-hidden">
@@ -83,8 +83,10 @@ export default function TestimonialsSection() {
                 We handle this via staggered viewport triggers in the sub-components */}
             <FloatingCloud testimonials={topTestimonials} isPaused={isModalOpen} />
             
-            <div className="absolute inset-0 z-20 flex items-center justify-center">
-              <CenterHeadline onLeaveTestimonial={() => setIsModalOpen(true)} />
+            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="pointer-events-auto">
+                <CenterHeadline onLeaveTestimonial={() => setIsModalOpen(true)} />
+              </div>
             </div>
           </div>
         </div>
