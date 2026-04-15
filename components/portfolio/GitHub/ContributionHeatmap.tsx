@@ -67,7 +67,7 @@ export default function ContributionHeatmap({ heatmap, totalContributions, strea
         </div>
       </div>
 
-      <div className="relative rounded-[2rem] bg-secondary/10 p-8 md:p-10 border border-border/10 overflow-x-auto custom-scrollbar group">
+      <div className="relative rounded-[2rem] bg-secondary/10 p-8 md:p-10 border border-border/10 overflow-x-auto scrollbar-hide group">
         {/* Tooltip */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 h-6 pointer-events-none">
             {hoveredCell && (

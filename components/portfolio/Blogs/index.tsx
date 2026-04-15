@@ -160,9 +160,9 @@ export default function BlogsSection() {
         {/* Headline & Search */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-24 gap-8">
           <div className="flex flex-col gap-12" ref={titleRef}>
-            <h2 className="flex flex-wrap items-end text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[0.9]">
+            <h2 className="flex flex-wrap items-end text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[1.1]">
               {blogsTitle.map((word, wordIdx) => (
-                <div key={wordIdx} className="flex overflow-hidden mr-6">
+                <div key={wordIdx} className="flex overflow-hidden mr-6 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
                     <motion.span
                       key={i}
@@ -177,7 +177,7 @@ export default function BlogsSection() {
                   ))}
                 </div>
               ))}
-              <div className="flex overflow-hidden">
+              <div className="flex overflow-hidden pb-4 -mb-4">
                 {resourcesTitle.map((letter, i) => (
                   <motion.span
                     key={i}

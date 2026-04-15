@@ -106,20 +106,14 @@ export default function GitHubSection() {
       </div>
 
       <div className="relative mx-auto max-w-[1400px]">
-        {/* Vertical Side Label */}
-        <div className="absolute top-0 -left-12 hidden flex-col items-center gap-8 lg:flex">
-          <span className="text-[10px] font-black tracking-[0.4em] uppercase text-muted-foreground/30 [writing-mode:vertical-lr] rotate-180">
-            Telemetry // 2025
-          </span>
-          <div className="h-24 w-px border-l border-dashed border-border/20" />
-        </div>
+        {/* Vertical Side Label Removed */}
 
         {/* Section Headline */}
         <div className="mb-12 md:mb-32 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[0.8] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
               {titleWords.map((word, wordIdx) => (
-                <div key={wordIdx} className="flex overflow-hidden mr-4">
+                <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
                     <motion.span
                       key={i}
@@ -135,7 +129,7 @@ export default function GitHubSection() {
                 </div>
               ))}
               <span className="text-[0.6em] text-muted-foreground/20 italic font-light ml-2 mr-4">&</span> 
-              <div className="flex overflow-hidden">
+              <div className="flex overflow-hidden pb-4 -mb-4">
                 {activityWords.map((letter, i) => (
                   <motion.span
                     key={i}
@@ -172,13 +166,11 @@ export default function GitHubSection() {
         {/* Main Content Grid */}
         {!error && (
           <div className="flex flex-col gap-12 md:gap-20 lg:pl-16">
-            {/* Top Row: Metrics Bar */}
-            {isLoading ? <MetricsSkeleton /> : data && <MetricsBar metrics={data.metrics} />}
-
-            {/* Middle Row: Heatmap + Languages & Pinned Repos */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
-              {/* Left Column (8 cols): Heatmap + Streak */}
-              <div className="lg:col-span-8">
+              {/* Left Column: Stats & Heatmap */}
+              <div className="lg:col-span-8 flex flex-col gap-12 md:gap-20">
+                {isLoading ? <MetricsSkeleton /> : data && <MetricsBar metrics={data.metrics} />}
+                
                 {isLoading ? (
                   <HeatmapSkeleton />
                 ) : data && (
@@ -190,7 +182,7 @@ export default function GitHubSection() {
                 )}
               </div>
 
-              {/* Right Column (4 cols): Languages + Pinned Repos List */}
+              {/* Right Column: Top Languages & Pinned Repos */}
               <div className="lg:col-span-4 flex flex-col gap-8">
                 {isLoading ? (
                   <div className="flex flex-col gap-8">
