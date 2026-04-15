@@ -15,10 +15,7 @@ export default function SearchBar({ query, setQuery, hasResults = true }: Search
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      className="relative w-full lg:w-96 group flex justify-center lg:justify-end"
+      className="relative w-full lg:w-80 group flex justify-start"
     >
       <div 
         className={`relative flex items-center group max-w-[280px] w-full transition-all duration-300 rounded-full px-4 py-1.5 border border-border/40 bg-secondary/40 hover:bg-secondary/50 shadow-sm`}

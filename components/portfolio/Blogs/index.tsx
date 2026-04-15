@@ -117,8 +117,8 @@ export default function BlogsSection() {
       y: 0,
       rotateX: 0,
       transition: {
-        duration: 1,
-        delay: 0.2 + i * 0.04,
+        duration: 0.7,
+        delay: 0.1 + i * 0.02,
         ease: premiumEase,
       },
     }),
@@ -157,71 +157,67 @@ export default function BlogsSection() {
       />
 
       <div className="mx-auto max-w-[1400px] px-6 relative z-10">
-        {/* Headline & Search */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-24 gap-8">
-          <div className="flex flex-col gap-12" ref={titleRef}>
-            <h2 className="flex flex-wrap items-end text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[1.1]">
-              {blogsTitle.map((word, wordIdx) => (
-                <div key={wordIdx} className="flex overflow-hidden mr-6 pb-4 -mb-4">
-                  {word.split("").map((letter, i) => (
-                    <motion.span
-                      key={i}
-                      custom={i + (wordIdx * 5)}
-                      variants={letterAnimation}
-                      initial="hidden"
-                      animate={isTitleInView ? "visible" : "hidden"}
-                      className="inline-block origin-bottom"
-                    >
-                      {letter}
-                    </motion.span>
-                  ))}
-                </div>
-              ))}
-              <div className="flex overflow-hidden pb-4 -mb-4">
-                {resourcesTitle.map((letter, i) => (
+        {/* Headline */}
+        <div className="flex flex-col items-center mb-16 gap-12" ref={titleRef}>
+          <h2 className="flex flex-wrap items-center justify-center text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[1.1]">
+            {blogsTitle.map((word, wordIdx) => (
+              <div key={wordIdx} className="flex overflow-hidden mr-6 pb-4 -mb-4">
+                {word.split("").map((letter, i) => (
                   <motion.span
                     key={i}
-                    custom={i + 10}
+                    custom={i + (wordIdx * 5)}
                     variants={letterAnimation}
                     initial="hidden"
                     animate={isTitleInView ? "visible" : "hidden"}
-                    className="inline-block origin-bottom text-muted-foreground/20"
+                    className="inline-block origin-bottom"
                   >
                     {letter}
                   </motion.span>
                 ))}
               </div>
-            </h2>
-
-            <motion.p
-              initial={{ opacity: 0, x: -20 }}
-              animate={isTitleInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="text-xs md:text-sm font-medium italic text-muted-foreground/50 max-w-xl"
-            >
-              Technical writing, explored concepts, and community resources.
-            </motion.p>
-          </div>
-
-          <SearchBar 
-            query={searchQuery} 
-            setQuery={setSearchQuery} 
-            hasResults={searchQuery.trim() === "" || filteredBlogs.length > 0} 
-          />
+            ))}
+            <div className="flex overflow-hidden pb-4 -mb-4">
+              {resourcesTitle.map((letter, i) => (
+                <motion.span
+                  key={i}
+                  custom={i + 10}
+                  variants={letterAnimation}
+                  initial="hidden"
+                  animate={isTitleInView ? "visible" : "hidden"}
+                  className="inline-block origin-bottom text-muted-foreground/20"
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
+          </h2>
         </div>
 
-        {/* Filters */}
-        {!loading && (
-          <div className="mb-12">
-            <FilterRow
-              platforms={platforms}
-              tags={tags}
-              activeFilters={activeFilters}
-              onFilterToggle={handleFilterToggle}
-              onClearAll={handleClearAll}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex items-center justify-start mb-12 gap-8 border-b border-border/10 pb-6 w-full overflow-hidden"
+        >
+          <div className="flex-shrink-0">
+            <SearchBar 
+              query={searchQuery} 
+              setQuery={setSearchQuery} 
+              hasResults={searchQuery.trim() === "" || filteredBlogs.length > 0} 
             />
           </div>
-        )}
+          <div className="flex-1 overflow-hidden min-w-0">
+            {!loading && (
+              <FilterRow
+                platforms={platforms}
+                tags={tags}
+                activeFilters={activeFilters}
+                onFilterToggle={handleFilterToggle}
+                onClearAll={handleClearAll}
+              />
+            )}
+          </div>
+        </motion.div>
 
         {/* Content */}
         {loading ? (

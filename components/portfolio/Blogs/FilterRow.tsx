@@ -23,15 +23,15 @@ export default function FilterRow({
   const isAllSelected = activeFilters.length === 0;
 
   return (
-    <div className="relative w-full mb-16">
+    <div className="relative w-full">
       <div 
         ref={scrollContainerRef}
-        className="flex items-center gap-2 overflow-x-auto pb-6 scrollbar-hide px-2"
+        className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-hide px-2"
       >
         {/* All / Reset Pill */}
         <button
           onClick={onClearAll}
-          className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+          className={`px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
             isAllSelected 
             ? "bg-foreground text-background" 
             : "text-muted-foreground/60 hover:text-foreground"
@@ -49,7 +49,7 @@ export default function FilterRow({
             <button
               key={platform}
               onClick={() => onFilterToggle(platform)}
-              className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex-shrink-0 whitespace-nowrap ${
+              className={`px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex-shrink-0 whitespace-nowrap ${
                 isActive 
                 ? "bg-foreground text-background" 
                 : "bg-secondary/10 text-muted-foreground/60 hover:bg-secondary/20 hover:text-foreground"
@@ -69,7 +69,7 @@ export default function FilterRow({
             <button
               key={tag}
               onClick={() => onFilterToggle(tag)}
-              className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex-shrink-0 whitespace-nowrap ${
+              className={`px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex-shrink-0 whitespace-nowrap ${
                 isActive 
                 ? "bg-primary text-white" 
                 : "border border-border/40 text-muted-foreground/60 hover:border-foreground/20 hover:text-foreground"
