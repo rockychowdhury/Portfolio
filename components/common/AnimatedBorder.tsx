@@ -6,28 +6,29 @@ import { ReactNode } from "react";
 interface Props {
   children: ReactNode;
   isActive: boolean;
+  innerClassName?: string;
 }
 
-export default function AnimatedBorder({ children, isActive }: Props) {
+export default function AnimatedBorder({ children, isActive, innerClassName }: Props) {
   if (!isActive) return <>{children}</>;
 
   return (
-    <div className="relative p-[2px] rounded-[2rem] overflow-hidden group/border">
-      {/* Animated Gradient Background */}
+    <div className="relative p-[1.5px] rounded-[1.6rem] overflow-hidden group/border h-full">
+      {/* Animated Neon Beam */}
       <motion.div
         animate={{
           rotate: [0, 360],
         }}
         transition={{
-          duration: 4,
+          duration: 3,
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute inset-[-100%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_150deg,var(--primary)_180deg,transparent_210deg,transparent_360deg)] opacity-60 group-hover/border:opacity-100 transition-opacity"
+        className="absolute inset-[-150%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_120deg,var(--primary)_180deg,cyan_210deg,transparent_270deg,transparent_360deg)] opacity-70 group-hover/border:opacity-100 transition-opacity blur-[1px]"
       />
       
       {/* Inner Content Container */}
-      <div className="relative bg-background rounded-[1.9rem] h-full z-10 overflow-hidden">
+      <div className={`relative h-full z-10 overflow-hidden rounded-[1.5rem] ${innerClassName || "bg-background"}`}>
         {children}
       </div>
     </div>

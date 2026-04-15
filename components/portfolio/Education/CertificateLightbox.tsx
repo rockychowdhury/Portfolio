@@ -50,17 +50,17 @@ export default function CertificateLightbox({
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="relative w-full max-w-5xl bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-secondary transition-colors z-10"
+              className="absolute top-4 right-4 p-2 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-secondary hover:scale-110 active:scale-95 transition-all cursor-pointer z-10"
             >
               <X className="w-5 h-5" />
             </button>
@@ -92,7 +92,7 @@ export default function CertificateLightbox({
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer"
                   >
                     Verify Authenticity
                     <ExternalLink className="w-4 h-4" />
@@ -100,7 +100,7 @@ export default function CertificateLightbox({
                   
                   <button
                     onClick={onClose}
-                    className="w-full py-3 bg-secondary/50 border border-border/50 rounded-xl font-semibold text-sm hover:bg-secondary transition-colors"
+                    className="w-full py-3 bg-secondary/50 border border-border/50 rounded-xl font-semibold text-sm hover:bg-secondary active:scale-[0.98] transition-all cursor-pointer"
                   >
                     Close Preview
                   </button>

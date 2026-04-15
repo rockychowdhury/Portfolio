@@ -15,16 +15,17 @@ export default function SkillTags({ skills }: SkillTagsProps) {
   const visibleTags = expanded ? tagList : tagList.slice(0, limit);
 
   return (
-    <div className="flex flex-wrap gap-2 mt-4">
+    <div className="flex flex-wrap gap-1.5 mt-2">
       <AnimatePresence mode="popLayout">
-        {visibleTags.map((tag) => (
+        {visibleTags.map((tag, idx) => (
           <motion.span
             key={tag}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ delay: idx * 0.03 }}
             layout
-            className="px-2.5 py-1 text-[11px] font-medium tracking-tight text-muted-foreground bg-secondary/40 border border-border/50 rounded-lg hover:text-foreground hover:bg-secondary/60 transition-colors"
+            className="px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-muted-foreground/60 bg-secondary/5 border border-border/10 rounded-md hover:text-foreground hover:bg-secondary/20 transition-all duration-300"
           >
             {tag}
           </motion.span>
@@ -34,9 +35,9 @@ export default function SkillTags({ skills }: SkillTagsProps) {
       {hasMore && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="px-2.5 py-1 text-[11px] font-bold tracking-tight text-primary hover:underline transition-all"
+          className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-all ml-1"
         >
-          {expanded ? "Show Less" : `+${tagList.length - limit} more`}
+          {expanded ? "Less" : `+${tagList.length - limit}`}
         </button>
       )}
     </div>

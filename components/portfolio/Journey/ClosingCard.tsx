@@ -7,19 +7,15 @@ import { cn } from "@/lib/utils";
 
 const ClosingCard = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.5 });
   
   return (
-    <div ref={containerRef} className="relative w-full py-8 flex items-start gap-4">
-      {/* status indicator - pill */}
-      <div className="absolute left-[-20px] w-[9px] h-[9px] rounded-full border border-amber-500 bg-background z-20" />
-      
+    <div ref={containerRef} className="relative w-full flex items-start gap-4">
       <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        whileInView={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 min-w-[250px]"
       >
         <div className="flex items-center gap-3">
           <Smile className="w-4 h-4 text-amber-500" />
@@ -28,7 +24,7 @@ const ClosingCard = () => {
           </h3>
         </div>
         
-        <p className="text-[12px] text-muted-foreground leading-relaxed max-w-[400px]">
+        <p className="text-[12px] text-muted-foreground leading-relaxed">
           Every milestone and line of code has shaped who I am today. 
           Reached the present — let's build the next chapter together.
         </p>

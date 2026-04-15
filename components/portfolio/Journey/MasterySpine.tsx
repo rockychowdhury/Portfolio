@@ -3,38 +3,30 @@
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
-const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) => {
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start center", "end center"],
-  });
-
-  const pathLength = useSpring(scrollYProgress, {
+const MasterySpine = ({ progress }: { progress: number }) => {
+  const pathLength = useSpring(progress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
-
   return (
-    <div className="absolute left-[20px] top-4 bottom-4 w-px pointer-events-none">
+    <div className="absolute top-[24px] left-0 right-0 h-px pointer-events-none">
       {/* Background Track */}
-      <div className="absolute inset-0 border-l border-black/[0.08] dark:border-white/[0.08]" />
+      <div className="absolute inset-0 border-t border-black/[0.1] dark:border-white/[0.1]" />
       
       {/* Active Line (Drawing) */}
       <motion.div
-        style={{ scaleY: pathLength, opacity, originY: 0 }}
-        className="absolute inset-0 border-l border-primary z-10"
+        style={{ scaleX: pathLength, originX: 0 }}
+        className="absolute inset-0 border-t border-primary z-10 shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]"
       />
 
       {/* Subtle indicator at the tip */}
       <motion.div
         style={{ 
-          top: useTransform(pathLength, (p) => `${p * 100}%`),
-          opacity 
+          left: useTransform(pathLength, (p) => `${p * 100}%`),
         }}
-        className="absolute left-[-2.5px] w-[6px] h-[6px] rounded-full bg-primary z-20"
+        className="absolute top-[-3.5px] w-2 h-2 rounded-full bg-primary z-20 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
       />
     </div>
   );
