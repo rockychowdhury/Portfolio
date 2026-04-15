@@ -190,7 +190,7 @@ export default function HeroSection({
       id="hero"
       className="relative min-h-screen w-full overflow-hidden bg-background pt-24 lg:pt-0"
     >
-      <div className="mx-auto flex h-full max-w-[1400px] flex-col px-6 md:px-12 lg:flex-row lg:px-20">
+      <div className="mx-auto flex h-full max-w-[1400px] flex-col px-6 md:px-12 lg:grid lg:grid-cols-2 lg:px-20">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-1 flex-col justify-center py-12 lg:py-0">
           {/* Vertical Label — Desktop Only */}
@@ -198,9 +198,9 @@ export default function HeroSection({
             <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
               Problem Solver
             </span>
-            <div className="h-40 w-px border-l border-dashed border-border/60" />
+            <div className="h-64 w-px border-l border-dashed border-border/60" />
             <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
-              2024
+              2023
             </span>
           </div>
 
@@ -208,12 +208,12 @@ export default function HeroSection({
             variants={stagger}
             initial="hidden"
             animate={preloaderDone ? "visible" : "hidden"}
-            className="lg:pl-12"
+            className="lg:pl-12 lg:pt-24 xl:pt-32"
           >
             {/* Stats Row — pushed down */}
             <motion.div
               variants={fadeUp}
-              className="mb-24 mt-8 flex flex-wrap items-start gap-12 md:gap-20"
+              className="mb-12 mt-8 flex flex-wrap items-start gap-12 md:gap-20"
             >
               <div>
                 <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
@@ -236,7 +236,7 @@ export default function HeroSection({
             {/* Main Heading */}
             <div className="relative">
               <h1
-                className="flex text-[7rem] font-medium leading-[0.85] tracking-tighter text-foreground sm:text-[9rem] md:text-[11rem] lg:text-[12rem] xl:text-[14rem]"
+                className="flex font-medium leading-[0.85] tracking-tighter text-foreground text-[clamp(6rem,16vw,14rem)] lg:text-[clamp(6rem,12vw,12rem)] 2xl:text-[clamp(12rem,15vw,14rem)]"
                 style={{ perspective: "600px" }}
               >
                 {helloLetters.map((letter, i) => (
@@ -270,38 +270,38 @@ export default function HeroSection({
                 variants={fadeUp}
                 initial="hidden"
                 animate={preloaderDone ? "visible" : "hidden"}
-                className="mt-12 flex flex-wrap gap-4"
+                className="mt-12 flex flex-wrap lg:flex-nowrap gap-4"
               >
                 <a
                   href="https://linkedin.com/in/rockychowdhury1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex items-center gap-3 px-8 py-4 bg-foreground text-background rounded-full font-bold text-sm overflow-hidden transition-all hover:shadow-2xl active:scale-[0.98]"
+                  className="group relative flex items-center gap-3 px-7 py-3 bg-foreground text-background rounded-full font-bold text-sm overflow-hidden transition-all hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)] hover:-translate-y-1 active:scale-[0.98] whitespace-nowrap"
                 >
-                  <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                  <LinkedinIcon className="size-[18px] relative z-10" />
-                  <span className="relative z-10">Connect on LinkedIn</span>
-                  <span className="relative z-10 text-[10px] opacity-60 group-hover:opacity-100 transition-opacity">↗</span>
+                  <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                  <LinkedinIcon className="size-4 relative z-10" />
+                  <span className="relative z-10">LinkedIn</span>
+                  <span className="relative z-10 text-[10px] opacity-60 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">↗</span>
                 </a>
                 <a
                   href={resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex items-center gap-3 px-8 py-4 bg-transparent border-2 border-foreground/15 text-foreground rounded-full font-bold text-sm overflow-hidden transition-all hover:border-foreground/40 hover:shadow-lg active:scale-[0.98]"
+                  className="group relative flex items-center gap-3 px-7 py-3 bg-transparent border border-foreground/10 text-foreground rounded-full font-bold text-sm overflow-hidden transition-all hover:border-foreground/30 hover:bg-foreground/[0.02] hover:-translate-y-1 active:scale-[0.98] whitespace-nowrap"
                 >
-                  <span className="absolute inset-0 bg-foreground/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                  <ExternalLink className="size-[18px] relative z-10 group-hover:rotate-12 transition-transform" />
-                  <span className="relative z-10">View Resume</span>
+                  <span className="absolute inset-0 bg-foreground/[0.03] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                  <ExternalLink className="size-4 relative z-10 group-hover:rotate-12 transition-transform" />
+                  <span className="relative z-10">Resume</span>
                 </a>
               </motion.div>
             </div>
 
             {/* Scroll Indicator — pushed inward with pl-12 */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: 2 }}
-              className="mt-28 hidden lg:flex items-center gap-4 pl-12"
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ delay: 2 }}
+                className="mt-20 xl:mt-28 hidden lg:flex items-center gap-4 pl-20"
             >
               <div className="relative flex flex-col items-center">
                 <motion.div
@@ -332,7 +332,7 @@ export default function HeroSection({
         </div>
 
         {/* ── Right Content: Image ── */}
-        <div className="relative flex flex-1 items-end justify-center lg:h-screen lg:justify-end">
+        <div className="relative flex flex-1 items-center justify-center lg:h-screen lg:justify-end">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
             animate={
@@ -342,7 +342,7 @@ export default function HeroSection({
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
-            className="relative h-[65vh] w-[110%] right-[-5%] transition-all md:h-[75vh] lg:h-[88vh] lg:w-full lg:right-0 xl:w-[105%] xl:right-[-2.5%]"
+            className="relative h-[65vh] w-[110%] right-[-5%] transition-all md:h-[75vh] lg:h-[80vh] lg:w-full lg:right-0 xl:h-[85vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
           >
             <Image
               src="/profile.png"

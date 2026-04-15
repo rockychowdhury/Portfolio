@@ -25,7 +25,7 @@ export function ThemeToggle() {
     // Remove transition class after animation completes
     setTimeout(() => {
       document.documentElement.classList.remove("theme-transitioning");
-    }, 700);
+    }, 500);
   };
 
   if (!mounted) return <div className="p-2 h-9 w-9" />;

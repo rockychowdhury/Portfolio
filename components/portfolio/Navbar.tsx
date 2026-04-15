@@ -34,6 +34,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
   const [copied, setCopied] = useState(false);
 
   const email = process.env.NEXT_PUBLIC_USER_EMAIL || "rocky20809@gmail.com";
+  const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -135,7 +136,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
         `}} />
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           {/* Email Section */}
           <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/30 border border-border/30">
             <span className="text-xs font-medium text-muted-foreground">{email}</span>
@@ -172,7 +173,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             <ThemeToggle />
             
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center justify-center h-10 px-4 rounded-full bg-background border border-border/50 text-foreground transition-all hover:bg-secondary hover:shadow-md"
@@ -196,7 +197,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
         </div>
 
         {/* Mobile Menu Toggle */}
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -215,7 +216,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-background/95 backdrop-blur-xl md:hidden"
+            className="overflow-hidden bg-background/95 backdrop-blur-xl lg:hidden"
           >
             <div className="flex flex-col gap-2 px-6 py-8">
               {navLinks.map((link) => (
@@ -243,7 +244,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 </div>
                 
                 <div className="flex gap-3">
-                  <a href="/resume.pdf" className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-background border border-border/50 text-sm font-semibold">
+                  <a href={resumeUrl} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-background border border-border/50 text-sm font-semibold">
                     <Download className="size-4" /> Resume
                   </a>
                   <a href="https://linkedin.com/in/rockychowdhury1" className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-foreground text-background text-sm font-semibold">
