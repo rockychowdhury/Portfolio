@@ -86,10 +86,10 @@ export default function ContactSection() {
   };
 
   const socialLinks = [
-    { name: "LinkedIn", icon: <FaLinkedin size={20} />, href: "https://linkedin.com/in/rockychowdhury1", color: "hover:bg-[#0077B5]" },
-    { name: "GitHub", icon: <FaGithub size={20} />, href: "https://github.com/rockychowdhury", color: "hover:bg-[#333]" },
-    { name: "WhatsApp", icon: <FaWhatsapp size={20} />, href: "https://wa.me/+8801700000000", color: "hover:bg-[#25D366]" },
-    { name: "YouTube", icon: <FaYoutube size={20} />, href: "https://youtube.com/@rockychowdhury", color: "hover:bg-[#FF0000]" },
+    { name: "LinkedIn", icon: <FaLinkedin size={20} />, href: "https://linkedin.com/in/rockychowdhury1", color: "hover:text-[#0077B5]" },
+    { name: "GitHub", icon: <FaGithub size={20} />, href: "https://github.com/rockychowdhury", color: "hover:text-[#333] dark:hover:text-white" },
+    { name: "WhatsApp", icon: <FaWhatsapp size={20} />, href: "https://wa.me/+8801700000000", color: "hover:text-[#25D366]" },
+    { name: "YouTube", icon: <FaYoutube size={20} />, href: "https://youtube.com/@rockychowdhury", color: "hover:text-[#FF0000]" },
   ];
 
   const subjectPills = ["Job Opportunity", "Freelance Project", "Collaboration", "Just Saying Hi"];
@@ -106,7 +106,7 @@ Looking forward to connecting.`;
   return (
     <section 
       id="contact" 
-      className="relative w-full overflow-hidden bg-background px-6 py-32 md:px-12 lg:px-20"
+      className="relative w-full overflow-hidden bg-background px-6 pt-20 pb-20 md:px-12 lg:px-20"
       onMouseMove={handleMouseMove}
     >
       {/* Animated Grid Background */}
@@ -173,60 +173,52 @@ Looking forward to connecting.`;
                   Got an idea? <br />
                   <span className="text-muted-foreground/30">Let&apos;s engineer it.</span>
                 </motion.h2>
-                <motion.p
+                <motion.div 
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-xs md:text-sm font-medium italic text-muted-foreground/50 max-w-md"
+                  className="flex items-center gap-3 text-xs md:text-sm font-medium text-muted-foreground/60"
                 >
-                  Open to backend roles, freelance projects, and interesting problems.
-                </motion.p>
+                  <div className="size-1.5 rounded-full bg-primary" />
+                  Typically respond within 24 hours. Emails reviewed daily.
+                </motion.div>
               </div>
             </div>
 
-            <div className="mt-8 space-y-12">
+            <div className="mt-8 space-y-16">
               <div className="space-y-6">
-                <div className="group flex items-center gap-6">
-                  <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary/50 border border-border/50 text-muted-foreground transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20">
-                    <MapPin size={24} />
+                <div className="group flex items-center gap-4">
+                  <MapPin size={24} className="text-primary" />
+                  <div className="flex flex-col">
+                    <p className="text-xl font-medium text-foreground">Dhaka, Bangladesh <span className="text-xs font-normal text-muted-foreground/40 ml-2">GMT+6</span></p>
+                    <p className="text-xs font-mono text-muted-foreground/60">Local Time: {currentTime || "--:-- --"}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60">Location</p>
-                    <div className="flex flex-col">
-                      <p className="text-xl font-medium text-foreground">Dhaka, Bangladesh <span className="text-xs font-normal text-muted-foreground/40 ml-2">GMT+6</span></p>
-                      <p className="text-xs font-mono text-muted-foreground/60">Currently: {currentTime || "--:-- --"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pl-[88px] text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
-                  <span className="text-primary italic">⚡</span> Typically responds within 24 hours
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                {socialLinks.map((link, i) => (
-                  <motion.a
-                    key={link.name}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    className={`group/link flex items-center gap-0 overflow-hidden h-14 rounded-2xl bg-secondary/30 border border-border/50 text-muted-foreground transition-all px-4 ${link.color} hover:text-white hover:pr-6 active:scale-95`}
-                    title={link.name}
-                  >
-                    <div className="flex size-6 items-center justify-center">
-                      {link.icon}
-                    </div>
-                    <motion.span 
-                      className="w-0 overflow-hidden whitespace-nowrap text-[10px] font-bold uppercase tracking-widest transition-all group-hover/link:w-auto group-hover/link:ml-3"
+              <div className="flex flex-col gap-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40">Connect via Socials</p>
+                <div className="flex flex-wrap gap-8">
+                  {socialLinks.map((link, i) => (
+                    <motion.a
+                      key={link.name}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className={`group/link flex items-center gap-3 text-muted-foreground transition-all ${link.color}`}
                     >
-                      {link.name}
-                    </motion.span>
-                  </motion.a>
-                ))}
+                      <div className="transition-transform group-hover/link:scale-110 group-hover/link:-rotate-12">
+                        {link.icon}
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest">
+                        {link.name}
+                      </span>
+                    </motion.a>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -236,10 +228,10 @@ Looking forward to connecting.`;
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="relative rounded-3xl border border-border/50 bg-secondary/10 p-8 backdrop-blur-sm md:p-12 lg:p-16"
+              className="relative rounded-3xl border border-border/50 bg-secondary/10 p-6 backdrop-blur-sm md:p-10 lg:p-12"
             >
-              <form onSubmit={handleSubmit} className="space-y-10">
-                <div className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-5">
                   {/* Floating Label Input: Name */}
                   <div className="group relative">
                     <input
@@ -249,9 +241,9 @@ Looking forward to connecting.`;
                       placeholder=" "
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="peer w-full border-b border-border/50 bg-transparent pb-4 pt-6 text-lg font-medium outline-none transition-all focus:border-primary"
+                      className="peer w-full border-b border-border/50 bg-transparent pb-3 pt-5 text-lg font-medium outline-none transition-all focus:border-primary"
                     />
-                    <label className="absolute left-0 top-6 -z-10 origin-[0] -translate-y-6 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-primary">
+                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
                       Your Name
                     </label>
                   </div>
@@ -265,26 +257,26 @@ Looking forward to connecting.`;
                       placeholder=" "
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="peer w-full border-b border-border/50 bg-transparent pb-4 pt-6 text-lg font-medium outline-none transition-all focus:border-primary"
+                      className="peer w-full border-b border-border/50 bg-transparent pb-3 pt-5 text-lg font-medium outline-none transition-all focus:border-primary"
                     />
-                    <label className="absolute left-0 top-6 -z-10 origin-[0] -translate-y-6 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-primary">
+                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
                       Email address
                     </label>
                   </div>
 
                   {/* Subject Pill Selector */}
-                  <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">
                       I&apos;m interested in...
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {subjectPills.map((pill) => (
                         <button
                           key={pill}
                           type="button"
                           onClick={() => setFormData({ ...formData, subject: pill })}
-                          className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
-                            formData.subject === pill
+                          className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
+                            formData.subject === pill && !["Others"].includes(formData.subject)
                               ? "border-primary bg-primary text-primary-foreground"
                               : "border-border/50 bg-background/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                           }`}
@@ -292,11 +284,44 @@ Looking forward to connecting.`;
                           {pill}
                         </button>
                       ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const isCurrentlyOthers = !subjectPills.includes(formData.subject) && formData.subject !== "";
+                          setFormData({ ...formData, subject: isCurrentlyOthers ? "" : " " });
+                        }}
+                        className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
+                          !subjectPills.includes(formData.subject) && formData.subject !== ""
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border/50 bg-background/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                        }`}
+                      >
+                        Others
+                      </button>
                     </div>
                   </div>
 
-                  {/* Message Area */}
-                  <div className="group relative space-y-4">
+                  <AnimatePresence>
+                    {(!subjectPills.includes(formData.subject) && formData.subject !== "") && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <input
+                          required
+                          type="text"
+                          placeholder="What is the subject?..."
+                          value={formData.subject.trim()}
+                          onChange={(e) => setFormData({ ...formData, subject: e.target.value || " " })}
+                          className="w-full border-b border-border/50 bg-transparent pb-3 pt-4 text-lg font-medium outline-none focus:border-primary"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="group relative space-y-3">
                     <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-colors group-focus-within:text-primary">
                       Message
                     </label>
@@ -309,7 +334,7 @@ Looking forward to connecting.`;
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         placeholder={placeholderText}
                         maxLength={1000}
-                        className="w-full resize-none rounded-2xl border border-border/50 bg-background/50 p-6 text-lg font-medium outline-none transition-all placeholder:text-[10px] md:placeholder:text-xs placeholder:italic placeholder:text-muted-foreground/30 focus:border-primary focus:bg-background"
+                        className="w-full resize-none rounded-2xl border border-border/50 bg-background/50 p-4 text-lg font-medium outline-none transition-all placeholder:text-[10px] md:placeholder:text-xs placeholder:italic placeholder:text-muted-foreground/30 focus:border-primary focus:bg-background"
                       />
                       <div className="absolute bottom-4 right-6 text-[10px] font-mono text-muted-foreground/40">
                         {formData.message.length} / 1000
@@ -322,12 +347,12 @@ Looking forward to connecting.`;
                   <button
                     disabled={status === "loading"}
                     type="submit"
-                    className={`group relative flex flex-1 items-center justify-center gap-3 overflow-hidden rounded-full px-8 py-5 text-sm font-bold uppercase tracking-widest transition-all disabled:opacity-50 ${
+                    className={`group relative flex flex-[1.5] items-center justify-center gap-3 overflow-hidden rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-widest transition-all disabled:opacity-50 ${
                       status === "success" 
                         ? "bg-green-600 text-white" 
                         : status === "error" 
                         ? "bg-red-600 text-white" 
-                        : "bg-foreground text-background hover:pr-12"
+                        : "bg-foreground text-background hover:pr-10"
                     }`}
                   >
                     <AnimatePresence mode="wait">
@@ -351,7 +376,7 @@ Looking forward to connecting.`;
                           className="flex items-center gap-2"
                         >
                           <CheckCircle2 size={18} />
-                          <span>Message Sent</span>
+                          <span>Sent</span>
                         </motion.div>
                       ) : status === "error" ? (
                         <motion.div
@@ -362,7 +387,7 @@ Looking forward to connecting.`;
                           className="flex items-center gap-2"
                         >
                           <AlertCircle size={18} />
-                          <span>Failed — Try Again</span>
+                          <span>Retry</span>
                         </motion.div>
                       ) : (
                         <motion.div
@@ -373,7 +398,7 @@ Looking forward to connecting.`;
                           className="flex items-center gap-2"
                         >
                           <span>Send Message</span>
-                          <ArrowRight size={18} className="absolute right-8 translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                          <ArrowRight size={18} className="absolute right-6 translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -381,7 +406,7 @@ Looking forward to connecting.`;
                   <button
                     onClick={handleClear}
                     type="button"
-                    className="flex items-center justify-center gap-3 rounded-full border border-border px-8 py-5 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-95"
+                    className="flex flex-1 items-center justify-center gap-3 rounded-full border border-border px-6 py-3.5 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-95"
                   >
                     <Trash2 size={18} />
                     <span>Clear</span>

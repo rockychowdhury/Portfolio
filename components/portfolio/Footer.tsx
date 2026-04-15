@@ -12,7 +12,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0 border-t border-border/40">
+    <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
         <div className="flex flex-col items-center gap-10">
           {/* ── Animated Scroll to Top Indicator ── */}
