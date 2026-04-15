@@ -199,9 +199,14 @@ export default function GitHubSection() {
                   )
                 )}
 
-                {/* Pinned Repositories Moved Here */}
-                <div className="flex flex-col gap-8 pt-8 border-t border-border/10">
-                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/40">Featured Repositories</h3>
+                {/* Pinned Repositories: High Fidelity Header */}
+                <div className="flex flex-col gap-5 pt-6 border-t border-border/10">
+                   <div className="flex items-center gap-3">
+                     <div className="h-px w-6 bg-primary/30" />
+                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                       Featured Repositories
+                     </h3>
+                   </div>
                    {isLoading ? (
                      <PinnedReposSkeleton />
                    ) : (

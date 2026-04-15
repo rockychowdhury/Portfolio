@@ -63,8 +63,9 @@ function ActivityPulse({ data }: { data: number[] }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          whileInView={{ pathLength: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
         />
       </svg>
       <div className="flex items-center gap-1 opacity-60 transition-opacity hover:opacity-100">
@@ -84,8 +85,9 @@ function VelocityGauge({ current, target = 30 }: { current: number; target?: num
       <div className="h-1.5 w-full bg-foreground/[0.03] rounded-full overflow-hidden border border-border/30">
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, delay: 0.5 }}
+          whileInView={{ width: `${percentage}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, delay: 0.4 }}
           className="h-full bg-gradient-to-r from-emerald-500/40 to-emerald-400"
         />
       </div>
@@ -106,8 +108,9 @@ function MergeImpact({ count }: { count: number }) {
           <motion.div
             key={i}
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.8 + i * 0.05 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 + i * 0.05 }}
             className="w-1.5 h-1.5 rounded-full bg-blue-500/60 shadow-[0_0_8px_rgba(59,130,246,0.3)]"
           />
         ))}
@@ -131,8 +134,9 @@ function ResilienceTrack({ current, longest }: { current: number; longest: numbe
         </div>
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1.2, delay: 1 }}
+          whileInView={{ width: `${percentage}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, delay: 0.6 }}
           className="absolute top-0 left-0 h-full bg-orange-500/60 shadow-[0_0_12px_rgba(249,115,22,0.2)] rounded-sm"
         />
       </div>
@@ -167,8 +171,9 @@ function PeakHistogram({ heatmap }: { heatmap: { date: string; count: number }[]
             </span>
             <motion.div
               initial={{ height: 0 }}
-              animate={{ height: `${d.height}%` }}
-              transition={{ duration: 0.8, delay: 1.2 + i * 0.05 }}
+              whileInView={{ height: `${d.height}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.8 + i * 0.05 }}
               className={`w-full rounded-t-[1px] transition-colors ${d.height === 100 ? 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]' : 'bg-foreground/20'}`}
             />
             <span className={`text-[8px] font-bold ${d.height === 100 ? 'text-primary' : 'text-foreground/40'}`}>{dayLabels[i]}</span>
