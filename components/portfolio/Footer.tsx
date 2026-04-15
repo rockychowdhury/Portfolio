@@ -12,9 +12,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative w-full overflow-hidden bg-background pt-32 pb-0 border-t border-border/40">
+    <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0 border-t border-border/40">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
-        <div className="flex flex-col items-center gap-12">
+        <div className="flex flex-col items-center gap-10">
           {/* ── Animated Scroll to Top Indicator ── */}
           <motion.button
             onClick={scrollToTop}
@@ -42,18 +42,21 @@ export default function Footer() {
           </motion.button>
 
           {/* ── Minimalist Utility Line: Links & Copyright ── */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
-            <a href="#about" className="hover:text-foreground transition-colors">About</a>
-            <a href="#projects" className="hover:text-foreground transition-colors">Work</a>
-            <a href="#skills" className="hover:text-foreground transition-colors">Skills</a>
-            <span className="hidden sm:inline opacity-20 mx-2">|</span>
-            <span>{`© ${currentYear} // ROCKY CHOWDHURY`}</span>
+          <div className="flex flex-wrap items-end justify-between w-full gap-x-8 gap-y-4 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+              <a href="#skills" className="hover:text-foreground transition-colors">Skills</a>
+              <a href="#projects" className="hover:text-foreground transition-colors">Projects</a>
+              <a href="#education" className="hover:text-foreground transition-colors">Education</a>
+              <a href="#blogs" className="hover:text-foreground transition-colors">Blogs</a>
+              <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+            </div>
+            <span className="text-right">{`© ${currentYear} // রকি চৌধুরী`}</span>
           </div>
         </div>
       </div>
 
       {/* ── Giant Signature Typography (Flush Bottom) ── */}
-      <div className="relative select-none flex justify-center items-end mt-12 overflow-hidden">
+      <div className="relative select-none flex justify-center items-end mt-8 overflow-hidden">
         <motion.h1 
           initial={{ y: "40%", opacity: 0 }}
           whileInView={{ y: "0%", opacity: 1 }}
