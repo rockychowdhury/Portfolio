@@ -106,7 +106,7 @@ Looking forward to connecting.`;
   return (
     <section 
       id="contact" 
-      className="relative w-full overflow-hidden bg-background px-6 pt-20 pb-20 md:px-12 lg:px-20"
+      className="relative w-full overflow-hidden bg-background px-6 py-32 md:px-12 md:py-48 lg:px-20 lg:py-64"
       onMouseMove={handleMouseMove}
     >
       {/* Animated Grid Background */}

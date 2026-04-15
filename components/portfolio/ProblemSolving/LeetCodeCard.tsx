@@ -1,7 +1,5 @@
-"use client";
-
-import { motion } from "framer-motion";
-import CountUp from "./CountUp";
+import { motion, useSpring, useTransform } from "framer-motion";
+import { useEffect } from "react";
 import MiniSparkline from "./MiniSparkline";
 import { ILeetCodeProfile } from "@/lib/db/models/ProblemSolvingProfile";
 
@@ -10,15 +8,26 @@ interface LeetCodeCardProps {
   loading?: boolean;
 }
 
+function Counter({ value }: { value: number }) {
+  const count = useSpring(0, { stiffness: 30, damping: 15 });
+  const rounded = useTransform(count, (latest) => Math.round(latest).toLocaleString());
+
+  useEffect(() => {
+    count.set(value);
+  }, [value, count]);
+
+  return <motion.span>{rounded}</motion.span>;
+}
+
 export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
   if (loading || !data) {
     return (
-      <div className="h-full min-h-[400px] bg-secondary/5 border border-border/10 rounded-2xl animate-pulse"></div>
+      <div className="h-full min-h-[400px] bg-secondary/5 border border-border/10 rounded-3xl animate-pulse col-span-1 lg:col-span-7"></div>
     );
   }
 
   const { handle, solved, totalActiveDays, longestStreak, contests, topTags, ratingGraph } = data;
-  const total = solved.all || 1; // avoid zero div
+  const total = solved.all || 1;
 
   const bars = [
     { label: "Easy", count: solved.easy, color: "#00b8a3" },
@@ -28,203 +37,186 @@ export default function LeetCodeCard({ data, loading }: LeetCodeCardProps) {
 
   return (
     <motion.div
-      className="col-span-1 lg:col-span-7 w-full bg-secondary/10 border border-border/10 rounded-2xl p-6 lg:p-8 hover:shadow-[0_8px_30px_rgba(255,192,30,0.05)] transition-shadow duration-500 relative overflow-hidden"
+      className="col-span-1 lg:col-span-7 w-full bg-secondary/10 border border-border/10 rounded-3xl p-8 lg:p-12 hover:shadow-[0_8px_30px_rgba(255,192,30,0.03)] transition-shadow duration-500 relative overflow-hidden group"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6 }}
-      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.8 }}
     >
-      {/* Background glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#ffc01e]/5 rounded-full blur-[80px] pointer-events-none" />
+      {/* Background glow highlights */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-[#ffc01e]/5 rounded-full blur-[100px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#00b8a3]/5 rounded-full blur-[80px] pointer-events-none" />
 
-      {/* Header */}
-      <div className="flex justify-between items-start mb-8 relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#ffc01e]/10 flex items-center justify-center">
-            {/* LeetCode SVG Icon approx */}
-            <svg viewBox="0 0 24 24" fill="#ffc01e" className="w-6 h-6">
+      {/* Header Area */}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12 relative z-10">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-[#ffc01e]/5 border border-[#ffc01e]/20 flex items-center justify-center p-3">
+            <svg viewBox="0 0 24 24" fill="#ffc01e" className="w-8 h-8">
               <path d="M16.102 17.93l-2.697 2.607c-.466.467-1.111.662-1.823.662s-1.357-.195-1.824-.662l-4.332-4.363c-.467-.467-.702-1.15-.702-1.863s.235-1.357.702-1.824l4.319-4.38c.467-.467 1.125-.645 1.837-.645s1.357.195 1.823.662l2.697 2.606c.514.515 1.365.497 1.9-.038.536-.536.554-1.387.039-1.901l-2.609-2.636a5.055 5.055 0 0 0-7.015 0l-4.32 4.363C3.418 11.235 3 12.186 3 13.1c0 1.042.418 1.954 1.151 2.686l4.32 4.362c.94.94 2.193 1.411 3.447 1.411 1.253 0 2.506-.471 3.447-1.411l2.61-2.636c.514-.515.496-1.366-.039-1.901a1.328 1.328 0 0 0-1.834-.031z"/>
               <path d="M18.666 4.6l-5.636 5.636c-.467.467-1.111.662-1.823.662s-1.357-.195-1.824-.662l-1.045-1.045c-.515-.514-.497-1.365.038-1.901.536-.536 1.387-.554 1.901-.039l1.045 1.045a5.055 5.055 0 0 0 7.015 0l5.636-5.636C24.438 2.193 25.389 1.775 26.303 1.775c1.041 0 1.953.418 2.685 1.151l-10.322 1.674z" transform="translate(-3 -1.775)"/>
             </svg>
           </div>
-          <div>
-            <h3 className="font-bold text-lg text-foreground">LeetCode</h3>
-            <p className="text-sm text-muted-foreground/60">{handle}</p>
+          <div className="space-y-1">
+            <h3 className="text-2xl font-bold text-foreground">LeetCode</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-muted-foreground/40">{handle}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500/40 animate-pulse" />
+            </div>
           </div>
         </div>
-        <div className="text-right flex flex-col items-end">
-          <div className="text-sm text-muted-foreground/60">
-            {contests?.topPercentage ? `Top ${contests.topPercentage}% globally` : `Top ${Math.max(1, Math.floor(1000 / total))}% globally`}
+        
+        <div className="flex flex-col items-start md:items-end gap-1">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffc01e]/60">
+            {contests?.topPercentage ? `Top ${contests.topPercentage}% Globally` : "Ranked Contender"}
           </div>
           {contests?.globalRanking > 0 && (
-            <div className="text-xs text-muted-foreground/40 mt-1 font-medium">
-              Rank: <CountUp to={contests.globalRanking} />
+            <div className="text-3xl font-light tracking-tighter text-foreground/40">
+              #<Counter value={contests.globalRanking} />
             </div>
           )}
         </div>
       </div>
 
-      {/* Main Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
-        
-        {/* Solved Donut */}
-        <div className="md:col-span-4 flex flex-col justify-center relative">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/40">Solved</span>
-          </div>
-          <div className="text-5xl font-extrabold text-foreground tracking-tighter mb-4">
-            <CountUp to={solved.all} />
-          </div>
-          
-          {/* Circular Donut Chart SVG */}
-          <div className="flex justify-center md:justify-start w-full mt-4">
-            <div className="relative w-24 h-24">
-              <svg width="96" height="96" viewBox="0 0 100 100" className="-rotate-90 origin-center filter drop-shadow-md">
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="12" />
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center mb-16">
+        {/* Left Col: Main Stat & Donut */}
+        <div className="md:col-span-5 flex flex-col items-center md:items-start">
+           <div className="flex flex-col gap-1 mb-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30">Total Persistence</span>
+              <div className="text-7xl lg:text-8xl font-medium tracking-tighter text-foreground">
+                <Counter value={solved.all} />
+              </div>
+           </div>
+           
+           <div className="relative w-40 h-40">
+              <svg width="160" height="160" viewBox="0 0 100 100" className="-rotate-90 origin-center">
+                <circle cx="50" cy="50" r="44" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-foreground/[0.03]" />
                 
-                {/* Easy */}
+                {/* Easy Segment */}
                 <motion.circle 
-                  cx="50" cy="50" r="40" fill="transparent" stroke="#00b8a3" strokeWidth="12"
-                  strokeDasharray="251.3"
-                  initial={{ strokeDashoffset: 251.3 }}
-                  whileInView={{ strokeDashoffset: 251.3 - (solved.easy / total) * 251.3 }}
+                  cx="50" cy="50" r="44" fill="transparent" stroke="#00b8a3" strokeWidth="6"
+                  strokeDasharray="276.46"
+                  initial={{ strokeDashoffset: 276.46 }}
+                  whileInView={{ strokeDashoffset: 276.46 - (solved.easy / total) * 276.46 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1, ease: "easeOut" }}
+                  transition={{ duration: 1.5, ease: [0.25, 0.4, 0.25, 1] }}
                   strokeLinecap="round"
                 />
                 
-                {/* Medium */}
+                {/* Medium Segment */}
                 <motion.circle 
-                  cx="50" cy="50" r="40" fill="transparent" stroke="#ffc01e" strokeWidth="12"
-                  strokeDasharray="251.3"
-                  initial={{ strokeDashoffset: 251.3 }}
-                  whileInView={{ strokeDashoffset: 251.3 - (solved.medium / total) * 251.3 }}
+                  cx="50" cy="50" r="44" fill="transparent" stroke="#ffc01e" strokeWidth="6"
+                  strokeDasharray="276.46"
+                  initial={{ strokeDashoffset: 276.46 }}
+                  whileInView={{ strokeDashoffset: 276.46 - (solved.medium / total) * 276.46 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                  transition={{ duration: 1.5, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
                   strokeLinecap="round"
                   transform={`rotate(${(solved.easy / total) * 360} 50 50)`}
                 />
                 
-                {/* Hard */}
+                {/* Hard Segment */}
                 <motion.circle 
-                  cx="50" cy="50" r="40" fill="transparent" stroke="#ff375f" strokeWidth="12"
-                  strokeDasharray="251.3"
-                  initial={{ strokeDashoffset: 251.3 }}
-                  whileInView={{ strokeDashoffset: 251.3 - (solved.hard / total) * 251.3 }}
+                  cx="50" cy="50" r="44" fill="transparent" stroke="#ff375f" strokeWidth="6"
+                  strokeDasharray="276.46"
+                  initial={{ strokeDashoffset: 276.46 }}
+                  whileInView={{ strokeDashoffset: 276.46 - (solved.hard / total) * 276.46 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+                  transition={{ duration: 1.5, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
                   strokeLinecap="round"
                   transform={`rotate(${((solved.easy + solved.medium) / total) * 360} 50 50)`}
                 />
               </svg>
-            </div>
-          </div>
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                 <span className="text-[10px] font-bold text-muted-foreground/30 uppercase tracking-widest">Ratio</span>
+                 <span className="text-xl font-bold text-foreground/80">{Math.round((solved.all / 3300) * 100)}%</span>
+              </div>
+           </div>
         </div>
 
-        {/* Difficulty Breakdown */}
-        <div className="md:col-span-8 flex flex-col justify-center space-y-4">
+        {/* Right Col: Difficulty Tracks */}
+        <div className="md:col-span-7 flex flex-col justify-center space-y-8">
           {bars.map((bar, i) => (
-            <div key={bar.label}>
-              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1.5">
-                <span className="text-muted-foreground/40">{bar.label}</span>
-                <span className="text-foreground">
-                  <CountUp to={bar.count} delay={0.3 + i * 0.1} />
-                </span>
+            <div key={bar.label} className="group/bar">
+              <div className="flex justify-between items-end mb-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{bar.label}</span>
+                  <div className="text-2xl font-medium tracking-tight text-foreground">
+                    <Counter value={bar.count} />
+                  </div>
+                </div>
+                <div className="text-[10px] font-bold text-muted-foreground/20 italic pb-1">
+                  {Math.round((bar.count / total) * 100)}% Capacity
+                </div>
               </div>
-              <div className="w-full bg-background/50 rounded-full h-1.5 overflow-hidden">
+              
+              <div className="relative h-2 w-full bg-foreground/[0.03] rounded-full overflow-hidden border border-border/5">
                 <motion.div
-                  className="h-full rounded-full relative"
-                  style={{ backgroundColor: bar.color }}
-                  initial={{ scaleX: 0, originX: 0 }}
-                  whileInView={{ scaleX: bar.count / (Math.max(solved.easy, solved.medium, solved.hard) || 1) }}
+                  className="absolute inset-y-0 left-0 rounded-full"
+                  style={{ backgroundColor: bar.color, opacity: 0.8 }}
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${(bar.count / total) * 100}%` }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.3 + i * 0.1, duration: 0.8, ease: "easeOut" }}
-                >
-                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                </motion.div>
+                  transition={{ duration: 1.2, delay: 0.4 + i * 0.1, ease: "circOut" }}
+                />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "linear", delay: i * 0.5 }}
+                />
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Header and Flex Container for Streak & Contests */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        {/* Streak Pill */}
-        <div className="inline-flex items-center gap-4 bg-secondary/10 border border-border/10 rounded-full px-5 py-2.5">
-          <div className="flex items-center gap-2">
-            <motion.span 
-              className="text-lg"
-              animate={{ opacity: [1, 0.7, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              🔥
-            </motion.span>
-            <span className="text-sm font-medium text-foreground/80 hidden sm:inline">
-              Current: <CountUp to={totalActiveDays} className="text-foreground font-bold" /> days
-            </span>
-            <span className="text-sm font-medium text-foreground/80 sm:hidden">
-              <CountUp to={totalActiveDays} className="text-foreground font-bold" /> d
-            </span>
-            <span className="mx-2 text-border/20">|</span>
-            <span className="text-lg">🏆</span>
-            <span className="text-sm font-medium text-foreground/80 hidden sm:inline">
-              Longest: <CountUp to={longestStreak || totalActiveDays} className="text-foreground font-bold" /> days
-            </span>
-            <span className="text-sm font-medium text-foreground/80 sm:hidden">
-              <CountUp to={longestStreak || totalActiveDays} className="text-foreground font-bold" /> d
-            </span>
-          </div>
+      {/* Footer Connectivity Bar */}
+      <div className="flex flex-wrap items-center gap-6 pt-10 border-t border-border/10">
+        <div className="flex flex-col gap-1">
+           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Persistence Track</span>
+           <div className="px-5 py-2.5 rounded-2xl bg-foreground/[0.03] border border-border/10 flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                 <span className="text-orange-500 text-sm">🔥</span>
+                 <span className="text-xs font-bold text-foreground/60 tracking-tight">
+                   Streak: <span className="text-foreground"><Counter value={totalActiveDays} /> days</span>
+                 </span>
+              </div>
+              <div className="w-px h-3 bg-border/20" />
+              <div className="flex items-center gap-2">
+                 <span className="text-yellow-500 text-sm">🏆</span>
+                 <span className="text-xs font-bold text-foreground/60 tracking-tight">
+                   Peak: <span className="text-foreground"><Counter value={longestStreak || totalActiveDays} /> days</span>
+                 </span>
+              </div>
+           </div>
         </div>
 
-        {/* Contest Pill */}
-        {contests && contests.attended > 0 && (
-          <div className="inline-flex items-center gap-4 bg-secondary/10 border border-border/10 rounded-full px-5 py-2.5">
-            <div className="flex items-center gap-2">
-               <span className="text-xl">⚔️</span>
-               <span className="text-sm font-medium text-foreground/80">
-                 Rating: <CountUp to={contests.rating} className="text-foreground font-bold" /> 
-                 {contests.maxRating > contests.rating && (
-                   <span className="text-muted-foreground/40 text-xs ml-1 font-normal">
-                     (↑ {contests.maxRating})
-                   </span>
-                 )}
-               </span>
-               <span className="mx-2 text-border/20">|</span>
-               <span className="text-sm font-medium text-foreground/80">
-                 Contests: <CountUp to={contests.attended} className="text-foreground font-bold" />
-               </span>
+        {ratingGraph && ratingGraph.length > 0 && (
+          <div className="flex-1 min-w-[240px]">
+            <div className="flex justify-between items-center mb-2 px-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Competitive Momentum</span>
+              {contests && (
+                <span className="text-[10px] font-bold text-[#ffc01e]">Rating: {contests.rating}</span>
+              )}
+            </div>
+            <div className="h-14 w-full bg-foreground/[0.02] rounded-xl border border-border/5 p-2 flex items-center justify-center overflow-hidden">
+               <MiniSparkline data={ratingGraph} color="#ffc01e" width={500} height={40} strokeWidth={2} />
             </div>
           </div>
         )}
       </div>
 
-      {/* Rating Curve */}
-      {ratingGraph && ratingGraph.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-xs text-muted-foreground/40 font-bold uppercase tracking-widest mb-3">Contest Rating Curve</h4>
-          <div className="p-4 pt-6 w-full bg-background/50 rounded-xl border border-border/10 relative h-28 flex items-center justify-center translate-x-[-1rem]">
-             <MiniSparkline data={ratingGraph} color="#ffc01e" width={300} height={60} strokeWidth={3} />
-          </div>
-        </div>
-      )}
-
-      {/* Top Tags */}
+      {/* Top Skills Tags */}
       {topTags && topTags.length > 0 && (
-        <div>
-          <h4 className="text-xs text-muted-foreground/40 font-bold uppercase tracking-widest mb-3">Top Skills</h4>
-          <div className="flex flex-wrap gap-2">
-            {topTags.map((tag) => (
-              <motion.span
-                key={tag}
-                whileHover={{ scale: 1.05 }}
-                className="px-3 py-1 bg-secondary/10 border border-border/10 rounded-md text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 cursor-default"
-              >
-                {tag}
-              </motion.span>
-            ))}
-          </div>
+        <div className="mt-8 flex flex-wrap gap-2">
+          {topTags.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1.5 rounded-lg bg-foreground/[0.03] border border-border/10 text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 transition-colors hover:bg-[#ffc01e]/10 hover:text-[#ffc01e] hover:border-[#ffc01e]/20 cursor-default"
+            >
+              # {tag}
+            </span>
+          ))}
         </div>
       )}
     </motion.div>

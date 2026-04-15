@@ -138,20 +138,30 @@ export default function GitHubSection() {
                   ))}
                 </div>
               ))}
-              <span className="text-[0.6em] text-muted-foreground/20 italic font-light ml-2 mr-4">&</span> 
-              <div className="flex overflow-hidden pb-4 -mb-4">
-                {activityWords.map((letter, i) => (
-                  <motion.span
-                    key={i}
-                    custom={i + 15}
-                    variants={letterAnimation}
-                    initial="hidden"
-                    animate={isTitleInView ? "visible" : "hidden"}
-                    className="inline-block origin-bottom"
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
+              <div className="flex items-center">
+                <motion.span 
+                  initial="hidden"
+                  animate={isTitleInView ? "visible" : "hidden"}
+                  variants={letterAnimation}
+                  custom={12}
+                  className="text-[0.6em] text-muted-foreground/20 italic font-light mr-4"
+                >
+                  &
+                </motion.span>
+                <div className="flex overflow-hidden pb-4 -mb-4">
+                  {activityWords.map((letter, i) => (
+                    <motion.span
+                      key={i}
+                      custom={i + 15}
+                      variants={letterAnimation}
+                      initial="hidden"
+                      animate={isTitleInView ? "visible" : "hidden"}
+                      className="inline-block origin-bottom text-muted-foreground/20"
+                    >
+                      {letter}
+                    </motion.span>
+                  ))}
+                </div>
               </div>
             </h2>
           </div>
