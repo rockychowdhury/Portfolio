@@ -4,7 +4,7 @@
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import { Project } from "@/types/project";
-import { ProjectTags } from "./ProjectTags";
+import { ProjectTags } from "@/components/projects/ProjectTags";
 import { ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";

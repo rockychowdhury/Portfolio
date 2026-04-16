@@ -1,10 +1,12 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ArrowUpRight, Github, ExternalLink, Code2 } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Code2 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
+import { ProjectTags } from "@/components/projects/ProjectTags";
 import { IProject } from "@/lib/db/models/Project";
 import { useInView } from "react-intersection-observer";
 import clsx from "clsx";
@@ -122,7 +124,7 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
           <div className="h-[20vh]" aria-hidden />
           {projects.map((project, index) => (
             <ArchiveDetailBlock
-              key={project.id || project._id}
+              key={project._id}
               project={project}
               index={index}
               onInView={setActiveIndex}
@@ -140,7 +142,7 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
 
             <AnimatePresence mode="popLayout" custom={direction}>
               <motion.div
-                key={activeProject.id || activeProject._id}
+                key={activeProject._id}
                 custom={direction}
                 initial={{ y: direction > 0 ? "100%" : "-100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
