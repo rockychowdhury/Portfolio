@@ -18,8 +18,8 @@ export function ProjectWindowPreview({ project }: ProjectWindowPreviewProps) {
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={project.id || project._id}             // key change triggers exit + enter
-          className="absolute inset-0"
+          key={project.id || project._id}
+          className="absolute inset-0 z-10"
           initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
@@ -48,6 +48,7 @@ export function ProjectWindowPreview({ project }: ProjectWindowPreviewProps) {
           )}
         </motion.div>
       </AnimatePresence>
+
     </WindowChrome>
   );
 }
