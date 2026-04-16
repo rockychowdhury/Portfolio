@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import BackgroundText from "./BackgroundText";
 import BrowserWindow from "./BrowserWindow";
 import ProjectMeta from "./ProjectMeta";
@@ -16,8 +16,18 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   const [isLocked, setIsLocked] = useState(false);
   
   const isInView = useInView(containerRef, { amount: 0.5, once: false });
-
   const scrollLockRef = useRef<HTMLDivElement>(null);
+
+  // Auto-advance logic (fallback for static content)
+  useEffect(() => {
+    if (!isInView || isLocked) return;
+
+    const timer = setInterval(() => {
+      setActiveIndex(current => (current + 1) % projects.length);
+    }, 12000); // 12 seconds fallback
+
+    return () => clearInterval(timer);
+  }, [isInView, isLocked, activeIndex, projects.length]);
 
   // Refined Scroll Locking implementation
   useEffect(() => {
@@ -26,23 +36,27 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 
     const handleWheel = (e: WheelEvent) => {
       if (isLocked) {
-        e.preventDefault();
+        // If scrolling heavily, unlock and allow normal scroll
+        if (Math.abs(e.deltaY) > 50) {
+           // Allow natural scroll to take over
+        } else {
+           e.preventDefault();
+        }
       }
     };
 
-    // We must use a non-passive listener to be allowed to preventDefault
     el.addEventListener("wheel", handleWheel, { passive: false });
     return () => el.removeEventListener("wheel", handleWheel);
   }, [isLocked]);
 
   const handleVideoEnded = (index: number) => {
-    if (index === activeIndex && index < projects.length - 1) {
-      // Small delay for the flip animation to feel natural
+    if (index === activeIndex) {
       setTimeout(() => {
-        setActiveIndex(prev => prev + 1);
-      }, 300); // Slightly faster for responsiveness
+        setActiveIndex(prev => (prev + 1) % projects.length);
+      }, 300);
     }
   };
+
 
   if (!projects || projects.length === 0) return null;
 
@@ -55,8 +69,9 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         <BackgroundText activeIndex={activeIndex} projects={projects} />
         
         {/* Centered container for the content */}
+
+
         <div className="relative z-10 w-full flex-1 flex items-center justify-center pointer-events-none">
-          {/* Precise Hover Zone for Scroll Lock - matches BrowserWindow dimensions */}
           <div 
             ref={scrollLockRef}
             className="relative w-full max-w-[900px] aspect-[16/10] mx-4 md:mx-12 pointer-events-auto bg-background rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-foreground/5"
@@ -67,7 +82,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
               activeIndex={activeIndex} 
               projects={projects} 
               onVideoEnded={handleVideoEnded}
-              isPlaying={isInView}
+              isPlaying={isInView && !isLocked}
             />
           </div>
         </div>
@@ -75,15 +90,23 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         <ProjectMeta activeIndex={activeIndex} projects={projects} />
 
         {/* Status Hint */}
-        <div className="absolute bottom-8 right-12 hidden md:block">
-          <div className="flex flex-col items-center gap-4">
+        <div className="absolute bottom-12 right-12 hidden md:block">
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col gap-2">
+              {projects.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`w-1 transition-all duration-500 rounded-full ${i === activeIndex ? "h-8 bg-primary" : "h-2 bg-foreground/10"}`}
+                />
+              ))}
+            </div>
             <span className="text-[10px] font-black tracking-[0.4em] uppercase text-foreground/40 [writing-mode:vertical-lr]">
-              {activeIndex + 1} / {projects.length}
+              {String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
             </span>
-            <div className="h-12 w-px bg-foreground/10" />
           </div>
         </div>
       </div>
     </div>
   );
 }
+

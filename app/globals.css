@@ -138,6 +138,13 @@
   html {
     @apply font-sans scroll-smooth;
   }
+
+  /* Prevent layout jank during image/video load */
+  video,
+  img {
+    display: block;
+    max-width: 100%;
+  }
 }
 
 /* Custom scrollbar */

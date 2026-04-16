@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Calendar, ArrowUpRight, Monitor, Code } from "lucide-react";
+import { ArrowUpRight, Github, ExternalLink, Code2, Layers } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
-import AnimatedBorder from "../common/AnimatedBorder";
 import { IProject } from "@/lib/db/models/Project";
+import clsx from "clsx";
 
 interface ProjectCardProps {
   project: IProject;
@@ -14,107 +14,114 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const isFeatured = project.isFeatured;
-
-  // Skills parsing for compact display
-  const techList = project.techStack?.slice(0, 10).join(" · ") || "";
+  const skillsList = project.skills?.slice(0, 4) || [];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative h-[450px] w-full rounded-[2.5rem] overflow-hidden cursor-pointer bg-muted"
     >
-      <AnimatedBorder isActive={isFeatured}>
-        <div className="group h-full bg-card p-5 md:p-6 flex flex-col justify-between transition-all relative">
-          
-          {/* 1. Top Badges */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2 px-3 py-1 bg-secondary/50 rounded-full">
-              <Code className="w-3 h-3 text-muted-foreground" />
-              <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground">
-                {isFeatured ? "Featured Project" : "Product"}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2 px-3 py-1 bg-foreground text-background rounded-full">
-               <Monitor className="w-3 h-3" />
-               <span className="text-[11px] font-bold uppercase tracking-widest leading-none">
-                  {project.techStack?.[0] || "Live"}
-               </span>
-            </div>
-          </div>
+      {/* 1. Full-bleed Background Thumbnail */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={project.thumbnail}
+          alt={project.title}
+          fill
+          className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+          unoptimized
+        />
+        {/* Dynamic Multi-layered Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-primary/5 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      </div>
 
-          {/* 2. Media Section */}
-          <div className="relative aspect-[1.4/1] w-full mb-6 rounded-2xl overflow-hidden border border-border/50 bg-secondary/10 group/media">
-            <Image
-              src={project.image}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover/media:scale-110"
-            />
-            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/media:opacity-100 transition-opacity" />
-          </div>
-
-          {/* 3. Content Block */}
-          <div className="mb-6 flex-1">
-            <h3 className="text-xl font-bold tracking-tight text-foreground leading-tight mb-3 line-clamp-2">
-              {project.title}
-            </h3>
-            
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-4 w-4 rounded-full bg-primary/20 flex items-center justify-center">
-                 <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-              </div>
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Independent Development
-              </span>
-            </div>
-
-            {techList && (
-              <p className="text-xs text-muted-foreground/70 leading-relaxed font-medium line-clamp-3">
-                {techList}
-              </p>
-            )}
-          </div>
-
-          {/* 4. Footer */}
-          <div className="flex items-center justify-between pt-5 border-t border-border/40">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-bold uppercase tracking-wider">
-                2024 - Present
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-xl bg-secondary/40 hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
-                  title="Source Code"
-                >
-                  <FaGithub className="w-4 h-4" />
-                </a>
-              )}
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group/btn flex items-center gap-1.5 px-4 py-2 bg-primary/10 border border-primary/20 hover:bg-primary/20 rounded-xl text-[11px] font-bold text-primary transition-all shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]"
-                >
-                  Live Demo
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
+      {/* 2. Content Overlay - Permanent (Lower) & Reveal (Upper) */}
+      <div className="relative z-10 h-full w-full p-8 md:p-12 flex flex-col justify-end">
+        
+        {/* Header Tags (Static) */}
+        <div className="absolute top-8 left-8 flex gap-3">
+          <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-white/10 text-white/80">
+            {isFeatured ? "Showcase" : "Repository"}
+          </span>
         </div>
-      </AnimatedBorder>
+
+        {/* Links Overlay (Hidden -> Slide in from Top Right) */}
+        <div className="absolute top-8 right-8 flex gap-3 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 delay-100">
+           {project.githubLink && (
+            <a
+              href={project.githubLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white hover:bg-primary hover:border-primary transition-all duration-300"
+            >
+              <FaGithub size={20} />
+            </a>
+          )}
+           {project.liveLink && (
+            <a
+              href={project.liveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white hover:bg-primary hover:border-primary transition-all duration-300"
+            >
+              <ExternalLink size={20} />
+            </a>
+          )}
+        </div>
+
+        {/* Main Text Content */}
+        <div className="transform transition-transform duration-500 group-hover:-translate-y-4">
+          <div className="flex items-center gap-4 mb-4">
+             <div className="h-px w-8 bg-primary/60 group-hover:w-16 transition-all duration-500" />
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">
+                Technical Case Study
+             </span>
+          </div>
+
+          <h3 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter font-anton leading-[0.85] mb-6 [text-shadow:0_4px_24px_rgba(0,0,0,0.5)]">
+            {project.title}
+          </h3>
+
+          {/* Reveal Content (Description & Skills) */}
+          <div className="max-h-0 opacity-0 group-hover:max-h-[200px] group-hover:opacity-100 transition-all duration-700 ease-in-out overflow-hidden">
+            <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium mb-6 line-clamp-2 italic font-serif">
+              {project.description}
+            </p>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              {skillsList.map((s: any, i: number) => {
+                const name = typeof s === 'string' ? s : s.name;
+                return (
+                  <span 
+                    key={i} 
+                    className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </span>
+                );
+              })}
+              {(project.skills?.length || 0) > 4 && (
+                <span className="text-[9px] font-bold text-white/20 self-center">
+                  +{(project.skills?.length || 0) - 4}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Indicator (Bottom Right) */}
+        <div className="absolute bottom-8 right-8 w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/20 group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all duration-500 group-hover:scale-110">
+           <ArrowUpRight size={20} />
+        </div>
+      </div>
+
+      {/* Glass Light Sweep Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+        <div className="absolute top-[-100%] left-[-100%] w-[300%] h-[300%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_120deg,rgba(255,255,255,0.05)_180deg,transparent_240deg,transparent_360deg)] animate-[spin_4s_linear_infinite]" />
+      </div>
     </motion.div>
   );
 }

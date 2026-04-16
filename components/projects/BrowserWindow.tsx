@@ -42,7 +42,7 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
               <div className="flex-1 max-w-sm px-4">
                 <div className="h-6 w-full rounded-lg bg-foreground/5 border border-foreground/5 flex items-center px-4 overflow-hidden">
                   <span className="text-[10px] text-foreground/40 font-mono truncate">
-                    {project.liveUrl || "https://project.ai"}
+                    {project.liveLink || "https://project.ai"}
                   </span>
                 </div>
               </div>
@@ -51,16 +51,17 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
 
             {/* Content (Screen) */}
             <div className="relative flex-1 w-full overflow-hidden bg-muted/20">
-              {project.videoUrl ? (
+              {project.previewLink ? (
                 <VideoPreview 
-                  src={project.videoUrl} 
+                  src={project.previewLink} 
                   isActive={isPlaying ?? true} 
                   onEnded={() => onVideoEnded?.(activeIndex)}
                 />
-              ) : project.image ? (
+              ) : project.thumbnail ? (
+
                 <div className="relative w-full h-full">
                   <Image
-                    src={project.image}
+                    src={project.thumbnail}
                     alt={project.title}
                     fill
                     className="object-cover brightness-[0.98] contrast-[1.02]"
@@ -68,6 +69,7 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
                     priority
                   />
                 </div>
+
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-[1em] text-foreground/10">
                   {project.title} Preview

@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 
 export default function RootLayout({
   children,
@@ -57,7 +58,9 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
         >
-          {children}
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>
