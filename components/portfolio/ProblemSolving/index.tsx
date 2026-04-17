@@ -1,10 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import SectionWrapper from "../SectionWrapper";
+import PlatformCard from "./PlatformCard";
 import NarrativeBar from "./NarrativeBar";
-import LeetCodeCard from "./LeetCodeCard";
-import CodeforcesCard from "./CodeforcesCard";
-import CodeChefCard from "./CodeChefCard";
 import { IProblemSolvingProfile } from "@/lib/db/models/ProblemSolvingProfile";
 
 // Premium easing for sections
@@ -67,6 +65,22 @@ export default function ProblemSolvingSection() {
 
   const titleWords = "Algorithmic".split(" ");
   const thinkingWords = "Thinking".split("");
+
+  // Helper for Codeforces Rank & Color
+  const getCodeforcesRank = (rating: number) => {
+    if (rating >= 3000) return { title: "Legendary Grandmaster", color: "#ff0000" };
+    if (rating >= 2600) return { title: "International Grandmaster", color: "#ff0000" };
+    if (rating >= 2400) return { title: "Grandmaster", color: "#ff0000" };
+    if (rating >= 2300) return { title: "International Master", color: "#ff8c00" };
+    if (rating >= 2100) return { title: "Master", color: "#ff8c00" };
+    if (rating >= 1900) return { title: "Candidate Master", color: "#aa00aa" };
+    if (rating >= 1600) return { title: "Expert", color: "#0000ff" };
+    if (rating >= 1400) return { title: "Specialist", color: "#03a89e" };
+    if (rating >= 1200) return { title: "Pupil", color: "#008000" };
+    return { title: "Newbie", color: "#808080" };
+  };
+
+  const cfMaxRank = getCodeforcesRank(data?.codeforces?.maxRating || 0);
 
   return (
     <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
@@ -136,19 +150,61 @@ export default function ProblemSolvingSection() {
             totalSolved={totalSolved} 
             totalContests={totalContests} 
             peakRating={peakRating} 
-            leetcodePercentage="Top 30%" 
+            leetcodePercentage={data?.leetcode?.contests?.topPercentage ? `Top ${data.leetcode.contests.topPercentage}%` : "Top 30%"} 
           />
 
-          {/* Main Grid for Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 w-full">
-            {/* LeetCode Hero Card */}
-            <LeetCodeCard data={data?.leetcode || null} loading={loading} />
+          {/* Main Grid for Cards - Now 3 Columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            {/* LeetCode Card */}
+            <PlatformCard 
+              name="LeetCode"
+              username={data?.leetcode?.handle || "Loading..."}
+              iconPath="/assets/problemsolving/lettcode.png"
+              rankDisplay={data?.leetcode?.contests?.globalRanking ? `#${data.leetcode.contests.globalRanking.toLocaleString()}` : "Ranked"}
+              maxRating={data?.leetcode?.contests?.maxRating || 0}
+              solveCount={data?.leetcode?.solved?.all || 0}
+              contestCount={data?.leetcode?.contests?.attended || 0}
+              ratingGraph={data?.leetcode?.ratingGraph || []}
+              color="#ffa116"
+              profileUrl={`https://leetcode.com/${data?.leetcode?.handle || ""}`}
+              loading={loading}
+              solvedStats={{
+                easy: data?.leetcode?.solved?.easy || 0,
+                medium: data?.leetcode?.solved?.medium || 0,
+                hard: data?.leetcode?.solved?.hard || 0,
+              }}
+              percentageDisplay={data?.leetcode?.contests?.topPercentage ? `Top ${data.leetcode.contests.topPercentage}%` : undefined}
+            />
 
-            {/* Codeforces & CodeChef Cards Container */}
-            <div className="col-span-1 lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-12 w-full">
-              <CodeforcesCard data={data?.codeforces || null} loading={loading} />
-              <CodeChefCard data={data?.codechef || null} loading={loading} />
-            </div>
+            {/* Codeforces Card */}
+            <PlatformCard 
+              name="Codeforces"
+              username={data?.codeforces?.handle || "Loading..."}
+              iconPath="/assets/problemsolving/codeforces.png"
+              rankDisplay={cfMaxRank.title}
+              maxRating={data?.codeforces?.maxRating || 0}
+              solveCount={data?.codeforces?.totalSolved || 0}
+              contestCount={data?.codeforces?.totalContests || 0}
+              ratingGraph={data?.codeforces?.ratingGraph || []}
+              color={cfMaxRank.color}
+              profileUrl={`https://codeforces.com/profile/${data?.codeforces?.handle || ""}`}
+              loading={loading}
+            />
+
+            {/* CodeChef Card */}
+            <PlatformCard 
+              name="CodeChef"
+              username={data?.codechef?.handle || "Loading..."}
+              iconPath="/assets/problemsolving/codechef.png"
+              rankDisplay={data?.codechef?.stars ? `${data.codechef.stars}★ Division` : "Star Participant"}
+              maxRating={data?.codechef?.maxRating || 0}
+              solveCount={data?.codechef?.totalSolved || 0}
+              contestCount={data?.codechef?.totalContests || 0}
+              ratingGraph={data?.codechef?.ratingGraph || []}
+              color="#008000" // Green as requested (matching Pupil)
+              profileUrl={`https://www.codechef.com/users/${data?.codechef?.handle || ""}`}
+              loading={loading}
+            />
           </div>
         </div>
       </div>
