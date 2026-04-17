@@ -90,7 +90,7 @@ function ArchiveDetailBlock({
               className="group flex items-center justify-center h-12 px-8 rounded-full bg-foreground text-background transition-all hover:opacity-90 hover:shadow-lg shadow-black/10 font-black text-[11px] uppercase tracking-[0.2em]"
             >
               <ExternalLink className="size-4 mr-3 group-hover:scale-110 transition-transform" strokeWidth={3} />
-              Launch Stage
+              Live link
             </a>
           )}
 
@@ -114,7 +114,7 @@ function ArchiveDetailBlock({
               className="group flex items-center justify-center h-12 px-6 rounded-full bg-[#FF0000]/5 border border-[#FF0000]/10 text-[#FF0000] transition-all hover:bg-[#FF0000] hover:text-white hover:shadow-[0_8px_20px_-6px_rgba(255,0,0,0.4)] font-black text-[11px] uppercase tracking-[0.2em]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="mr-3 group-hover:scale-110 transition-transform"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-              Demo Video
+              YouTube
             </a>
           )}
         </div>
