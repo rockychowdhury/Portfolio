@@ -60,7 +60,9 @@ export default function Education() {
     : (heroItem ? [heroItem, ...initialCerts] : initialCerts);
 
   return (
-    <SectionWrapper id="education" className="relative py-24 lg:py-40 bg-background overflow-hidden" container={true}>
+    <SectionWrapper id="education" className="relative py-24 lg:py-40 bg-background overflow-hidden">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20 relative z-10">
+        
         {/* Section Header */}
         <div className="mb-24 lg:mb-32 flex flex-col items-start">
           <h2 className="flex flex-wrap items-center justify-start text-5xl font-light tracking-tighter text-foreground md:text-7xl lg:text-8xl leading-[1.1] cursor-default select-none">
@@ -120,6 +122,8 @@ export default function Education() {
             </>
           )}
         </div>
+      </div>
+
       {/* Background Decorative Elements */}
       <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />

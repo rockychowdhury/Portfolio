@@ -5,7 +5,6 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "fram
 import { Trash2, MapPin, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { FaWhatsapp, FaLinkedin, FaGithub, FaYoutube } from "react-icons/fa";
 import { toast } from "sonner";
-import SectionWrapper from "./SectionWrapper";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -105,11 +104,10 @@ I'm [Name] from [Company/Location]. I'd love to discuss
 Looking forward to connecting.`;
 
   return (
-    <SectionWrapper 
+    <section 
       id="contact" 
-      className="relative w-full overflow-hidden bg-background py-32 md:py-48 lg:py-64"
+      className="relative w-full overflow-hidden bg-background px-6 py-32 md:px-12 md:py-48 lg:px-20 lg:py-64"
       onMouseMove={handleMouseMove}
-      container={true}
     >
       {/* Animated Grid Background */}
       <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
@@ -136,7 +134,7 @@ Looking forward to connecting.`;
         }}
       />
 
-      <div className="relative">
+      <div className="relative z-10 mx-auto max-w-[1400px]">
         <div className="flex flex-col gap-16 lg:flex-row">
           
           {/* Left Side: Text and Info */}
@@ -447,6 +445,6 @@ Looking forward to connecting.`;
 
         </div>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

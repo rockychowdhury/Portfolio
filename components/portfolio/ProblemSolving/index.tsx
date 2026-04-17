@@ -83,19 +83,19 @@ export default function ProblemSolvingSection() {
   const cfMaxRank = getCodeforcesRank(data?.codeforces?.maxRating || 0);
 
   return (
-    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
+    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
       {/* ── Background & Guidelines ── */}
-      <div className="absolute inset-0 pointer-events-none px-6 md:px-12 lg:px-20">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
           <div className="absolute top-0 right-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative mx-auto max-w-[1400px]">
         {/* Section Headline */}
-        <div className="mb-12 md:mb-24 lg:pl-16 text-left" ref={titleRef}>
-          <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+        <div className="mb-12 md:mb-24 text-center" ref={titleRef}>
+          <div className="flex flex-col gap-2 items-center">
+            <h2 className="flex flex-wrap justify-center items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
@@ -130,10 +130,10 @@ export default function ProblemSolvingSection() {
           </div>
           
           <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={isTitleInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.8, ease: premiumEase }}
-            className="mt-12 flex items-center gap-4"
+            className="mt-12 flex justify-center items-center gap-4"
           >
             <div className="h-px w-8 bg-foreground/40" />
             <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
@@ -141,11 +141,12 @@ export default function ProblemSolvingSection() {
                 ? "Synchronizing Live Telemetry..."
                 : `${totalSolved} problems solved · ${totalContests} contests · Max Rating: ${peakRating}`}
             </p>
+            <div className="h-px w-8 bg-foreground/40" />
           </motion.div>
         </div>
 
         {/* Narrative Stats Bar */}
-        <div className="lg:pl-16">
+        <div className="flex flex-col items-center">
           <NarrativeBar 
             totalSolved={totalSolved} 
             totalContests={totalContests} 
@@ -154,7 +155,7 @@ export default function ProblemSolvingSection() {
           />
 
           {/* Main Grid for Cards - Now 3 Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
             {/* LeetCode Card */}
             <PlatformCard 
               name="LeetCode"

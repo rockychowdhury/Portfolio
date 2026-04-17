@@ -50,10 +50,9 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
   const bloomSortedAssignments = [...assignments].sort((a, b) => a.dist - b.dist);
 
   return (
-    <div className="relative w-full max-w-[1400px] mx-auto min-h-[600px] md:min-h-[1100px] py-12 md:py-24 overflow-visible">
+    <div className="relative w-full max-w-[1400px] mx-auto min-h-[900px] md:min-h-[1100px] py-12 md:py-24 overflow-visible">
       {bloomSortedAssignments.map((assignment, bloomIndex) => {
         const { testimonial, zone } = assignment;
-        // On mobile, we spread them more vertically and limit the horizontal spread to avoid center overlap
         return (
           <div 
             key={`${testimonial.name}-${bloomIndex}`}
@@ -63,19 +62,17 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
               top: `${zone.y}%`,
               transform: 'translate(-50%, -50%)',
               pointerEvents: zone.isInert ? 'none' : 'auto',
+              // Center-adjacent cards (priority 5) usually appear "on top"
               zIndex: zone.priority === 5 ? 30 : 10
             }}
           >
-            {/* Hide some cards on very small screens to keep it clean */}
-            <div className={`${bloomIndex > 6 ? 'hidden md:block' : 'block'}`}>
-              <FloatingCard 
-                testimonial={testimonial} 
-                index={bloomIndex} 
-                rotation={zone.rot}
-                isPaused={isPaused}
-                isInert={zone.isInert}
-              />
-            </div>
+            <FloatingCard 
+              testimonial={testimonial} 
+              index={bloomIndex} 
+              rotation={zone.rot}
+              isPaused={isPaused}
+              isInert={zone.isInert}
+            />
           </div>
         );
       })}

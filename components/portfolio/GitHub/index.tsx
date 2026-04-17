@@ -109,15 +109,15 @@ export default function GitHubSection() {
   const primaryStack = data?.languages?.slice(0, 4).map(l => l.name).join(" · ") || "Python · FastAPI · JavaScript · TypeScript";
 
   return (
-    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
+    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
       {/* ── Background & Guidelines ── */}
-      <div className="absolute inset-0 pointer-events-none px-6 md:px-12 lg:px-20">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
           <div className="absolute top-0 left-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative mx-auto max-w-[1400px]">
         {/* Section Headline */}
         <div className="mb-12 md:mb-32 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">

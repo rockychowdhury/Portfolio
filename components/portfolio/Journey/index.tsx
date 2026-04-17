@@ -5,7 +5,6 @@ import { motion, useInView } from "framer-motion";
 import MasterySpine from "./MasterySpine";
 import TimelineItem, { JourneyItem } from "./TimelineItem";
 import { JourneySkeleton } from "./JourneySkeleton";
-import SectionWrapper from "../SectionWrapper";
 
 // Premium easing for sections
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
@@ -51,11 +50,11 @@ const JourneySection = () => {
   }, []);
 
   return (
-    <SectionWrapper 
+    <section 
       id="journey"
-      className="relative w-full overflow-hidden bg-background py-24 text-foreground"
-      container={true}
+      className="relative w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground"
     >
+      <div className="mx-auto max-w-[1400px]">
         {/* Animated Section Header */}
         <div className="mb-24 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
@@ -111,7 +110,8 @@ const JourneySection = () => {
             </div>
           )}
         </div>
-    </SectionWrapper>
+      </div>
+    </section>
   );
 };
 

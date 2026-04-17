@@ -7,10 +7,9 @@ interface SectionWrapperProps extends HTMLMotionProps<"section"> {
   children: ReactNode;
   id?: string;
   className?: string;
-  container?: boolean;
 }
 
-export default function SectionWrapper({ children, id, className, container = true, ...props }: SectionWrapperProps) {
+export default function SectionWrapper({ children, id, className, ...props }: SectionWrapperProps) {
   return (
     <motion.section
       id={id}
@@ -21,13 +20,7 @@ export default function SectionWrapper({ children, id, className, container = tr
       className={className}
       {...props}
     >
-      {container ? (
-        <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20 w-full">
-          {children}
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </motion.section>
   );
 }
