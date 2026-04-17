@@ -108,7 +108,7 @@ export default function ProjectsSection() {
           <div className="pt-24 md:pt-40" />
 
           {/* Featured Projects - Sticky Layout */}
-          <section className="relative w-full py-20 md:py-40 px-6 md:px-12 lg:px-20">
+          <section className="relative w-full pt-20 md:pt-40 pb-10 md:pb-20 px-6 md:px-12 lg:px-20">
             <div className="max-w-[1400px] mx-auto lg:px-10">
               {/* Cinematic Header */}
               <div className="mb-32 lg:mb-48">
@@ -150,7 +150,7 @@ export default function ProjectsSection() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
                 {/* LEFT: 5/12 column span — scrollable project list */}
                 <div className="flex flex-col lg:col-span-5 relative z-20">
-                  <div className="h-[95vh]" aria-hidden />
+                  <div className="h-[40vh]" aria-hidden />
 
                   {featured.map((project, index) => (
                     <ProjectRow
@@ -161,12 +161,12 @@ export default function ProjectsSection() {
                       onActive={handleActive}
                     />
                   ))}
-                  <div className="h-[40vh] lg:h-[65vh]" aria-hidden />
+                  <div className="h-[20vh] lg:h-[30vh]" aria-hidden />
                 </div>
 
 
                 {/* RIGHT: 7/12 column span — sticky window preview with Intro Animation */}
-                <div className="hidden lg:block lg:col-span-7 sticky top-32 self-start pb-48 pointer-events-none">
+                <div className="hidden lg:block lg:col-span-7 sticky top-32 self-start pb-20 pointer-events-none">
                   <motion.div 
                     style={{ x: windowX, scale: windowScale }}
                     className="relative group pointer-events-auto z-10"
@@ -177,7 +177,7 @@ export default function ProjectsSection() {
               </div>
 
               {/* Unified Project Archive — Merged into the main flow */}
-              <div className="mt-20 lg:mt-32">
+              <div className="mt-12 lg:mt-16">
                 <ProjectArchiveScroll projects={all} />
               </div>
             </div>

@@ -7,29 +7,39 @@ import { WindowChrome } from "./WindowChrome";
 
 interface BrowserWindowProps {
   activeIndex: number;
+  direction: number;
   projects: any[];
   onVideoEnded?: (index: number) => void;
   isPlaying?: boolean;
 }
 
-export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isPlaying }: BrowserWindowProps) {
+export default function BrowserWindow({ activeIndex, direction, projects, onVideoEnded, isPlaying }: BrowserWindowProps) {
   const project = projects[activeIndex];
   if (!project) return null;
 
   return (
-    <div className="absolute inset-0 w-full h-full [perspective:2000px] pointer-events-none">
-      <AnimatePresence mode="popLayout" initial={false}>
+    <div className="absolute inset-0 w-full h-full pointer-events-none">
+      <AnimatePresence initial={false}>
         <motion.div
           key={activeIndex}
-          initial={{ rotateY: -110, opacity: 0, scale: 0.8, z: -100 }}
-          animate={{ rotateY: 0, opacity: 1, scale: 1, z: 0 }}
-          exit={{ rotateY: 110, opacity: 0, scale: 0.8, z: -100 }}
-          transition={{
-            duration: 1,
-            ease: [0.22, 1, 0.36, 1]
+          initial={{ 
+            clipPath: direction > 0 ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)",
+            zIndex: 20
+          }}
+          animate={{ 
+            clipPath: "inset(0% 0 0 0)",
+            zIndex: 20
+          }}
+          exit={{ 
+            zIndex: 10,
+            opacity: 0,
+            transition: { duration: 0.4 }
+          }}
+          transition={{ 
+            duration: 0.8,
+            ease: [0.19, 1, 0.22, 1]
           }}
           className="absolute inset-0 w-full h-full pointer-events-auto"
-          style={{ transformStyle: "preserve-3d" }}
         >
           {/* Browser Frame using WindowChrome */}
           <WindowChrome 

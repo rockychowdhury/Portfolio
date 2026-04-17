@@ -23,10 +23,12 @@ interface ProjectArchiveScrollProps {
 function ArchiveDetailBlock({
   project,
   index,
+  total,
   onInView
 }: {
   project: IProject;
   index: number;
+  total: number;
   onInView: (index: number) => void
 }) {
   const { ref, inView } = useInView({
@@ -40,7 +42,13 @@ function ArchiveDetailBlock({
   }, [inView, index, onInView]);
 
   return (
-    <div ref={ref} className="h-screen flex items-center">
+    <div 
+      ref={ref} 
+      className={clsx(
+        "flex items-center py-20",
+        (index === 0 || index === total - 1) ? "h-screen" : "min-h-[70vh]"
+      )}
+    >
       <motion.div
         initial={{ opacity: 0, x: -100, y: 100, scale: 0.8, filter: "blur(20px)" }}
         animate={inView ? 
@@ -151,10 +159,11 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
               key={project._id}
               project={project}
               index={index}
+              total={projects.length}
               onInView={setActiveIndex}
             />
           ))}
-          <div className="h-[30vh]" aria-hidden />
+          <div className="h-[5vh]" aria-hidden />
         </div>
 
 
@@ -166,33 +175,27 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
               hideChrome={true}
               className="w-full aspect-[16/10] max-w-[1400px] mx-auto pointer-events-auto"
             >
-              <AnimatePresence mode="wait" custom={direction}>
+              <AnimatePresence initial={false}>
                 <motion.div
                   key={activeProject._id}
-                  custom={direction}
                   initial={{ 
-                    opacity: 0, 
-                    y: direction * 40, 
-                    scale: 1.05,
-                    filter: "blur(10px)" 
+                    clipPath: direction > 0 ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)",
+                    zIndex: 20
                   }}
                   animate={{ 
-                    opacity: 1, 
-                    y: 0, 
-                    scale: 1,
-                    filter: "blur(0px)" 
+                    clipPath: "inset(0% 0 0 0)",
+                    zIndex: 20
                   }}
                   exit={{ 
-                    opacity: 0, 
-                    y: direction * -40, 
-                    scale: 0.95,
-                    filter: "blur(10px)" 
+                    zIndex: 10,
+                    opacity: 0,
+                    transition: { duration: 0.4 }
                   }}
                   transition={{ 
-                    duration: 0.8,
-                    ease: [0.16, 1, 0.3, 1]
+                    duration: 0.7,
+                    ease: [0.19, 1, 0.22, 1]
                   }}
-                  className="absolute inset-0 z-10"
+                  className="absolute inset-0"
                 >
                   <Image
                     src={activeProject.thumbnail}

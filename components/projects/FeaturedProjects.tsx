@@ -13,8 +13,15 @@ interface FeaturedProjectsProps {
 export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   
+  const direction = activeIndex >= prevIndex ? 1 : -1;
+
+  useEffect(() => {
+    setPrevIndex(activeIndex);
+  }, [activeIndex]);
+
   const isInView = useInView(containerRef, { amount: 0.5, once: false });
   const scrollLockRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +87,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           >
             <BrowserWindow 
               activeIndex={activeIndex} 
+              direction={direction}
               projects={projects} 
               onVideoEnded={handleVideoEnded}
               isPlaying={isInView && !isLocked}
