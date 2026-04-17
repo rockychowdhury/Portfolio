@@ -74,7 +74,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         <div className="relative z-10 w-full flex-1 flex items-center justify-center pointer-events-none">
           <div 
             ref={scrollLockRef}
-            className="relative w-full max-w-[900px] aspect-[16/10] mx-4 md:mx-12 pointer-events-auto bg-background rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-foreground/5"
+            className="relative w-full max-w-[1400px] aspect-[16/10] mx-4 md:mx-12 pointer-events-auto bg-background rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-foreground/5"
             onMouseEnter={() => setIsLocked(true)}
             onMouseLeave={() => setIsLocked(false)}
           >
