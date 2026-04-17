@@ -21,34 +21,49 @@ export function MarqueeRow({ achievements, direction, speed = 40 }: Props) {
 
   return (
     <div
-      className="relative overflow-hidden w-full py-2"
-      // Fade edges with a mask
+      className="relative w-full py-4 overflow-hidden group"
       style={{
         maskImage:
-          "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
         WebkitMaskImage:
-          "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
       }}
     >
-      <div
-        ref={rowRef}
-        className="flex gap-3 w-max"
+      {/* Perspective Wrapper */}
+      <div 
+        className="w-full"
         style={{
-          animation: `marquee-${direction} ${speed}s linear infinite`,
-          willChange: "transform",
-        }}
-        // Pause on hover — pure CSS via inline style toggle
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.animationPlayState = "paused";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.animationPlayState = "running";
+          perspective: "1200px",
+          perspectiveOrigin: "center",
+          transformStyle: "preserve-3d",
+          transform: direction === "left" ? "rotateY(2deg)" : "rotateY(-2deg)",
         }}
       >
-        {items.map((achievement, i) => (
-          <AchievementCard key={`${achievement._id}-${i}`} achievement={achievement} />
-        ))}
+        <div
+          ref={rowRef}
+          className="flex gap-8 w-max"
+          style={{
+            animation: `marquee-${direction} ${speed}s linear infinite`,
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "translateZ(0)",
+          }}
+
+          // Pause on hover
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.animationPlayState = "paused";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.animationPlayState = "running";
+          }}
+        >
+          {items.map((achievement, i) => (
+            <AchievementCard key={`${achievement._id}-${i}`} achievement={achievement} />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
+

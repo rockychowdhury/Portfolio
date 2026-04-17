@@ -23,51 +23,90 @@ export function AchievementCard({ achievement }: Props) {
 
   return (
     <motion.div
-      whileHover={{ scale: 1.035, y: -2 }}
-      transition={{ type: "spring", stiffness: 400, damping: 28 }}
-      className="relative flex items-center gap-3 shrink-0
-                 h-[56px] px-4 pr-5
-                 bg-white dark:bg-zinc-900
-                 border border-zinc-100 dark:border-zinc-800
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ 
+        opacity: 1, 
+        scale: 1,
+        y: [0, -3, 0],
+      }}
+      whileHover={{ 
+        scale: 1.05, 
+        y: -5,
+        boxShadow: `0 0 20px ${meta.color}33`,
+      }}
+      transition={{ 
+        y: {
+          duration: 3 + Math.random() * 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        },
+        type: "spring", 
+        stiffness: 400, 
+        damping: 28 
+      }}
+      className="relative flex items-center gap-4 shrink-0
+                 h-[64px] px-5
+                 bg-white/70 dark:bg-zinc-900/70
+                 backdrop-blur-md
+                 border border-white/20 dark:border-zinc-800/50
                  rounded-2xl cursor-default select-none
-                 shadow-[0_1px_3px_rgba(0,0,0,0.06)]
-                 hover:shadow-[0_4px_16px_rgba(0,0,0,0.10)]
-                 transition-shadow duration-200"
-      style={{ borderLeft: `3px solid ${meta.color}` }}
+                 shadow-[0_2px_10px_rgba(0,0,0,0.05)]
+                 transition-all duration-300"
+      style={{ 
+        borderLeft: `4px solid ${meta.color}`,
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        transform: "translateZ(0)",
+      }}
+
     >
+      {/* Glow Background (Visible on hover) */}
+      <div 
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{ 
+          background: `radial-gradient(circle at center, ${meta.color}11 0%, transparent 70%)` 
+        }}
+      />
+
       {/* Icon bubble */}
       <span
-        className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-        style={{ background: meta.bg }}
+        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+                   relative overflow-hidden border border-white/10 dark:border-zinc-700/30"
+        style={{ background: `${meta.bg}88` }}
       >
-        <Icon size={15} style={{ color: meta.color }} strokeWidth={2} />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+        <Icon size={18} style={{ color: meta.color }} strokeWidth={2.5} />
       </span>
 
       {/* Text */}
       <div className="flex flex-col justify-center min-w-0">
-        <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100
-                      leading-tight whitespace-nowrap">
+        <p className="text-[14px] font-bold text-zinc-900 dark:text-zinc-50
+                      leading-tight whitespace-nowrap tracking-tight">
           {achievement.title}
         </p>
-        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 whitespace-nowrap mt-0.5">
-          {achievement.organization}
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 whitespace-nowrap uppercase tracking-wider">
+            {achievement.organization}
+          </p>
+          <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
+            {year}
+          </span>
+        </div>
       </div>
 
-      {/* Right meta */}
-      <div className="ml-auto flex items-center gap-2 pl-3 shrink-0">
-        {statBadge && (
+      {/* Right meta - Stat Badge */}
+      {statBadge && (
+        <div className="ml-4 shrink-0">
           <span
-            className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+            className="text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20"
             style={{ background: meta.bg, color: meta.color }}
           >
             {statBadge}
           </span>
-        )}
-        <span className="text-[11px] text-zinc-300 dark:text-zinc-600 font-mono">
-          {year}
-        </span>
-      </div>
+        </div>
+      )}
     </motion.div>
   );
 }
+
