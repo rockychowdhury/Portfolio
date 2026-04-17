@@ -84,7 +84,7 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
                 <h3
                   className={clsx(
                     "text-3xl md:text-5xl font-black tracking-tighter transition-all duration-700 font-anton uppercase leading-[0.85]",
-                    isActive ? "text-foreground" : "text-foreground/20"
+                    isActive ? "text-foreground" : "text-foreground/30"
                   )}
                 >
                   {project.title}
@@ -127,7 +127,7 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
 
           <p className={clsx(
             "text-sm md:text-base leading-relaxed transition-all duration-700 max-w-[90%] font-medium tracking-tight",
-            isActive ? "text-foreground/60" : "text-foreground/5"
+            isActive ? "text-foreground/60" : "text-foreground/10"
           )}>
             {project.description}
           </p>
