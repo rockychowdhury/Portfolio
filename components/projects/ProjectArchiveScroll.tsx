@@ -166,15 +166,31 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
               hideChrome={true}
               className="w-full aspect-[16/10] max-w-[1400px] mx-auto pointer-events-auto"
             >
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={activeProject._id}
-                  initial={{ opacity: 0, filter: "blur(10px)", scale: 1.05 }}
-                  animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-                  exit={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
+                  custom={direction}
+                  initial={{ 
+                    opacity: 0, 
+                    y: direction * 40, 
+                    scale: 1.05,
+                    filter: "blur(10px)" 
+                  }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1,
+                    filter: "blur(0px)" 
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    y: direction * -40, 
+                    scale: 0.95,
+                    filter: "blur(10px)" 
+                  }}
                   transition={{ 
-                    duration: 0.5,
-                    ease: [0.22, 1, 0.36, 1]
+                    duration: 0.8,
+                    ease: [0.16, 1, 0.3, 1]
                   }}
                   className="absolute inset-0 z-10"
                 >
