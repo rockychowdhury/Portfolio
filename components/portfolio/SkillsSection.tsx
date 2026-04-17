@@ -7,6 +7,7 @@ import { Search, Info } from "lucide-react";
 import * as FaIcons from "react-icons/fa6";
 import * as VscIcons from "react-icons/vsc";
 import type { IconType } from "react-icons";
+import SectionWrapper from "./SectionWrapper";
 
 // ── Types ──
 interface Skill {
@@ -405,8 +406,6 @@ function ShapeGroup({
   );
 }
 
-
-
 // ── Ticker Component ──
 function SkillTicker({ skills }: { skills: Skill[] }) {
   const [isPaused, setIsPaused] = useState(false);
@@ -495,7 +494,6 @@ function SkillTicker({ skills }: { skills: Skill[] }) {
 
 // ── Main Section ──
 export default function SkillsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
   const shapesRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(shapesRef, { once: true, margin: "-10% 0px -10% 0px" });
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -503,7 +501,6 @@ export default function SkillsSection() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch("/api/skills")
       .then((r) => r.json())
       .then((data: Skill[]) => setSkills(data))
@@ -518,7 +515,7 @@ export default function SkillsSection() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Search logic - now uses debouncedQuery
+  // Search logic
   const filteredSearch = useMemo(() => {
     const query = debouncedQuery.trim();
     if (!query) return [];
@@ -531,21 +528,16 @@ export default function SkillsSection() {
 
   const searchStatus = useMemo(() => {
     if (!searchQuery.trim()) return "idle";
-    
-    // Check if what the user CURRENTLY typed (not debounced) is matching
-    // This gives immediate visual feedback while the "lock on" (highlights) wait for debounce
     const currentMatches = skills.filter(
       (s) => 
         s.name.toLowerCase().includes(searchQuery.trim().toLowerCase()) && 
         s.name !== "TBA"
     );
-
     return currentMatches.length > 0 ? "found" : "not_found";
   }, [searchQuery, skills]);
 
   const highlightedIds = useMemo(() => filteredSearch.map(s => s._id), [filteredSearch]);
 
-  // Group skills
   const shapeSkills = useMemo(() => {
     const result: Record<string, Skill[]> = {};
     for (const group of Object.keys(SHAPE_GROUPS)) {
@@ -555,7 +547,6 @@ export default function SkillsSection() {
   }, [skills]);
 
   const tickerSkills = useMemo(() => {
-    // Sort all skills based on the TICKER_GROUPS_ORDER
     return [...skills].sort((a, b) => {
       const idxA = TICKER_GROUPS_ORDER.indexOf(a.group);
       const idxB = TICKER_GROUPS_ORDER.indexOf(b.group);
@@ -568,7 +559,6 @@ export default function SkillsSection() {
     [skills]
   );
 
-  // Headline Animation Logic (Synced with blogs)
   const title = "Technical".split("");
   const subtitle = "Skillset".split("");
   const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
@@ -591,13 +581,11 @@ export default function SkillsSection() {
   const isTitleInView = useInView(titleRef, { once: true, margin: "-10%" });
 
   return (
-    <section
-      ref={sectionRef}
-      id="skills"
-      className="relative w-full bg-background py-20 md:py-32 overflow-hidden"
-    >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
-        
+    <div id="skills" className="relative w-full bg-background overflow-hidden">
+      <SectionWrapper
+        container={true}
+        className="py-20 md:py-32"
+      >
         {/* Section Header */}
         <div className="flex flex-col items-center mb-10 md:mb-16" ref={titleRef}>
           <h2 className="flex flex-wrap items-center justify-center text-5xl md:text-8xl lg:text-9xl font-light tracking-tighter text-foreground leading-none">
@@ -631,8 +619,7 @@ export default function SkillsSection() {
             </span>
           </h2>
           
-          {/* Minimal Skill Navigator - Ultra Compact */}
-          <div className="flex flex-col items-center mt-6 mb-10 w-full mx-auto" ref={titleRef}>
+          <div className="flex flex-col items-center mt-6 mb-10 w-full mx-auto">
             <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/40 hover:bg-secondary/50 border border-border/60 rounded-full px-4 py-1.5 transition-all duration-300">
               <Search className="w-3.5 h-3.5 text-muted-foreground/40 mr-2.5" />
               <input
@@ -642,14 +629,10 @@ export default function SkillsSection() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent border-none py-0.5 text-[11px] font-medium focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
               />
-              
               <div className="flex items-center gap-2.5 ml-1.5">
-                {/* Shortcut Hint */}
                 <div className="hidden xs:flex items-center px-1.5 py-0.5 rounded border border-border/30 bg-background/50 shadow-sm">
                   <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">⌘K</span>
                 </div>
-
-                {/* Info & Lamp Duo */}
                 <div className="flex items-center gap-2">
                   <div className="relative group/info">
                     <Info className="w-3.5 h-3.5 text-muted-foreground/30 hover:text-muted-foreground/50 cursor-help transition-colors" />
@@ -659,8 +642,6 @@ export default function SkillsSection() {
                       </p>
                     </div>
                   </div>
-
-                  {/* Tiny Status Indicator */}
                   <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-sm ${
                     searchStatus === "idle" ? "bg-muted/10" :
                     searchStatus === "found" ? "bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.4)]" :
@@ -672,7 +653,6 @@ export default function SkillsSection() {
           </div>
         </div>
 
-        {/* Top Skills Prominent Bar */}
         {topSkills.length > 0 && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -713,9 +693,8 @@ export default function SkillsSection() {
             />
           ))}
         </div>
-      </div>
+      </SectionWrapper>
 
-      {/* Ticker Row */}
       <SkillTicker skills={tickerSkills} />
 
       <style>{`
@@ -724,6 +703,6 @@ export default function SkillsSection() {
           to { transform: translateX(-25%); }
         }
       `}</style>
-    </section>
+    </div>
   );
 }

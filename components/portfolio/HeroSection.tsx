@@ -188,9 +188,9 @@ export default function HeroSection({
     <section
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen w-full overflow-hidden bg-background pt-24 lg:pt-0"
+      className="relative min-h-screen w-full overflow-x-hidden bg-background pt-24 lg:pt-0"
     >
-      <div className="mx-auto flex h-full max-w-[1400px] flex-col px-6 md:px-12 lg:grid lg:grid-cols-2 lg:px-20">
+      <div className="mx-auto flex h-full max-w-[1400px] flex-col px-6 md:px-12 lg:grid lg:grid-cols-2 lg:px-20 w-full relative">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-1 flex-col justify-center py-12 lg:py-0">
           {/* Vertical Label — Desktop Only */}
@@ -236,7 +236,7 @@ export default function HeroSection({
             {/* Main Heading */}
             <div className="relative">
               <h1
-                className="flex font-medium leading-[0.85] tracking-tighter text-foreground text-[clamp(6rem,16vw,14rem)] lg:text-[clamp(6rem,12vw,12rem)] 2xl:text-[clamp(12rem,15vw,14rem)]"
+                className="flex font-medium leading-[0.85] tracking-tighter text-foreground text-[clamp(4rem,16vw,14rem)] lg:text-[clamp(6rem,12vw,12rem)] 2xl:text-[clamp(12rem,15vw,14rem)]"
                 style={{ perspective: "600px" }}
               >
                 {helloLetters.map((letter, i) => (
@@ -342,7 +342,7 @@ export default function HeroSection({
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
-            className="relative h-[75vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
+            className="relative h-[75vh] w-full transition-all md:h-[85vh] lg:h-[90vh] lg:w-full xl:h-[95vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
           >
             <Image
               src="/profile.png"

@@ -6,6 +6,7 @@ import { Project } from "@/types/project";
 import { ProjectRow } from "@/components/projects/ProjectRow";
 import { ProjectWindowPreview } from "@/components/projects/ProjectWindowPreview";
 import ProjectArchiveScroll from "@/components/projects/ProjectArchiveScroll";
+import SectionWrapper from "@/components/portfolio/SectionWrapper";
 
 const headerLetters = "WORKS".split("");
 
@@ -21,15 +22,6 @@ const letterAnimation = {
       ease: [0.25, 0.4, 0.25, 1] as const,
     },
   }),
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] as const },
-  },
 };
 
 export default function ProjectsSection() {
@@ -81,7 +73,6 @@ export default function ProjectsSection() {
   });
 
   // Transform values for the cinematic window reveal
-  // From 0 to 0.1 of section scroll, we transition from center/large to right/normal
   const windowX = useTransform(scrollYProgress, [0, 0.08], ["-35%", "0%"]);
   const windowScale = useTransform(scrollYProgress, [0, 0.08], [1.15, 1]);
 
@@ -103,88 +94,81 @@ export default function ProjectsSection() {
           Initializing Projects // 2026
         </div>
       ) : (
-        <>
-          {/* Section Entrance Padding to avoid Navbar collision */}
-          <div className="pt-24 md:pt-40" />
-
-          {/* Featured Projects - Sticky Layout */}
-          <section className="relative w-full pt-20 md:pt-40 pb-10 md:pb-20 px-6 md:px-12 lg:px-20">
-            <div className="max-w-[1400px] mx-auto lg:px-10">
-              {/* Cinematic Header */}
-              <div className="mb-32 lg:mb-48">
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  className="flex flex-col"
-                >
-                  <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
-                    {headerLetters.map((letter, i) => (
-                      <motion.span
-                        key={i}
-                        custom={i}
-                        variants={letterAnimation}
-                        className="inline-block origin-bottom"
-                      >
-                        {letter}
-                      </motion.span>
-                    ))}
-                  </h2>
-
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-                    className="mt-12 flex items-center gap-4"
+        <SectionWrapper
+          container={true}
+          className="relative w-full pt-24 md:pt-40"
+        >
+          {/* Cinematic Header */}
+          <div className="mb-32 lg:mb-48">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-col"
+            >
+              <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+                {headerLetters.map((letter, i) => (
+                  <motion.span
+                    key={i}
+                    custom={i}
+                    variants={letterAnimation}
+                    className="inline-block origin-bottom"
                   >
-                    <div className="h-px w-8 bg-foreground/40" />
-                    <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
-                      {featured.length + all.length} Full-Stack Projects Shipped to Production
-                    </p>
-                  </motion.div>
-                </motion.div>
-              </div>
+                    {letter}
+                  </motion.span>
+                ))}
+              </h2>
 
-              {/* 5/12 and 7/12 sticky layout for better text space */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
-                {/* LEFT: 5/12 column span — scrollable project list */}
-                <div className="flex flex-col lg:col-span-5 relative z-20">
-                  <div className="h-[40vh]" aria-hidden />
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
+                className="mt-12 flex items-center gap-4"
+              >
+                <div className="h-px w-8 bg-foreground/40" />
+                <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
+                  {featured.length + all.length} Full-Stack Projects Shipped to Production
+                </p>
+              </motion.div>
+            </motion.div>
+          </div>
 
-                  {featured.map((project, index) => (
-                    <ProjectRow
-                      key={project.id}
-                      project={project}
-                      index={index + 1}
-                      isActive={activeId === project.id}
-                      onActive={handleActive}
-                    />
-                  ))}
-                  <div className="h-[20vh] lg:h-[30vh]" aria-hidden />
-                </div>
+          {/* 5/12 and 7/12 sticky layout for better text space */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+            {/* LEFT: 5/12 column span — scrollable project list */}
+            <div className="flex flex-col lg:col-span-5 relative z-20">
+              <div className="h-[20vh] lg:h-[40vh]" aria-hidden />
 
-
-                {/* RIGHT: 7/12 column span — sticky window preview with Intro Animation */}
-                <div className="hidden lg:block lg:col-span-7 sticky top-32 self-start pb-20 pointer-events-none">
-                  <motion.div 
-                    style={{ x: windowX, scale: windowScale }}
-                    className="relative group pointer-events-auto z-10"
-                  >
-                    <ProjectWindowPreview project={activeProject} />
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Unified Project Archive — Merged into the main flow */}
-              <div className="mt-12 lg:mt-16">
-                <ProjectArchiveScroll projects={all} />
-              </div>
+              {featured.map((project, index) => (
+                <ProjectRow
+                  key={project.id}
+                  project={project}
+                  index={index + 1}
+                  isActive={activeId === project.id}
+                  onActive={handleActive}
+                />
+              ))}
+              <div className="h-[20vh] lg:h-[30vh]" aria-hidden />
             </div>
-          </section>
-        </>
+
+            {/* RIGHT: 7/12 column span — sticky window preview with Intro Animation */}
+            <div className="hidden lg:block lg:col-span-7 sticky top-32 self-start pb-20 pointer-events-none">
+              <motion.div 
+                style={{ x: windowX, scale: windowScale }}
+                className="relative group pointer-events-auto z-10"
+              >
+                <ProjectWindowPreview project={activeProject} />
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Unified Project Archive — Merged into the main flow */}
+          <div className="mt-12 lg:mt-16">
+            <ProjectArchiveScroll projects={all} />
+          </div>
+        </SectionWrapper>
       )}
     </div>
-
   );
 }

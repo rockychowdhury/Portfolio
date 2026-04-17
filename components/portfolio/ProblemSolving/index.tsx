@@ -83,15 +83,15 @@ export default function ProblemSolvingSection() {
   const cfMaxRank = getCodeforcesRank(data?.codeforces?.maxRating || 0);
 
   return (
-    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
+    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
       {/* ── Background & Guidelines ── */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none px-6 md:px-12 lg:px-20">
         <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
           <div className="absolute top-0 right-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-[1400px]">
+      <div className="relative">
         {/* Section Headline */}
         <div className="mb-12 md:mb-24 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
