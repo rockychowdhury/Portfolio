@@ -13,6 +13,7 @@ import ContactSection from "@/components/portfolio/ContactSection";
 import TestimonialsSection from "@/components/portfolio/Testimonials";
 import BlogsSection from "@/components/portfolio/Blogs";
 import Education from "@/components/portfolio/Education";
+import AchievementsSection from "@/components/portfolio/AchievementsSection";
 import ProjectsSection from "@/sections/ProjectsSection";
 
 import JourneySection from "@/components/portfolio/Journey";
@@ -51,6 +52,7 @@ export default function Home() {
         <GitHubSection />
 
         <Education />
+        <AchievementsSection />
         <ProjectsSection />
         <JourneySection />
 
