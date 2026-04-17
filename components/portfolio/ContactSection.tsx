@@ -164,15 +164,42 @@ Looking forward to connecting.`;
               </div>
 
               <div className="space-y-4">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl"
-                >
-                  Got an idea? <br />
-                  <span className="text-muted-foreground/30">Let&apos;s engineer it.</span>
-                </motion.h2>
+                <div className="relative">
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl"
+                  >
+                    Got an idea? <br />
+                    <span className="text-muted-foreground/30">Let&apos;s engineer it.</span>
+                  </motion.h2>
+
+                  {/* ── Hand-drawn Curved Arrow (Desktop Only) ── */}
+                  <div className="hidden lg:block absolute -right-16 top-[-10px] pointer-events-none z-20">
+                    <svg width="180" height="100" viewBox="0 0 180 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted-foreground/20">
+                      <motion.path 
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        whileInView={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
+                        d="M10 10C50 10 120 20 160 80" 
+                        stroke="currentColor" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                      />
+                      <motion.path 
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 2.1 }}
+                        d="M145 70L160 80L165 65" 
+                        stroke="currentColor" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                      />
+                    </svg>
+                  </div>
+                </div>
                 <motion.div 
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
