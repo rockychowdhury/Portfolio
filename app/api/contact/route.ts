@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
@@ -28,21 +30,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // Configure the SMTP transporter (Gmail/SMTP)
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_HOST_USER,
-        pass: process.env.EMAIL_HOST_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: `"${name}" <${process.env.EMAIL_HOST_USER}>`,
-      to: process.env.RECEIVER_EMAIL,
+    const { data, error } = await resend.emails.send({
+      from: `Portfolio <onboarding@resend.dev>`,
+      to: process.env.RECEIVER_EMAIL || "server.info8000@gmail.com",
       replyTo: email,
       subject: `Portfolio: ${subject} from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; color: #333;">
           <h2 style="color: #000; border-bottom: 2px solid #eee; padding-bottom: 10px;">New Portfolio Message</h2>
@@ -57,11 +49,14 @@ export async function POST(req: Request) {
           </p>
         </div>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
+    if (error) {
+      console.error("Resend error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    return NextResponse.json({ message: "Email sent successfully!" }, { status: 200 });
+    return NextResponse.json({ message: "Email sent successfully!", id: data?.id }, { status: 200 });
   } catch (error) {
     console.error("Email send error:", error);
     return NextResponse.json(
