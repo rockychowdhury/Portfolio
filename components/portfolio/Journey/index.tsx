@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import MasterySpine from "./MasterySpine";
+import TimelineItem, { JourneyItem } from "./TimelineItem";
+import { JourneySkeleton } from "./JourneySkeleton";
 
 // Premium easing for sections
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
@@ -21,11 +24,30 @@ const letterAnimation = {
 };
 
 const JourneySection = () => {
+  const [journeyData, setJourneyData] = useState<JourneyItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef(null);
   const isTitleInView = useInView(titleRef, { once: true, margin: "-10%" });
 
   const titleWords = "Professional".split(" ");
   const accentWords = "Journey".split("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/journey");
+        const data = await response.json();
+        setJourneyData(data);
+      } catch (error) {
+        console.error("Error fetching journey data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <section 
@@ -33,8 +55,8 @@ const JourneySection = () => {
       className="relative w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground"
     >
       <div className="mx-auto max-w-[1400px]">
-        {/* Animated Section Header Only */}
-        <div className="mb-16 lg:pl-16 text-left" ref={titleRef}>
+        {/* Animated Section Header */}
+        <div className="mb-24 lg:pl-16 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
             <h2 className="flex flex-wrap items-end text-[3.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[5rem] md:text-[6rem] lg:text-[8rem]">
               {titleWords.map((word, wordIdx) => (
@@ -69,25 +91,28 @@ const JourneySection = () => {
               </div>
             </h2>
           </div>
-          
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={isTitleInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, delay: 0.8, ease: premiumEase }}
-            className="mt-8 flex items-center gap-4"
-          >
-            <div className="h-px w-8 bg-foreground/40" />
-            <p className="text-[10px] md:text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground/60">
-              [ 04. JOURNEY ]
-            </p>
-          </motion.div>
+        </div>
+
+        {/* Timeline Content */}
+        <div className="relative lg:pl-16" ref={containerRef}>
+          {loading ? (
+            <JourneySkeleton />
+          ) : (
+            <div className="relative max-w-4xl">
+              {/* Vertical Spine */}
+              <MasterySpine containerRef={containerRef} />
+              
+              <div className="flex flex-col">
+                {journeyData.map((item, index) => (
+                  <TimelineItem key={item._id} item={item} index={index} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 };
-
-
-
 
 export default JourneySection;
