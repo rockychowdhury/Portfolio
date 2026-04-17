@@ -29,16 +29,8 @@ export function MarqueeRow({ achievements, direction, speed = 40 }: Props) {
           "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
       }}
     >
-      {/* Perspective Wrapper */}
-      <div 
-        className="w-full"
-        style={{
-          perspective: "1200px",
-          perspectiveOrigin: "center",
-          transformStyle: "preserve-3d",
-          transform: direction === "left" ? "rotateY(2deg)" : "rotateY(-2deg)",
-        }}
-      >
+      {/* Animation Wrapper */}
+      <div className="w-full">
         <div
           ref={rowRef}
           className="flex gap-8 w-max"
@@ -47,7 +39,7 @@ export function MarqueeRow({ achievements, direction, speed = 40 }: Props) {
             willChange: "transform",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "translateZ(0)",
+            transform: "translate3d(0,0,0)",
           }}
 
           // Pause on hover

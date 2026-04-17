@@ -23,26 +23,18 @@ export function AchievementCard({ achievement }: Props) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ 
-        opacity: 1, 
-        scale: 1,
-        y: [0, -3, 0],
-      }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
       whileHover={{ 
         scale: 1.05, 
-        y: -5,
-        boxShadow: `0 0 20px ${meta.color}33`,
+        y: -2,
+        boxShadow: `0 10px 30px -10px ${meta.color}33`,
       }}
       transition={{ 
-        y: {
-          duration: 3 + Math.random() * 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        },
         type: "spring", 
         stiffness: 400, 
-        damping: 28 
+        damping: 30 
       }}
       className="relative flex items-center gap-4 shrink-0
                  h-[64px] px-5
