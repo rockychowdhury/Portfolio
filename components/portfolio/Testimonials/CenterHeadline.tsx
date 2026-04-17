@@ -33,9 +33,36 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-4xl font-bold tracking-tight text-muted-foreground/30 md:text-6xl"
+          className="text-4xl font-bold tracking-tight text-muted-foreground/30 md:text-6xl relative"
         >
           who&apos;ve worked with me.
+
+          {/* ── Hand-drawn Curved Arrow (Desktop Only) ── */}
+          <div className="hidden lg:block absolute right-0 top-1/2 translate-y-4 pointer-events-none z-20">
+            <svg width="140" height="120" viewBox="0 0 140 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted-foreground/20">
+              <motion.path 
+                initial={{ pathLength: 0, opacity: 0 }}
+                whileInView={{ pathLength: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.5, delay: 1.2, ease: "easeInOut" }}
+                d="M130 10C100 10 20 20 10 100" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+              />
+              <motion.path 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: 2.5 }}
+                d="M25 85L10 100L5 80" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+              />
+            </svg>
+          </div>
         </motion.h2>
       </div>
 
