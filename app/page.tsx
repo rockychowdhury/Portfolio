@@ -47,16 +47,13 @@ export default function Home() {
       <main>
         <HeroSection preloaderDone={preloaderDone} />
         <SkillsSection />
-
+        <ProjectsSection />
         <ProblemSolvingSection />
         <GitHubSection />
-
         <Education />
-        <AchievementsSection />
-        <ProjectsSection />
-        <JourneySection />
-
         <BlogsSection />
+        <AchievementsSection />
+        <JourneySection />
         <TestimonialsSection />
         <ContactSection />
       </main>

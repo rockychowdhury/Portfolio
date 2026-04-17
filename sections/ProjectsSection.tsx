@@ -97,7 +97,7 @@ export default function ProjectsSection() {
   const activeProject = featured.find((p) => p.id === activeId) ?? featured[0];
 
   return (
-    <div className="relative bg-background" ref={containerRef}>
+    <div className="relative bg-background" ref={containerRef} id="projects">
       {loading ? (
         <div className="flex h-screen items-center justify-center text-foreground/20 text-[10px] font-black uppercase tracking-[1em] animate-pulse">
           Initializing Projects // 2026
