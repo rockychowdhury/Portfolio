@@ -48,7 +48,7 @@ export default function ProjectsSection() {
       try {
         const res = await fetch("/api/projects");
         const data = await res.json();
-        
+
         if (!res.ok) {
           throw new Error(data.message || "Failed to fetch projects");
         }
@@ -58,11 +58,11 @@ export default function ProjectsSection() {
           id: p._id,
           skills: p.skills.map((s: any) => typeof s === 'string' ? s : s.name)
         }));
-        
+
         const featuredList = mappedProjects.filter((p: any) => p.isFeatured);
         setFeatured(featuredList);
         setAll(mappedProjects.filter((p: any) => !p.isFeatured));
-        
+
         if (featuredList.length > 0) {
           setActiveId(featuredList[0].id);
         }
@@ -92,7 +92,7 @@ export default function ProjectsSection() {
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Main Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:64px_64px]" />
-        
+
         {/* Ambient Light Blooms */}
         <div className="absolute top-0 left-[-10%] w-[50%] h-[50%] bg-blue-500/[0.03] rounded-full blur-[120px]" />
         <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-500/[0.03] rounded-full blur-[120px]" />
@@ -102,7 +102,7 @@ export default function ProjectsSection() {
       <section className="relative w-full py-20 md:py-40 px-6 md:px-12 lg:px-20">
         {/* Horizontal Technical Line */}
         <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-foreground/5 to-transparent" />
-        
+
         {/* Stage Coordinates Overlay */}
         <div className="absolute top-12 right-12 hidden xl:flex flex-col items-end opacity-20 pointer-events-none">
           <span className="text-[9px] font-black font-mono tracking-[0.3em]">STAGE_COORD: 34.0522° N, 118.2437° W</span>
@@ -153,7 +153,7 @@ export default function ProjectsSection() {
                 {/* Subtle Glow behind the header */}
                 <div className="absolute inset-0 bg-foreground/[0.02] blur-3xl rounded-full -z-10" />
               </h2>
-              
+
               <motion.div variants={fadeUp} className="mt-12 flex flex-col md:flex-row md:items-end gap-8">
                 <p className="text-sm md:text-lg text-foreground/40 max-w-xl font-medium tracking-tight leading-relaxed">
                   Curated selection of high-fidelity digital experiences and technical architectural solutions designed for the modern web.
@@ -169,7 +169,7 @@ export default function ProjectsSection() {
             {/* LEFT: 1/4 column span — scrollable project list */}
             <div className="flex flex-col lg:col-span-1">
               <div className="h-[20vh] lg:h-[35vh]" aria-hidden />
-              
+
               {featured.map((project, index) => (
                 <ProjectRow
                   key={project.id}
@@ -184,7 +184,7 @@ export default function ProjectsSection() {
 
             {/* RIGHT: 3/4 column span — sticky window preview */}
             <div className="hidden lg:block lg:col-span-3 sticky top-32 self-start pb-48">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -208,9 +208,9 @@ export default function ProjectsSection() {
           <span className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground/20">Studio Archive</span>
         </div>
 
-         <div className="max-w-[1400px] mx-auto lg:px-10">
-            <ProjectArchiveScroll projects={all} />
-         </div>
+        <div className="max-w-[1400px] mx-auto lg:px-10">
+          <ProjectArchiveScroll projects={all} />
+        </div>
       </section>
     </div>
   );

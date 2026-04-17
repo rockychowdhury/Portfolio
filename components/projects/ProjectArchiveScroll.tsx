@@ -40,7 +40,7 @@ function ArchiveDetailBlock({
   }, [inView, index, onInView]);
 
   return (
-    <div ref={ref} className="min-h-[70vh] flex flex-col justify-center py-20 lg:py-40">
+    <div ref={ref} className="h-screen flex items-center py-20 lg:py-40">
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -48,8 +48,9 @@ function ArchiveDetailBlock({
         transition={{ duration: 0.8 }}
         className="max-w-xl"
       >
+
         <div className="flex items-center gap-4 mb-8">
-           <div className="w-1.5 h-1.5 rounded-full bg-foreground/20" />
+          <div className="w-1.5 h-1.5 rounded-full bg-foreground/20" />
           <span className="text-foreground/40 font-black font-mono text-[10px] uppercase tracking-[0.4em]">
             Artifact Archive // 0{index + 1}
           </span>
@@ -131,43 +132,39 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
               onInView={setActiveIndex}
             />
           ))}
-          <div className="h-[20vh]" aria-hidden />
         </div>
 
-        <div className="hidden lg:block sticky top-32 mt-[15vh] self-start w-full flex items-center justify-center pointer-events-none">
 
-          <div className="relative w-full aspect-[16/10] max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] bg-zinc-950">
-            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-              <motion.div
-                key={activeProject._id}
-                custom={direction}
-                initial={{ y: direction > 0 ? "100%" : "-100%", opacity: 1 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ 
-                  y: direction > 0 ? "-20%" : "20%", 
-                  opacity: 0, 
-                  scale: 0.95,
-                  transition: { duration: 0.4 } 
-                }}
-                transition={{ 
-                  duration: 0.7,
-                  ease: [0.16, 1, 0.3, 1]
-                }}
-                className="absolute inset-0 z-10"
-              >
-
-                <Image
-                  src={activeProject.thumbnail}
-                  alt={activeProject.title}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                  priority
-                />
-              </motion.div>
-            </AnimatePresence>
+        {/* RIGHT: Sticky Image Showcase */}
+        <div className="hidden lg:block sticky top-0 h-screen self-start w-full pointer-events-none">
+          <div className="h-full w-full flex items-center justify-center py-20">
+            <div className="relative w-full aspect-[16/10] max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] bg-zinc-950">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeProject._id}
+                  initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 1.05, filter: "blur(4px)" }}
+                  transition={{ 
+                    duration: 0.6,
+                    ease: [0.22, 1, 0.36, 1]
+                  }}
+                  className="absolute inset-0 z-10"
+                >
+                  <Image
+                    src={activeProject.thumbnail}
+                    alt={activeProject.title}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    priority
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
+
 
 
 

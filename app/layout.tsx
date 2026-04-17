@@ -50,9 +50,10 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} ${anton.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${anton.variable} antialiased selection:bg-foreground/10`}
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="bg-background text-foreground overflow-x-hidden" suppressHydrationWarning>
+
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
