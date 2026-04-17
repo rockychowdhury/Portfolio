@@ -83,12 +83,13 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
              <div className="flex items-end justify-between gap-6">
                 <h3
                   className={clsx(
-                    "text-4xl md:text-6xl font-black tracking-tighter transition-all duration-700 font-anton uppercase leading-[0.85]",
+                    "text-3xl md:text-5xl font-black tracking-tighter transition-all duration-700 font-anton uppercase leading-[0.85]",
                     isActive ? "text-foreground" : "text-foreground/20"
                   )}
                 >
                   {project.title}
                 </h3>
+
                 
                 {/* External links - Futuristic glass buttons */}
                 <div className="flex items-center gap-3 shrink-0 mb-1">

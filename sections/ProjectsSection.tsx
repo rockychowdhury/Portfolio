@@ -100,26 +100,6 @@ export default function ProjectsSection() {
 
       {/* Featured Projects - Sticky Layout */}
       <section className="relative w-full py-20 md:py-40 px-6 md:px-12 lg:px-20">
-        {/* Horizontal Technical Line */}
-        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-foreground/5 to-transparent" />
-
-        {/* Stage Coordinates Overlay */}
-        <div className="absolute top-12 right-12 hidden xl:flex flex-col items-end opacity-20 pointer-events-none">
-          <span className="text-[9px] font-black font-mono tracking-[0.3em]">STAGE_COORD: 34.0522° N, 118.2437° W</span>
-          <span className="text-[9px] font-black font-mono tracking-[0.3em] mt-1">SYSTEM_VER: 2.0.4 // ARTIFACT_ARCHIVE</span>
-        </div>
-
-        {/* Vertical Labels */}
-        <div className="absolute top-1/2 left-8 -translate-y-1/2 hidden xl:flex flex-col items-center gap-12 opacity-10 pointer-events-none">
-          <span className="text-[9px] font-black uppercase tracking-[0.5em] [writing-mode:vertical-lr] rotate-180">
-            Featured Artifacts
-          </span>
-          <div className="h-32 w-px bg-foreground/20 border-l border-dashed border-foreground/30" />
-          <span className="text-[9px] font-black uppercase tracking-[0.5em] [writing-mode:vertical-lr] rotate-180">
-            Selected // 026
-          </span>
-        </div>
-
         <div className="max-w-[1400px] mx-auto lg:px-10">
           {/* Cinematic Header */}
           <div className="mb-32 lg:mb-48">
@@ -129,45 +109,44 @@ export default function ProjectsSection() {
               viewport={{ once: true }}
               className="flex flex-col"
             >
-              <div className="flex items-center gap-6 mb-12">
-                <motion.div variants={fadeUp} className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-foreground/20 animate-pulse" />
-                  <span className="text-[10px] font-black font-mono uppercase tracking-[0.5em] text-foreground/40">
-                    Portfolio Stage // 001
-                  </span>
-                </motion.div>
-                <motion.div variants={fadeUp} className="h-px flex-1 bg-linear-to-r from-foreground/10 to-transparent" />
-              </div>
-
-              <h2 className="flex font-anton text-[clamp(4rem,12vw,10rem)] leading-[0.8] tracking-tighter uppercase text-foreground relative">
+              <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
                 {headerLetters.map((letter, i) => (
                   <motion.span
                     key={i}
                     custom={i}
                     variants={letterAnimation}
-                    className="inline-block"
+                    className="inline-block origin-bottom"
                   >
                     {letter}
                   </motion.span>
                 ))}
-                {/* Subtle Glow behind the header */}
-                <div className="absolute inset-0 bg-foreground/[0.02] blur-3xl rounded-full -z-10" />
               </h2>
 
-              <motion.div variants={fadeUp} className="mt-12 flex flex-col md:flex-row md:items-end gap-8">
-                <p className="text-sm md:text-lg text-foreground/40 max-w-xl font-medium tracking-tight leading-relaxed">
-                  Curated selection of high-fidelity digital experiences and technical architectural solutions designed for the modern web.
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
+                className="mt-12 flex items-center gap-4"
+              >
+                <div className="h-px w-8 bg-foreground/40" />
+                <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
+                  {featured.length + all.length} Full-Stack Projects Shipped to Production
                 </p>
-                <div className="flex-1 h-px bg-foreground/5 mb-2 hidden md:block" />
               </motion.div>
             </motion.div>
           </div>
 
 
-          {/* 1/4 and 3/4 sticky layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-16 items-start">
-            {/* LEFT: 1/4 column span — scrollable project list */}
-            <div className="flex flex-col lg:col-span-1">
+
+
+
+
+
+          {/* 5/12 and 7/12 sticky layout for better text space */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+            {/* LEFT: 5/12 column span — scrollable project list */}
+            <div className="flex flex-col lg:col-span-5">
               <div className="h-[20vh] lg:h-[35vh]" aria-hidden />
 
               {featured.map((project, index) => (
@@ -182,37 +161,31 @@ export default function ProjectsSection() {
               <div className="h-[40vh] lg:h-[65vh]" aria-hidden />
             </div>
 
-            {/* RIGHT: 3/4 column span — sticky window preview */}
-            <div className="hidden lg:block lg:col-span-3 sticky top-32 self-start pb-48">
+            {/* RIGHT: 7/12 column span — sticky window preview */}
+            <div className="hidden lg:block lg:col-span-7 sticky top-32 self-start pb-48 pointer-events-none">
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
-                className="relative group"
+                className="relative group pointer-events-auto"
               >
                 <div className="absolute inset-0 bg-foreground/[0.03] blur-[120px] rounded-full -z-10" />
                 <ProjectWindowPreview project={activeProject} />
               </motion.div>
             </div>
 
+          </div>
 
+          {/* Unified Project Archive — Merged into the main flow */}
+          <div className="mt-20 lg:mt-32">
+            <ProjectArchiveScroll projects={all} />
           </div>
         </div>
       </section>
-
-      {/* Technical Archive */}
-      <section className="relative border-t border-foreground/5 bg-background py-32 md:py-48 px-6 md:px-12 lg:px-20">
-        {/* Section divider label */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-background border border-foreground/5 rounded-full z-10">
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground/20">Studio Archive</span>
-        </div>
-
-        <div className="max-w-[1400px] mx-auto lg:px-10">
-          <ProjectArchiveScroll projects={all} />
-        </div>
-      </section>
     </div>
+
+
   );
 }
 
