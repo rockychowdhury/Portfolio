@@ -48,38 +48,39 @@ function ArchiveDetailBlock({
         transition={{ duration: 0.8 }}
         className="max-w-xl"
       >
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-8">
+           <div className="w-1.5 h-1.5 rounded-full bg-foreground/20" />
           <span className="text-foreground/40 font-black font-mono text-[10px] uppercase tracking-[0.4em]">
-            Archive Artifact // 0{index + 1}
+            Artifact Archive // 0{index + 1}
           </span>
           <div className="h-px w-12 bg-foreground/10" />
         </div>
 
-        <h3 className="text-3xl md:text-5xl font-black text-foreground uppercase tracking-tighter font-anton leading-[0.9] mb-8">
+        <h3 className="text-4xl md:text-6xl font-black text-foreground uppercase tracking-tighter font-anton leading-[0.85] mb-8">
           {project.title}
         </h3>
 
-        <p className="text-base md:text-xl text-foreground/40 leading-relaxed font-medium mb-10 italic">
+        <p className="text-sm md:text-lg text-foreground/40 leading-relaxed font-medium mb-12 tracking-tight">
           {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-2 mb-10">
-          {project.skills?.slice(0, 6).map((s: any, i: number) => (
-            <span key={i} className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-foreground/[0.03] border border-foreground/5 text-foreground/50">
+        <div className="flex flex-wrap gap-2 mb-12">
+          {project.skills?.slice(0, 8).map((s: any, i: number) => (
+            <span key={i} className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-foreground/[0.03] border border-foreground/5 text-foreground/50 backdrop-blur-sm">
               {typeof s === 'string' ? s : s.name}
             </span>
           ))}
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           {project.githubLink && (
             <a
               href={project.githubLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/30 hover:text-foreground transition-all group"
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 hover:text-foreground transition-all group"
             >
-              <FaGithub size={16} className="group-hover:rotate-12 transition-transform" />
+              <FaGithub size={18} className="group-hover:rotate-12 transition-transform" />
               Source Code
             </a>
           )}
@@ -88,16 +89,17 @@ function ArchiveDetailBlock({
               href={project.liveLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex items-center gap-3 px-8 py-3 bg-foreground text-background rounded-full font-black text-[10px] uppercase tracking-widest overflow-hidden transition-all hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)] hover:-translate-y-1 active:scale-[0.98]"
+              className="group relative flex items-center gap-4 px-10 py-4 bg-foreground text-background rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] overflow-hidden transition-all hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.4)] hover:-translate-y-1 active:scale-[0.98]"
             >
               <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
               <span className="relative z-10">Launch Stage</span>
-              <ArrowUpRight size={14} className="relative z-10 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <ArrowUpRight size={16} className="relative z-10 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </a>
           )}
         </div>
       </motion.div>
     </div>
+
   );
 }
 
@@ -121,7 +123,6 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
 
         {/* LEFT: Scrolling Details */}
         <div className="relative">
-          <div className="h-[20vh]" aria-hidden />
           {projects.map((project, index) => (
             <ArchiveDetailBlock
               key={project._id}
@@ -130,31 +131,31 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
               onInView={setActiveIndex}
             />
           ))}
-          <div className="h-[40vh]" aria-hidden />
+          <div className="h-[20vh]" aria-hidden />
         </div>
 
-        <div className="hidden lg:block sticky top-32 h-[calc(100vh-8rem)] w-full flex items-center justify-center">
-          <WindowChrome 
-            url={activeProject.liveLink || activeProject.githubLink}
-            showOverlays={false}
-            className="w-[90%]"
-          >
+        <div className="hidden lg:block sticky top-32 mt-[15vh] self-start w-full flex items-center justify-center pointer-events-none">
 
-            <AnimatePresence mode="popLayout" custom={direction}>
+          <div className="relative w-full aspect-[16/10] max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] bg-zinc-950">
+            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
               <motion.div
                 key={activeProject._id}
                 custom={direction}
-                initial={{ y: direction > 0 ? "100%" : "-100%", opacity: 0 }}
+                initial={{ y: direction > 0 ? "100%" : "-100%", opacity: 1 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: direction > 0 ? "-100%" : "100%", opacity: 0, transition: { duration: 0.3 } }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 35,
-                  mass: 0.8
+                exit={{ 
+                  y: direction > 0 ? "-20%" : "20%", 
+                  opacity: 0, 
+                  scale: 0.95,
+                  transition: { duration: 0.4 } 
                 }}
-                className="absolute inset-0"
+                transition={{ 
+                  duration: 0.7,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className="absolute inset-0 z-10"
               >
+
                 <Image
                   src={activeProject.thumbnail}
                   alt={activeProject.title}
@@ -165,8 +166,11 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
                 />
               </motion.div>
             </AnimatePresence>
-          </WindowChrome>
+          </div>
         </div>
+
+
+
       </div>
     </div>
   );

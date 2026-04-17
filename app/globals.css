@@ -209,3 +209,12 @@ html.theme-transitioning body {
   0%   { transform: translateX(-33.333%); }
   100% { transform: translateX(0); }
 }
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}

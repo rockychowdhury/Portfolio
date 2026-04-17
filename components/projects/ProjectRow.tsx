@@ -33,58 +33,77 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
     <motion.div
       ref={ref}
       initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: isActive ? 1 : 0.3, x: 0 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, delay: index * 0.1 }}
       animate={{ 
-        opacity: isActive ? 1 : 0.3,
-        x: isActive ? 4 : 0
+        opacity: isActive ? 1 : 0.2,
+        x: isActive ? 8 : 0
       }}
       className={clsx(
-        "relative py-12 border-b border-foreground/5 transition-all duration-700 ease-in-out group/row"
+        "relative py-16 border-b border-foreground/5 transition-all duration-700 ease-in-out group/row"
       )}
     >
-      {/* Vertical Index label */}
-      <div className="absolute -left-12 top-12 hidden lg:flex flex-col items-center gap-4">
-        <span className={clsx(
-          "text-[10px] font-black font-mono transition-colors duration-500",
-          isActive ? "text-foreground" : "text-foreground/10"
-        )}>
-          {index.toString().padStart(2, '0')}
-        </span>
+      {/* Vertical Index label - Robotic style */}
+      <div className="absolute -left-16 top-16 hidden lg:flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center">
+          <span className={clsx(
+            "text-[8px] font-black font-mono uppercase tracking-[0.2em] mb-1 transition-colors duration-500",
+            isActive ? "text-foreground/40" : "text-foreground/10"
+          )}>
+            Art.
+          </span>
+          <span className={clsx(
+            "text-xl font-black font-mono transition-all duration-500",
+            isActive ? "text-foreground scale-110" : "text-foreground/10 scale-100"
+          )}>
+            {index.toString().padStart(2, '0')}
+          </span>
+        </div>
         <div className={clsx(
-          "w-px h-8 transition-all duration-500",
-          isActive ? "bg-foreground scale-y-100" : "bg-foreground/10 scale-y-50"
+          "w-px h-16 transition-all duration-700 origin-top",
+          isActive ? "bg-foreground scale-y-100 shadow-[0_0_15px_rgba(0,0,0,0.5)]" : "bg-foreground/5 scale-y-50"
         )} />
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div>
-          <div className="flex flex-col gap-2 mb-4">
-             <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-6">
+        <div className="relative">
+          {/* Artifact Version Label */}
+          <div className={clsx(
+            "mb-4 flex items-center gap-3 transition-opacity duration-500",
+            isActive ? "opacity-100" : "opacity-0"
+          )}>
+            <span className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-foreground/40">
+              V.2.0.4 // STAGE_ARCHIVE
+            </span>
+            <div className="h-px w-8 bg-foreground/10" />
+          </div>
+
+          <div className="flex flex-col gap-2 mb-6">
+             <div className="flex items-end justify-between gap-6">
                 <h3
                   className={clsx(
-                    "text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 font-anton uppercase leading-none",
-                    isActive ? "text-foreground translate-x-1" : "text-foreground/20 translate-x-0"
+                    "text-4xl md:text-6xl font-black tracking-tighter transition-all duration-700 font-anton uppercase leading-[0.85]",
+                    isActive ? "text-foreground" : "text-foreground/20"
                   )}
                 >
                   {project.title}
                 </h3>
                 
-                {/* External links */}
-                <div className="flex items-center gap-3 shrink-0">
+                {/* External links - Futuristic glass buttons */}
+                <div className="flex items-center gap-3 shrink-0 mb-1">
                   {project.githubLink && (
                     <a
                       href={project.githubLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={clsx(
-                        "p-2 rounded-full border border-foreground/5 transition-all duration-300 hover:bg-foreground hover:text-background",
-                        isActive ? "text-foreground/40" : "text-foreground/10"
+                        "p-3 rounded-xl border border-foreground/5 transition-all duration-300 backdrop-blur-sm hover:bg-foreground hover:text-background",
+                        isActive ? "text-foreground/40" : "text-foreground/5"
                       )}
                       aria-label="GitHub"
                     >
-                      <FaGithub className="w-3.5 h-3.5" />
+                      <FaGithub className="w-4 h-4" />
                     </a>
                   )}
                   {project.liveLink && (
@@ -93,12 +112,12 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
                       target="_blank"
                       rel="noopener noreferrer"
                       className={clsx(
-                        "p-2 rounded-full border border-foreground/5 transition-all duration-300 hover:bg-foreground hover:text-background",
-                        isActive ? "text-foreground/40" : "text-foreground/10"
+                        "p-3 rounded-xl border border-foreground/5 transition-all duration-300 backdrop-blur-sm hover:bg-foreground hover:text-background",
+                        isActive ? "text-foreground/40" : "text-foreground/5"
                       )}
                       aria-label="Live site"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
                 </div>
@@ -106,22 +125,36 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
           </div>
 
           <p className={clsx(
-            "text-sm leading-relaxed transition-all duration-500 max-w-[95%] font-medium",
+            "text-sm md:text-base leading-relaxed transition-all duration-700 max-w-[90%] font-medium tracking-tight",
             isActive ? "text-foreground/60" : "text-foreground/5"
           )}>
             {project.description}
           </p>
         </div>
 
-        <ProjectTags skills={project.skills} active={isActive} className="mt-2" />
+        {/* Tech Tags - Glassmorphic Upgrade */}
+        <div className={clsx(
+          "flex flex-wrap gap-2 mt-2 transition-all duration-700",
+          isActive ? "opacity-100 translate-y-0" : "opacity-20 translate-y-2"
+        )}>
+          {project.skills.map((skill, i) => (
+            <span 
+              key={i}
+              className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-foreground/[0.03] border border-foreground/5 text-foreground/50 backdrop-blur-sm"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
       </div>
 
-      {/* Subtle indicator line that grows when active */}
+      {/* Futuristic Glowing Pulse Line */}
       <div className={clsx(
-        "absolute bottom-0 left-0 h-[2px] bg-foreground transition-all duration-700 ease-out",
-        isActive ? "w-full opacity-100" : "w-0 opacity-0"
+        "absolute bottom-0 left-0 h-[2px] transition-all duration-1000 ease-in-out",
+        isActive ? "w-full bg-foreground opacity-100 shadow-[0_0_20px_rgba(0,0,0,0.3)]" : "w-0 bg-foreground/10 opacity-0"
       )} />
     </motion.div>
+
   );
 }
 
