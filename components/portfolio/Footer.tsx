@@ -15,49 +15,42 @@ export default function Footer() {
     <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
         <div className="flex flex-col items-center gap-10">
-          {/* ── Animated Scroll to Top Indicator ── */}
+          <div className="flex flex-wrap items-center justify-center w-full gap-x-8 gap-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 border-t border-foreground/5 pt-12">
+            <span className="text-center">{`© ${currentYear} // রকি চৌধুরী`}</span>
+          </div>
+
+          {/* ── Floating Back to Top (Absolute in Footer) ── */}
           <motion.button
             onClick={scrollToTop}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="group flex flex-col items-center gap-3 transition-opacity hover:opacity-70"
+            whileHover={{ y: -5, scale: 1.1 }}
+            className="absolute bottom-12 right-6 md:right-12 z-50 group flex flex-col items-center gap-3 transition-colors cursor-pointer"
           >
-            <div className="relative h-10 w-6 rounded-full border-2 border-muted-foreground/30 p-1">
+            <div className="relative h-10 w-6 rounded-full border-2 border-foreground/20 p-1 bg-background/50 backdrop-blur-sm group-hover:border-foreground/40 transition-colors shadow-lg">
               <motion.div
                 animate={{
-                  y: [0, 4, 0],
+                  y: [0, 8, 0],
                 }}
                 transition={{
                   duration: 1.5,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="mx-auto h-2 w-1 rounded-full bg-muted-foreground/50"
+                className="mx-auto h-2 w-1 rounded-full bg-foreground/40 group-hover:bg-foreground/60"
               />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground/40">
-              Back to Top
+            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground/30 group-hover:text-foreground/60 transition-colors">
+              Top
             </span>
           </motion.button>
-
-          {/* ── Minimalist Utility Line: Links & Copyright ── */}
-          <div className="flex flex-wrap items-end justify-between w-full gap-x-8 gap-y-4 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
-              <a href="#skills" className="hover:text-foreground transition-colors">Skills</a>
-              <a href="#projects" className="hover:text-foreground transition-colors">Projects</a>
-              <a href="#education" className="hover:text-foreground transition-colors">Education</a>
-              <a href="#blogs" className="hover:text-foreground transition-colors">Blogs</a>
-              <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
-            </div>
-            <span className="text-right">{`© ${currentYear} // রকি চৌধুরী`}</span>
-          </div>
         </div>
       </div>
 
       {/* ── Giant Signature Typography (Flush Bottom) ── */}
       <div className="relative select-none flex justify-center items-end mt-8 overflow-hidden">
-        <motion.h1 
+        <motion.h1
           initial={{ y: "40%", opacity: 0 }}
           whileInView={{ y: "0%", opacity: 1 }}
           viewport={{ once: true }}

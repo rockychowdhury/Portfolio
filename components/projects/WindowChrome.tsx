@@ -51,7 +51,7 @@ export function WindowChrome({ children, url, className, showOverlays = true, hi
               </span>
               <button 
                 onClick={handleCopy}
-                className="ml-auto p-1 rounded-md hover:bg-foreground/10 transition-colors pointer-events-auto group/copy"
+                className="ml-auto p-1 rounded-md hover:bg-foreground/10 transition-colors pointer-events-auto group/copy cursor-pointer"
                 title="Copy URL"
               >
                 <AnimatePresence mode="wait">
