@@ -51,8 +51,7 @@ async function seed() {
   try {
     await dbConnect();
 
-    console.log("Clearing old journey data (Achievements collection)...");
-    await Achievement.deleteMany({});
+
     
     console.log("Clearing new Journey collection...");
     await Journey.deleteMany({});
