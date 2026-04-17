@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import VideoPreview from "./VideoPreview";
+import { WindowChrome } from "./WindowChrome";
 
 interface BrowserWindowProps {
   activeIndex: number;
@@ -30,27 +31,14 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
           className="absolute inset-0 w-full h-full pointer-events-auto"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Browser Frame */}
-          <div className="relative w-full h-full rounded-2xl border-2 border-foreground/10 bg-background overflow-hidden flex flex-col shadow-2xl">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-foreground/5 bg-muted/30">
-              <div className="flex gap-2">
-                <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                <div className="h-3 w-3 rounded-full bg-green-500/80" />
-              </div>
-              <div className="flex-1 max-w-sm px-4">
-                <div className="h-6 w-full rounded-lg bg-foreground/5 border border-foreground/5 flex items-center px-4 overflow-hidden">
-                  <span className="text-[10px] text-foreground/40 font-mono truncate">
-                    {project.liveLink || "https://project.ai"}
-                  </span>
-                </div>
-              </div>
-              <div className="w-16 h-4 bg-foreground/5 rounded-full" />
-            </div>
-
+          {/* Browser Frame using WindowChrome */}
+          <WindowChrome 
+            url={project.liveLink || "https://project.ai"}
+            className="w-full h-full"
+            showOverlays={true}
+          >
             {/* Content (Screen) */}
-            <div className="relative flex-1 w-full overflow-hidden bg-muted/20">
+            <div className="relative w-full h-full overflow-hidden bg-muted/20">
               {project.previewLink ? (
                 <VideoPreview 
                   src={project.previewLink} 
@@ -58,7 +46,6 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
                   onEnded={() => onVideoEnded?.(activeIndex)}
                 />
               ) : project.thumbnail ? (
-
                 <div className="relative w-full h-full">
                   <Image
                     src={project.thumbnail}
@@ -69,14 +56,13 @@ export default function BrowserWindow({ activeIndex, projects, onVideoEnded, isP
                     priority
                   />
                 </div>
-
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-[1em] text-foreground/10">
                   {project.title} Preview
                 </div>
               )}
             </div>
-          </div>
+          </WindowChrome>
         </motion.div>
       </AnimatePresence>
     </div>

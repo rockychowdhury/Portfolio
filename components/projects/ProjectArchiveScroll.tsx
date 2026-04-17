@@ -162,7 +162,10 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
         <div className="hidden lg:block sticky top-0 h-screen self-start w-full pointer-events-none">
           <div className="h-full w-full flex items-center justify-center">
 
-            <div className="relative w-full aspect-[16/10] max-w-[1400px] mx-auto overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-foreground/5 bg-background/50 backdrop-blur-xl pointer-events-auto">
+            <WindowChrome 
+              hideChrome={true}
+              className="w-full aspect-[16/10] max-w-[1400px] mx-auto pointer-events-auto"
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeProject._id}
@@ -185,7 +188,7 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
                   />
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </WindowChrome>
           </div>
         </div>
 

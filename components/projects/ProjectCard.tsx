@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ArrowUpRight, Github, ExternalLink, Code2, Layers } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Code2, Layers } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { IProject } from "@/lib/db/models/Project";
 import clsx from "clsx";

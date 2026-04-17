@@ -8,9 +8,10 @@ interface WindowChromeProps {
   url?: string;
   className?: string;
   showOverlays?: boolean;
+  hideChrome?: boolean;
 }
 
-export function WindowChrome({ children, url, className, showOverlays = true }: WindowChromeProps) {
+export function WindowChrome({ children, url, className, showOverlays = true, hideChrome = false }: WindowChromeProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -32,7 +33,8 @@ export function WindowChrome({ children, url, className, showOverlays = true }: 
       )}
     >
       {/* Title bar - Clean Browser Style */}
-      <div className="relative flex items-center h-9 px-4 bg-secondary/30 backdrop-blur-md border-b border-foreground/5 z-20">
+      {!hideChrome && (
+        <div className="relative flex items-center h-9 px-4 bg-secondary/30 backdrop-blur-md border-b border-foreground/5 z-20">
         {/* Traffic lights */}
         <div className="flex gap-2.5 shrink-0">
           <div className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-[inset_0_0_2px_rgba(0,0,0,0.1)]" />
@@ -79,14 +81,18 @@ export function WindowChrome({ children, url, className, showOverlays = true }: 
         )}
         
         {/* Right side Featured Badge */}
-        <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-foreground text-background transition-transform duration-500 group-hover:scale-105">
-           <div className="size-0.5 rounded-full bg-background/50 animate-pulse" />
-           <span className="text-[8px] font-black uppercase tracking-[0.2em]">Featured</span>
+        <div className="ml-auto flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-foreground text-background transition-transform duration-500 group-hover:scale-105 shadow-sm">
+           <div className="size-1 rounded-full bg-background/30 animate-pulse" />
+           <span className="text-[8px] font-medium uppercase tracking-[0.1em]">Featured</span>
         </div>
       </div>
+      )}
 
       {/* Content area */}
-      <div className="relative w-full aspect-video overflow-hidden bg-background">
+      <div className={clsx(
+        "relative w-full overflow-hidden bg-background",
+        hideChrome ? "h-full" : "aspect-video"
+      )}>
         {showOverlays && (
           <>
             {/* Subtle inner shadow for depth */}

@@ -12,4 +12,5 @@ export interface Project {
   videoLink?: string;           // YouTube details video URL
   isFeatured: boolean;
   order: number;                // Controls display order, ascending
+  createdAt?: Date | string;
 }

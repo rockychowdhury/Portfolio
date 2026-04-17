@@ -14,6 +14,7 @@ export interface IProject {
   videoLink?: string;
   isFeatured: boolean;
   order: number;
+  createdAt?: Date | string;
 }
 
 const ProjectSchema = new Schema<IProject>(
@@ -31,8 +32,7 @@ const ProjectSchema = new Schema<IProject>(
     order: { type: Number, default: 0 },
   },
   { 
-    timestamps: true,
-    strictPopulate: false 
+    timestamps: true
   }
 );
 
