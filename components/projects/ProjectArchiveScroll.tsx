@@ -40,12 +40,20 @@ function ArchiveDetailBlock({
   }, [inView, index, onInView]);
 
   return (
-    <div ref={ref} className="h-screen flex items-center py-20 lg:py-40">
+    <div ref={ref} className="h-[92vh] flex items-center">
+
+
       <motion.div
-        initial={{ opacity: 0, x: -30 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: false, margin: "-10% 0px" }}
-        transition={{ duration: 0.8 }}
+        initial={{ opacity: 0, x: -100, y: 100, scale: 0.8, filter: "blur(20px)" }}
+        animate={inView ? 
+          { opacity: 1, x: 0, y: 0, scale: 1, filter: "blur(0px)" } : 
+          { opacity: 0, x: -50, y: -50, scale: 0.9, filter: "blur(10px)" }
+        }
+        transition={{ 
+          duration: 1.2, 
+          ease: [0.16, 1, 0.3, 1],
+          opacity: { duration: 0.8 }
+        }}
         className="max-w-xl"
       >
 
@@ -137,7 +145,8 @@ export default function ProjectArchiveScroll({ projects }: ProjectArchiveScrollP
 
         {/* RIGHT: Sticky Image Showcase */}
         <div className="hidden lg:block sticky top-0 h-screen self-start w-full pointer-events-none">
-          <div className="h-full w-full flex items-center justify-center py-20">
+          <div className="h-full w-full flex items-center justify-center">
+
             <div className="relative w-full aspect-[16/10] max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] bg-zinc-950">
               <AnimatePresence mode="wait">
                 <motion.div
