@@ -75,7 +75,7 @@ export default function PlatformCard({
       href={profileUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex flex-col rounded-[2.5rem] border border-border/10 bg-transparent p-7 transition-all duration-700 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] min-h-[440px]"
+      className="group relative flex flex-col rounded-[2.5rem] bg-transparent p-7 transition-all duration-700 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] min-h-[440px]"
       style={{ 
         // @ts-ignore
         '--hover-color': color 
@@ -86,24 +86,27 @@ export default function PlatformCard({
       transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
     >
       {/* Clipped Background & Border Layer */}
-      <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none">
-        {/* Base White Background */}
-        <div className="absolute inset-0 bg-[#ffffff]" />
+      <div className="absolute inset-0 rounded-[2.5rem] border border-border/10 pointer-events-none z-0">
+        {/* Inner background container with slight inset to avoid cropping the border */}
+        <div className="absolute inset-[1px] rounded-[2.4rem] overflow-hidden">
+          {/* Base White Background */}
+          <div className="absolute inset-0 bg-[#ffffff]" />
 
-        {/* Premium Gradient Background - Persistent with hover enhancement */}
-        <div 
-          className="absolute inset-0 opacity-100 transition-opacity duration-700"
-          style={{ 
-            background: `radial-gradient(circle at 0% 0%, ${color}18 0%, transparent 80%), 
-                         radial-gradient(circle at 100% 100%, ${color}12 0%, transparent 80%)`,
-          }}
-        />
-        
-        {/* Base Subtle Color to prevent "white bar" feel */}
-        <div className="absolute inset-0 bg-secondary/[0.01]" />
+          {/* Premium Gradient Background - Persistent with hover enhancement */}
+          <div 
+            className="absolute inset-0 opacity-100 transition-opacity duration-700"
+            style={{ 
+              background: `radial-gradient(circle at 0% 0%, ${color}18 0%, transparent 80%), 
+                           radial-gradient(circle at 100% 100%, ${color}12 0%, transparent 80%)`,
+            }}
+          />
+          
+          {/* Base Subtle Color to prevent "white bar" feel */}
+          <div className="absolute inset-0 bg-secondary/[0.01]" />
+        </div>
         
         {/* Dynamic Hover Border */}
-        <div className="absolute inset-0 border border-transparent transition-colors duration-700 group-hover:border-[var(--hover-color)]/30 z-20" />
+        <div className="absolute inset-0 border border-transparent rounded-[2.5rem] transition-colors duration-700 group-hover:border-[var(--hover-color)]/30 z-20" />
       </div>
 
       {/* Header Row */}

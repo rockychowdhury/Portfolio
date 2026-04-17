@@ -93,9 +93,9 @@ export default function ProblemSolvingSection() {
 
       <div className="relative mx-auto max-w-[1400px]">
         {/* Section Headline */}
-        <div className="mb-12 md:mb-24 text-center" ref={titleRef}>
-          <div className="flex flex-col gap-2 items-center">
-            <h2 className="flex flex-wrap justify-center items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+        <div className="mb-12 md:mb-24 lg:pl-16 text-left" ref={titleRef}>
+          <div className="flex flex-col gap-2">
+            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
@@ -130,10 +130,10 @@ export default function ProblemSolvingSection() {
           </div>
           
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0, x: -20 }}
+            animate={isTitleInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1, delay: 0.8, ease: premiumEase }}
-            className="mt-12 flex justify-center items-center gap-4"
+            className="mt-12 flex items-center gap-4"
           >
             <div className="h-px w-8 bg-foreground/40" />
             <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
@@ -141,21 +141,22 @@ export default function ProblemSolvingSection() {
                 ? "Synchronizing Live Telemetry..."
                 : `${totalSolved} problems solved · ${totalContests} contests · Max Rating: ${peakRating}`}
             </p>
-            <div className="h-px w-8 bg-foreground/40" />
           </motion.div>
         </div>
 
         {/* Narrative Stats Bar */}
-        <div className="flex flex-col items-center">
+        <div className="lg:pl-16 mb-16">
           <NarrativeBar 
             totalSolved={totalSolved} 
             totalContests={totalContests} 
             peakRating={peakRating} 
             leetcodePercentage={data?.leetcode?.contests?.topPercentage ? `Top ${data.leetcode.contests.topPercentage}%` : "Top 30%"} 
           />
+        </div>
 
-          {/* Main Grid for Cards - Now 3 Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
+        {/* Main Grid for Cards - Now 3 Columns */}
+        <div className="flex justify-center w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto px-6">
             {/* LeetCode Card */}
             <PlatformCard 
               name="LeetCode"
