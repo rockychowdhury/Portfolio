@@ -36,6 +36,9 @@ export const metadata: Metadata = {
       "Software Engineer & Problem Solver — 700+ DSA problems solved, 10+ projects completed.",
     type: "website",
   },
+  icons: {
+    icon: "/assets/logo.png",
+  },
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
