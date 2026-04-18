@@ -332,7 +332,7 @@ export default function HeroSection({
         </div>
 
         {/* ── Right Content: Image ── */}
-        <div className="relative flex items-start justify-center lg:flex-1 lg:h-screen lg:items-end lg:justify-end">
+        <div className="relative flex items-start justify-center lg:flex-1 lg:h-screen lg:items-end lg:justify-end mt-12 lg:mt-0">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
             animate={
