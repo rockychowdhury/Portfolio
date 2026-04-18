@@ -5,6 +5,8 @@ import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-mot
 import { Project } from "@/types/project";
 import { ProjectRow } from "@/components/projects/ProjectRow";
 import { ProjectWindowPreview } from "@/components/projects/ProjectWindowPreview";
+import { WindowChrome } from "@/components/projects/WindowChrome";
+import Image from "next/image";
 import ProjectArchiveScroll from "@/components/projects/ProjectArchiveScroll";
 
 const headerLetters = "WORKS".split("");
@@ -82,8 +84,8 @@ export default function ProjectsSection() {
 
   // Transform values for the cinematic window reveal
   // From 0 to 0.1 of section scroll, we transition from center/large to right/normal
-  const windowX = useTransform(scrollYProgress, [0, 0.08], ["-35%", "0%"]);
-  const windowScale = useTransform(scrollYProgress, [0, 0.08], [1.15, 1]);
+  const windowX = useTransform(scrollYProgress, [0, 0.08], ["-15%", "0%"]);
+  const windowScale = useTransform(scrollYProgress, [0, 0.08], [1.1, 1]);
 
   // Monitor scroll progress to force the first project into focus during the intro phase
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -108,8 +110,8 @@ export default function ProjectsSection() {
           <div className="pt-24 md:pt-40" />
 
           {/* Featured Projects - Sticky Layout */}
-          <section className="relative w-full pt-20 md:pt-40 pb-10 md:pb-20 px-6 md:px-12 lg:px-20">
-            <div className="max-w-[1400px] mx-auto lg:px-10">
+          <section className="relative w-full pt-20 md:pt-40 pb-10 md:pb-20">
+            <div className="container-main">
               {/* Cinematic Header */}
               <div className="mb-32 lg:mb-48">
                 <motion.div
@@ -118,7 +120,7 @@ export default function ProjectsSection() {
                   viewport={{ once: true }}
                   className="flex flex-col"
                 >
-                  <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+                  <h2 className="flex flex-wrap items-end text-[clamp(4rem,10vw,8rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
                     {headerLetters.map((letter, i) => (
                       <motion.span
                         key={i}
@@ -150,18 +152,49 @@ export default function ProjectsSection() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
                 {/* LEFT: 5/12 column span — scrollable project list */}
                 <div className="flex flex-col lg:col-span-5 relative z-20">
-                  <div className="h-[40vh]" aria-hidden />
+                  <div className="h-[10vh] lg:h-[40vh]" aria-hidden />
 
                   {featured.map((project, index) => (
-                    <ProjectRow
-                      key={project.id}
-                      project={project}
-                      index={index + 1}
-                      isActive={activeId === project.id}
-                      onActive={handleActive}
-                    />
+                    <div key={project.id}>
+                      <ProjectRow
+                        project={project}
+                        index={index + 1}
+                        isActive={activeId === project.id}
+                        onActive={handleActive}
+                      />
+                      {/* Mobile-only inline preview — visible below lg */}
+                      <div className="block lg:hidden my-6">
+                        <WindowChrome
+                          url={project.liveLink || project.previewLink}
+                          className="w-full"
+                        >
+                          <div className="relative w-full">
+                            {project.previewLink ? (
+                              <video
+                                src={project.previewLink}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                className="w-full aspect-video object-cover"
+                              />
+                            ) : (
+                              <div className="relative w-full aspect-video">
+                                <Image
+                                  src={project.thumbnail}
+                                  alt={project.title}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </WindowChrome>
+                      </div>
+                    </div>
                   ))}
-                  <div className="h-[20vh] lg:h-[30vh]" aria-hidden />
+                  <div className="h-[10vh] lg:h-[30vh]" aria-hidden />
                 </div>
 
 

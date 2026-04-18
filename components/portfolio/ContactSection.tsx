@@ -106,9 +106,10 @@ Looking forward to connecting.`;
   return (
     <section 
       id="contact" 
-      className="relative w-full overflow-hidden bg-background px-6 py-32 md:px-12 md:py-48 lg:px-20 lg:py-64"
+      className="relative w-full overflow-hidden bg-background py-16 md:py-24 lg:py-32"
       onMouseMove={handleMouseMove}
     >
+      <div className="container-main relative z-10">
       {/* Animated Grid Background */}
       <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
         <div 
@@ -134,12 +135,11 @@ Looking forward to connecting.`;
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-[1400px]">
-        <div className="flex flex-col gap-16 lg:flex-row">
+      <div className="flex flex-col gap-12 lg:flex-row lg:items-center">
           
           {/* Left Side: Text and Info */}
-          <div className="flex flex-col flex-1 gap-12">
-            <div className="space-y-6">
+          <div className="flex flex-col flex-1 gap-8">
+            <div className="space-y-4">
               <div className="flex flex-col gap-2">
                 <motion.span 
                   initial={{ opacity: 0, y: 10 }}
@@ -163,13 +163,13 @@ Looking forward to connecting.`;
                 </motion.div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="relative">
                   <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl"
+                    className="text-[clamp(2.5rem,6vw,4.5rem)] font-light tracking-tight text-foreground"
                   >
                     Got an idea? <br />
                     <span className="text-muted-foreground/30">Let&apos;s engineer it.</span>
@@ -212,7 +212,7 @@ Looking forward to connecting.`;
               </div>
             </div>
 
-            <div className="mt-8 space-y-16">
+            <div className="mt-6 space-y-10">
               <div className="space-y-6">
                 <div className="group flex items-center gap-4">
                   <MapPin size={24} className="text-primary" />

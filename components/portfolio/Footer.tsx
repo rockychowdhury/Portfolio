@@ -13,7 +13,7 @@ export default function Footer() {
 
   return (
     <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
+      <div className="container-main">
         <div className="flex flex-col items-center gap-10">
           <div className="flex flex-wrap items-center justify-center w-full gap-x-8 gap-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 border-t border-foreground/5 pt-12">
             <span className="text-center">{`© ${currentYear} // রকি চৌধুরী`}</span>
@@ -55,7 +55,7 @@ export default function Footer() {
           whileInView={{ y: "0%", opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: premiumEase }}
-          className="text-[16vw] md:text-[10.2vw] font-black tracking-tighter leading-[0.8] text-foreground uppercase text-center translate-y-[10%] px-4"
+          className="text-[clamp(3rem,16vw,8rem)] md:text-[clamp(5rem,10.2vw,14rem)] font-black tracking-tighter leading-[0.8] text-foreground uppercase text-center translate-y-[10%] px-4"
         >
           ROCKY <span className="hidden md:inline opacity-10">CHOWDHURY</span>
         </motion.h1>

@@ -156,10 +156,10 @@ export default function BlogsSection() {
         }}
       />
 
-      <div className="mx-auto max-w-[1400px] px-6 relative z-10">
+      <div className="container-main">
         {/* Headline */}
         <div className="flex flex-col items-center mb-16 gap-12" ref={titleRef}>
-          <h2 className="flex flex-wrap items-center justify-center text-5xl font-light tracking-tight text-foreground md:text-7xl lg:text-8xl leading-[1.1]">
+          <h2 className="flex flex-wrap items-center justify-center text-[clamp(3rem,8vw,8rem)] font-light tracking-tight text-foreground leading-[1.1]">
             {blogsTitle.map((word, wordIdx) => (
               <div key={wordIdx} className="flex overflow-hidden mr-6 pb-4 -mb-4">
                 {word.split("").map((letter, i) => (

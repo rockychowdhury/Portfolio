@@ -89,8 +89,8 @@ export default function PlatformCard({
       <div className="absolute inset-0 rounded-[2.5rem] border border-border/10 pointer-events-none z-0">
         {/* Inner background container with slight inset to avoid cropping the border */}
         <div className="absolute inset-[1px] rounded-[2.4rem] overflow-hidden">
-          {/* Base White Background */}
-          <div className="absolute inset-0 bg-[#ffffff]" />
+          {/* Base Background - Theme Aware */}
+          <div className="absolute inset-0 bg-card" />
 
           {/* Premium Gradient Background - Persistent with hover enhancement */}
           <div 
@@ -182,7 +182,7 @@ export default function PlatformCard({
       <div className="flex-1 flex flex-col justify-center relative z-10">
         <div className="flex items-center justify-between gap-6">
           {isLeetCode && solvedStats ? (
-            <div className="flex items-center gap-6 flex-1">
+            <div className="flex flex-col md:flex-row items-center gap-6 flex-1">
                {/* LeetCode Donut Chart */}
                <div className="relative h-28 w-28 transition-transform duration-700 group-hover:scale-105">
                   <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
@@ -223,7 +223,7 @@ export default function PlatformCard({
                   </div>
                </div>
                
-               <div className="flex flex-1 justify-between items-center ml-2">
+               <div className="flex flex-col md:flex-row flex-1 justify-between items-center md:ml-2 gap-6 md:gap-0">
                   <div className="flex flex-col gap-2">
                      <div className="flex items-center gap-2.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00b8a3]" />
@@ -242,9 +242,9 @@ export default function PlatformCard({
                      </div>
                   </div>
 
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-center md:items-end gap-1">
                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Contests</span>
-                     <div className="text-4xl font-black text-foreground/90 tracking-tighter tabular-nums">
+                     <div className="text-3xl md:text-4xl font-black text-foreground/90 tracking-tighter tabular-nums">
                         <Counter value={contestCount} />
                      </div>
                   </div>
@@ -254,13 +254,13 @@ export default function PlatformCard({
             <div className="flex flex-1 justify-between items-center">
               <div className="flex flex-col gap-1.5">
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Solved</span>
-                <div className="text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
+                <div className="text-4xl md:text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
                   <Counter value={solveCount} />
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1.5">
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Contests</span>
-                <div className="text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
+                <div className="text-4xl md:text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
                   <Counter value={contestCount} />
                 </div>
               </div>

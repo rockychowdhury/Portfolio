@@ -190,7 +190,7 @@ export default function HeroSection({
       id="hero"
       className="relative min-h-screen w-full overflow-hidden bg-background pt-24 lg:pt-0"
     >
-      <div className="mx-auto flex h-full max-w-[1400px] flex-col px-6 md:px-12 lg:grid lg:grid-cols-2 lg:px-20">
+      <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-1 flex-col justify-center py-12 lg:py-0">
           {/* Vertical Label — Desktop Only */}
@@ -216,18 +216,18 @@ export default function HeroSection({
               className="mb-12 mt-8 flex flex-wrap items-start gap-12 md:gap-20"
             >
               <div>
-                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
                   +{solvedCount}
                 </span>
-                <p className="mt-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
                   DSA Problems Solved
                 </p>
               </div>
               <div>
-                <span className="text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
                   {projectCount > 0 ? `+${projectCount}` : "—"}
                 </span>
-                <p className="mt-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
                   Full-Stack Projects Shipped
                 </p>
               </div>
@@ -236,7 +236,7 @@ export default function HeroSection({
             {/* Main Heading */}
             <div className="relative">
               <h1
-                className="flex font-medium leading-[0.85] tracking-tighter text-foreground text-[clamp(6rem,16vw,14rem)] lg:text-[clamp(6rem,12vw,12rem)] 2xl:text-[clamp(12rem,15vw,14rem)]"
+                className="flex font-medium text-fluid-hero text-foreground"
                 style={{ perspective: "600px" }}
               >
                 {helloLetters.map((letter, i) => (
@@ -342,14 +342,14 @@ export default function HeroSection({
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
-            className="relative h-[75vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-[105%] 2xl:right-[-2.5%]"
+            className="relative h-[65vh] xs:h-[75vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-full 2xl:right-0"
           >
             <Image
               src="/profile.png"
               alt="Rocky Chowdhury — Software Engineer"
               fill
               unoptimized
-              className="object-contain object-bottom scale-[1.0]  2xl:scale-[1.4] origin-bottom"
+              className="object-contain object-bottom scale-[1.0] 2xl:scale-[1.0] 3xl:scale-[1.4] origin-bottom"
               sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />

@@ -52,13 +52,13 @@ const JourneySection = () => {
   return (
     <section 
       id="journey"
-      className="relative w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground"
+      className="relative w-full overflow-hidden bg-background py-24 text-foreground"
     >
-      <div className="mx-auto max-w-[1400px]">
+      <div className="container-main">
         {/* Animated Section Header */}
-        <div className="mb-24 lg:pl-16 text-left" ref={titleRef}>
+        <div className="mb-24 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[3.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[5rem] md:text-[6rem] lg:text-[8rem]">
+            <h2 className="flex flex-wrap items-end text-[clamp(2.5rem,8vw,6.5rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
@@ -94,7 +94,7 @@ const JourneySection = () => {
         </div>
 
         {/* Timeline Content */}
-        <div className="relative lg:pl-16" ref={containerRef}>
+        <div className="relative" ref={containerRef}>
           {loading ? (
             <JourneySkeleton />
           ) : (

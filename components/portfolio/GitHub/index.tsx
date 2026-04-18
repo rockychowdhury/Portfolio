@@ -109,7 +109,7 @@ export default function GitHubSection() {
   const primaryStack = data?.languages?.slice(0, 4).map(l => l.name).join(" · ") || "Python · FastAPI · JavaScript · TypeScript";
 
   return (
-    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
+    <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
       {/* ── Background & Guidelines ── */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
@@ -117,11 +117,11 @@ export default function GitHubSection() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-[1400px]">
+      <div className="relative container-main">
         {/* Section Headline */}
-        <div className="mb-12 md:mb-32 lg:pl-16 text-left" ref={titleRef}>
+        <div className="mb-12 md:mb-32 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+            <h2 className="flex flex-wrap items-end text-[clamp(3.5rem,10vw,8.5rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
@@ -185,7 +185,7 @@ export default function GitHubSection() {
 
         {/* Main Content Sections */}
         {!error && (
-          <div className="flex flex-col gap-12 md:gap-32 lg:pl-16">
+          <div className="flex flex-col gap-12 md:gap-32">
             {/* 1. Meaningful Stats Row */}
             {isLoading ? (
               <MetricsSkeleton />

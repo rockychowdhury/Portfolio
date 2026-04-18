@@ -61,11 +61,11 @@ export default function Education() {
 
   return (
     <SectionWrapper id="education" className="relative py-24 lg:py-40 bg-background overflow-hidden">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20 relative z-10">
+      <div className="container-main relative z-10">
         
         {/* Section Header */}
         <div className="mb-24 lg:mb-32 flex flex-col items-start">
-          <h2 className="flex flex-wrap items-center justify-start text-5xl font-light tracking-tighter text-foreground md:text-7xl lg:text-8xl leading-[1.1] cursor-default select-none">
+          <h2 className="flex flex-wrap items-center justify-start text-[clamp(3rem,8vw,6.5rem)] font-light tracking-tighter text-foreground leading-[1.1] cursor-default select-none">
             {educationTitle.map((word, wordIdx) => (
               <div key={wordIdx} className="flex overflow-hidden mr-4 lg:mr-8 pb-4 -mb-4">
                 {word.split("").map((letter, i) => (

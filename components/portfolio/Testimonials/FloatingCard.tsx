@@ -10,6 +10,7 @@ interface FloatingCardProps {
   rotation?: number;
   isPaused?: boolean;
   isInert?: boolean; // For clipped cards
+  isMobile?: boolean; // For mobile stacked layout
 }
 
 const relationshipConfig = {
@@ -25,13 +26,14 @@ export default function FloatingCard({
   index, 
   rotation = 0, 
   isPaused = false,
-  isInert = false 
+  isInert = false,
+  isMobile = false 
 }: FloatingCardProps) {
   const config = relationshipConfig[testimonial.relationship] || relationshipConfig.Classmate;
   
   // 1. Dynamic Width based on quote length
   const quoteLength = testimonial.quote.length;
-  const widthClass = quoteLength < 100 ? "w-[220px]" : quoteLength < 200 ? "w-[280px]" : "w-[340px]";
+  const widthClass = isMobile ? "w-full" : quoteLength < 100 ? "w-[220px]" : quoteLength < 200 ? "w-[280px]" : "w-[340px]";
   
   // 2. Subconscious Hierarchy Scale
   const baseScale = config.strength === 5 ? 1 : 0.97;
@@ -60,7 +62,7 @@ export default function FloatingCard({
       className={`relative z-10 ${widthClass} ${isInert ? "pointer-events-none opacity-40 grayscale-[0.5]" : ""}`}
     >
       <motion.div
-        animate={isPaused ? {} : { 
+        animate={isPaused || isMobile ? {} : { 
           y: [0, -12, 0],
           rotate: [rotation - 0.5, rotation + 0.5, rotation - 0.5]
         }}

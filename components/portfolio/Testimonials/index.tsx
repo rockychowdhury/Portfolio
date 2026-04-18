@@ -73,17 +73,16 @@ export default function TestimonialsSection() {
       
       <div className="relative z-10 flex flex-col items-center">
         <div className="w-full relative">
-          {/* Headline centered between floating columns */}
-          <div className="absolute inset-0 flex items-center justify-center -z-10 opacity-0 pointer-events-none md:opacity-100">
-             {/* This space is reserved for visual balance in the absolute layer */}
+          {/* Mobile: Headline above cards */}
+          <div className="block md:hidden">
+            <CenterHeadline onLeaveTestimonial={() => setIsModalOpen(true)} />
           </div>
-          
+
+          {/* Desktop: Cards with headline overlaid */}
           <div className="relative">
-            {/* The spec says cards arrive first, then headline. 
-                We handle this via staggered viewport triggers in the sub-components */}
             <FloatingCloud testimonials={topTestimonials} isPaused={isModalOpen} />
             
-            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 z-50 items-center justify-center pointer-events-none hidden md:flex">
               <div className="pointer-events-auto">
                 <CenterHeadline onLeaveTestimonial={() => setIsModalOpen(true)} />
               </div>

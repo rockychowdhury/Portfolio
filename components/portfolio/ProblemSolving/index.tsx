@@ -83,7 +83,7 @@ export default function ProblemSolvingSection() {
   const cfMaxRank = getCodeforcesRank(data?.codeforces?.maxRating || 0);
 
   return (
-    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 px-6 md:px-12 lg:px-20 text-foreground">
+    <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
       {/* ── Background & Guidelines ── */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
@@ -91,11 +91,11 @@ export default function ProblemSolvingSection() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-[1400px]">
+      <div className="relative container-main">
         {/* Section Headline */}
-        <div className="mb-12 md:mb-24 lg:pl-16 text-left" ref={titleRef}>
+        <div className="mb-12 md:mb-24 text-left" ref={titleRef}>
           <div className="flex flex-col gap-2">
-            <h2 className="flex flex-wrap items-end text-[4.5rem] font-medium leading-[1.1] tracking-tighter text-foreground sm:text-[6rem] md:text-[8rem] lg:text-[10rem]">
+            <h2 className="flex flex-wrap items-end text-[clamp(3.5rem,10vw,8.5rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
               {titleWords.map((word, wordIdx) => (
                 <div key={wordIdx} className="flex overflow-hidden mr-4 pb-4 -mb-4">
                   {word.split("").map((letter, i) => (
@@ -145,7 +145,7 @@ export default function ProblemSolvingSection() {
         </div>
 
         {/* Narrative Stats Bar */}
-        <div className="lg:pl-16 mb-16">
+        <div className="mb-16">
           <NarrativeBar 
             totalSolved={totalSolved} 
             totalContests={totalContests} 
@@ -156,7 +156,7 @@ export default function ProblemSolvingSection() {
 
         {/* Main Grid for Cards - Now 3 Columns */}
         <div className="flex justify-center w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
             {/* LeetCode Card */}
             <PlatformCard 
               name="LeetCode"

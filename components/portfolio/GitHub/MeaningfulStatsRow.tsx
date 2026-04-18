@@ -240,7 +240,7 @@ export default function MeaningfulStatsRow({ metrics, streak, heatmap }: Meaning
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
       {stats.map((stat, idx) => (
         <motion.div
           key={idx}
@@ -250,18 +250,18 @@ export default function MeaningfulStatsRow({ metrics, streak, heatmap }: Meaning
           transition={{ duration: 0.6, delay: idx * 0.1 }}
           className="flex flex-col gap-1.5"
         >
-          <div className="text-3xl md:text-5xl font-medium tracking-tighter text-foreground leading-tight">
+          <div className="text-3xl xs:text-4xl md:text-5xl font-medium tracking-tighter text-foreground leading-tight">
             {stat.isText ? (
               <div className="flex items-baseline gap-2">
                 <span className="truncate">{stat.textValue}</span>
                 {stat.textSuffix && (
-                  <span className="text-base md:text-lg font-light text-foreground/40 lowercase">{stat.textSuffix}</span>
+                  <span className="text-sm xs:text-base md:text-lg font-light text-foreground/40 lowercase">{stat.textSuffix}</span>
                 )}
               </div>
             ) : (
               <div className="flex items-baseline gap-1">
                 <Counter value={stat.value} />
-                <span className="text-base md:text-lg font-light text-foreground/40 lowercase">{stat.suffix}</span>
+                <span className="text-sm xs:text-base md:text-lg font-light text-foreground/40 lowercase">{stat.suffix}</span>
               </div>
             )}
           </div>

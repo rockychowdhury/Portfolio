@@ -50,32 +50,49 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
   const bloomSortedAssignments = [...assignments].sort((a, b) => a.dist - b.dist);
 
   return (
-    <div className="relative w-full max-w-[1400px] mx-auto min-h-[900px] md:min-h-[1100px] py-12 md:py-24 overflow-visible">
-      {bloomSortedAssignments.map((assignment, bloomIndex) => {
-        const { testimonial, zone } = assignment;
-        return (
-          <div 
-            key={`${testimonial.name}-${bloomIndex}`}
-            className="absolute transition-all duration-700"
-            style={{ 
-              left: `${zone.x}%`, 
-              top: `${zone.y}%`,
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: zone.isInert ? 'none' : 'auto',
-              // Center-adjacent cards (priority 5) usually appear "on top"
-              zIndex: zone.priority === 5 ? 30 : 10
-            }}
-          >
-            <FloatingCard 
-              testimonial={testimonial} 
-              index={bloomIndex} 
-              rotation={zone.rot}
-              isPaused={isPaused}
-              isInert={zone.isInert}
-            />
-          </div>
-        );
-      })}
-    </div>
+    <>
+      {/* Desktop: Absolute-positioned floating cloud (md+) */}
+      <div className="relative w-full max-w-[1400px] mx-auto min-h-[900px] md:min-h-[1100px] py-12 md:py-24 overflow-visible hidden md:block">
+        {bloomSortedAssignments.map((assignment, bloomIndex) => {
+          const { testimonial, zone } = assignment;
+          return (
+            <div 
+              key={`${testimonial.name}-${bloomIndex}`}
+              className="absolute transition-all duration-700"
+              style={{ 
+                left: `${zone.x}%`, 
+                top: `${zone.y}%`,
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: zone.isInert ? 'none' : 'auto',
+                zIndex: zone.priority === 5 ? 30 : 10
+              }}
+            >
+              <FloatingCard 
+                testimonial={testimonial} 
+                index={bloomIndex} 
+                rotation={zone.rot}
+                isPaused={isPaused}
+                isInert={zone.isInert}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Mobile: Vertically stacked scrollable layout (< md) */}
+      <div className="flex flex-col gap-4 px-2 py-8 md:hidden">
+        {sortedTestimonials.slice(0, 6).map((testimonial, i) => (
+          <FloatingCard
+            key={`mobile-${testimonial.name}-${i}`}
+            testimonial={testimonial}
+            index={i}
+            rotation={0}
+            isPaused={false}
+            isInert={false}
+            isMobile={true}
+          />
+        ))}
+      </div>
+    </>
   );
 }

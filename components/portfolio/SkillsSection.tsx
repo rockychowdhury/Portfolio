@@ -193,22 +193,22 @@ function SkillIcon({
       animate={
         isBuilt
           ? {
-              scale: [1, 1.04, 1],
-              opacity: 1,
-            }
+            scale: [1, 1.04, 1],
+            opacity: 1,
+          }
           : { scale: 0, opacity: 0 }
       }
       transition={
         isBuilt
           ? {
-              scale: {
-                duration: BREATHE_DURATION,
-                repeat: Infinity,
-                delay: breatheDelay,
-                ease: "easeInOut",
-              },
-              opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 },
-            }
+            scale: {
+              duration: BREATHE_DURATION,
+              repeat: Infinity,
+              delay: breatheDelay,
+              ease: "easeInOut",
+            },
+            opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 },
+          }
           : { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 }
       }
       onMouseEnter={() => setShowTooltip(true)}
@@ -225,9 +225,8 @@ function SkillIcon({
         `}
       >
         {skill.icon_type === "text" ? (
-          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${
-            skill.name === "TBA" ? "text-muted-foreground/30" : "text-muted-foreground group-hover:text-foreground"
-          }`}>
+          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-muted-foreground group-hover:text-foreground"
+            }`}>
             {skill.icon}
           </span>
         ) : (
@@ -327,7 +326,7 @@ function ShapeGroup({
   }, [isInView, isBuilt, skills.length]);
 
   // Higher density shapes optimized for label clearance
-  const shapeSize = 130; 
+  const shapeSize = 130;
   const positions = useMemo(() => {
     switch (shape) {
       case "circle":
@@ -340,7 +339,7 @@ function ShapeGroup({
   }, [shape, skills.length]);
 
   return (
-    <div className="flex flex-col items-center gap-12 flex-1 min-w-[300px] max-w-[400px]">
+    <div className="flex flex-col items-center gap-12 flex-1 min-w-[280px] xs:min-w-[300px] max-w-[400px]">
       <motion.div
         className="relative aspect-square w-full flex items-center justify-center transform-gpu"
         animate={
@@ -351,11 +350,11 @@ function ShapeGroup({
         transition={
           isBuilt
             ? {
-                duration: FLOAT_DURATION,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: floatDelay,
-              }
+              duration: FLOAT_DURATION,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: floatDelay,
+            }
             : {}
         }
       >
@@ -378,7 +377,7 @@ function ShapeGroup({
 
       {/* Category Label Below - Grounded Design */}
       <div className="flex flex-col items-center gap-2.5">
-        <motion.span 
+        <motion.span
           initial={{ opacity: 0, y: 10 }}
           animate={isBuilt ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -386,7 +385,7 @@ function ShapeGroup({
         >
           {GROUP_LABELS[groupName]}
         </motion.span>
-        <motion.div 
+        <motion.div
           initial={{ width: 0, opacity: 0 }}
           animate={isBuilt ? { width: 40, opacity: 1 } : {}}
           transition={{ duration: 1, delay: 0.8 }}
@@ -471,8 +470,8 @@ function SkillTicker({ skills }: { skills: Skill[] }) {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/50 bg-secondary/5 hover:bg-secondary/10 hover:border-border transition-all group cursor-default"
                 >
                   {Icon && (
-                    <Icon 
-                      className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" 
+                    <Icon
+                      className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors"
                       style={{ color: item.skill?.color }}
                     />
                   )}
@@ -501,13 +500,14 @@ export default function SkillsSection() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isInfoHovered, setIsInfoHovered] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetch("/api/skills")
       .then((r) => r.json())
       .then((data: Skill[]) => setSkills(data))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Debounce logic
@@ -523,20 +523,20 @@ export default function SkillsSection() {
     const query = debouncedQuery.trim();
     if (!query) return [];
     return skills.filter(
-      (s) => 
-        s.name.toLowerCase().includes(query.toLowerCase()) && 
+      (s) =>
+        s.name.toLowerCase().includes(query.toLowerCase()) &&
         s.name !== "TBA"
     );
   }, [debouncedQuery, skills]);
 
   const searchStatus = useMemo(() => {
     if (!searchQuery.trim()) return "idle";
-    
+
     // Check if what the user CURRENTLY typed (not debounced) is matching
     // This gives immediate visual feedback while the "lock on" (highlights) wait for debounce
     const currentMatches = skills.filter(
-      (s) => 
-        s.name.toLowerCase().includes(searchQuery.trim().toLowerCase()) && 
+      (s) =>
+        s.name.toLowerCase().includes(searchQuery.trim().toLowerCase()) &&
         s.name !== "TBA"
     );
 
@@ -572,7 +572,7 @@ export default function SkillsSection() {
   const title = "Technical".split("");
   const subtitle = "Skillset".split("");
   const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
-  
+
   const letterAnimation = {
     hidden: { opacity: 0, y: 100, rotateX: 60 },
     visible: (i: number) => ({
@@ -596,11 +596,11 @@ export default function SkillsSection() {
       id="skills"
       className="relative w-full bg-background py-20 md:py-32 overflow-hidden"
     >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-20">
-        
+      <div className="container-main">
+
         {/* Section Header */}
         <div className="flex flex-col items-center mb-10 md:mb-16" ref={titleRef}>
-          <h2 className="flex flex-wrap items-center justify-center text-5xl md:text-8xl lg:text-9xl font-light tracking-tighter text-foreground leading-none">
+          <h2 className="flex flex-wrap items-center justify-center text-[clamp(2.5rem,10vw,9rem)] font-light tracking-tighter text-foreground leading-none">
             <span className="flex overflow-hidden pb-4 -mb-4 mr-4 md:mr-8">
               {title.map((letter, i) => (
                 <motion.span
@@ -630,42 +630,55 @@ export default function SkillsSection() {
               ))}
             </span>
           </h2>
-          
+
           {/* Minimal Skill Navigator - Ultra Compact */}
           <div className="flex flex-col items-center mt-6 mb-10 w-full mx-auto" ref={titleRef}>
-            <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/40 hover:bg-secondary/50 border border-border/60 rounded-full px-4 py-1.5 transition-all duration-300">
-              <Search className="w-3.5 h-3.5 text-muted-foreground/40 mr-2.5" />
+            <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/40 hover:bg-secondary/50 border border-border/60 rounded-full px-5 py-2 transition-all duration-300">
               <input
                 type="text"
-                placeholder="Search competency..."
+                placeholder="Find a technology..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent border-none py-0.5 text-[11px] font-medium focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
               />
-              
-              <div className="flex items-center gap-2.5 ml-1.5">
-                {/* Shortcut Hint */}
-                <div className="hidden xs:flex items-center px-1.5 py-0.5 rounded border border-border/30 bg-background/50 shadow-sm">
-                  <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">⌘K</span>
-                </div>
 
-                {/* Info & Lamp Duo */}
-                <div className="flex items-center gap-2">
-                  <div className="relative group/info">
-                    <Info className="w-3.5 h-3.5 text-muted-foreground/30 hover:text-muted-foreground/50 cursor-help transition-colors" />
-                    <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-3 py-2 bg-popover/95 backdrop-blur-md border border-border/50 rounded-lg shadow-xl opacity-0 group-hover/info:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-popover-foreground">
-                        Quick check skill availability you are looking for?
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Tiny Status Indicator */}
-                  <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-sm ${
-                    searchStatus === "idle" ? "bg-muted/10" :
-                    searchStatus === "found" ? "bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.4)]" :
-                    "bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+              <div className="flex items-center gap-3 ml-2">
+                {/* Status Indicator first */}
+                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-sm ${searchStatus === "idle" ? "bg-muted/10" :
+                    searchStatus === "found" ? "bg-green-500/80 shadow-[0_0_10px_rgba(34,197,94,0.5)]" :
+                      "bg-red-500/80 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
                   }`} />
+
+                {/* Info Icon at the end */}
+                <div 
+                  className="relative flex items-center justify-center"
+                  onMouseEnter={() => setIsInfoHovered(true)}
+                  onMouseLeave={() => setIsInfoHovered(false)}
+                >
+                  <Info className="w-3.5 h-3.5 text-muted-foreground/30 hover:text-muted-foreground/60 cursor-help transition-all duration-300 hover:scale-110" />
+                  
+                  <AnimatePresence>
+                    {isInfoHovered && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-popover/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] z-50 whitespace-nowrap"
+                      >
+                        <div className="relative">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-popover-foreground">
+                            Skill Availability Check
+                          </p>
+                          <p className="text-[9px] text-muted-foreground/70 mt-1 font-medium">
+                            Try typing "React" or "Python" to see the magic!
+                          </p>
+                          {/* Triangle pointer */}
+                          <div className="absolute -bottom-[14.5px] left-1/2 -translate-x-1/2 w-3 h-3 bg-popover/95 border-r border-b border-border/50 rotate-45" />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
@@ -674,7 +687,7 @@ export default function SkillsSection() {
 
         {/* Top Skills Prominent Bar */}
         {topSkills.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 1 }}
@@ -684,8 +697,8 @@ export default function SkillsSection() {
             {topSkills.map((s) => {
               const Icon = getIcon(s.icon, s.icon_group);
               return (
-                <div 
-                  key={s._id} 
+                <div
+                  key={s._id}
                   className="flex items-center gap-2 px-2 py-1 transition-all duration-300 group hover:scale-110"
                 >
                   {Icon && <Icon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-foreground transition-colors" style={{ color: s.color }} />}

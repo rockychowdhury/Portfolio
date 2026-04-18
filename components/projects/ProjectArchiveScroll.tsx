@@ -126,6 +126,19 @@ function ArchiveDetailBlock({
             </a>
           )}
         </div>
+
+        {/* Mobile-only inline preview */}
+        <div className="block lg:hidden mt-8 rounded-[1.5rem] overflow-hidden border border-foreground/5 shadow-sm">
+          <div className="relative w-full aspect-video">
+            <Image
+              src={project.thumbnail}
+              alt={project.title}
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        </div>
       </motion.div>
     </div>
 
