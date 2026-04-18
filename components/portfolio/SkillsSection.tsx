@@ -225,7 +225,7 @@ function SkillIcon({
         `}
       >
         {skill.icon_type === "text" ? (
-          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-muted-foreground group-hover:text-foreground"
+          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-foreground/70 group-hover:text-foreground"
             }`}>
             {skill.icon}
           </span>
@@ -240,7 +240,7 @@ function SkillIcon({
                 className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-500 
                   ${activeTooltip ? "scale-125 grayscale-0 opacity-100" : ""}
                   ${!activeTooltip && isTBA ? "text-muted-foreground/20 grayscale opacity-40" : ""}
-                  ${!activeTooltip && !isTBA ? "text-muted-foreground/80 grayscale opacity-80" : ""}
+                  ${!activeTooltip && !isTBA ? "text-foreground/60 grayscale-[0.4] opacity-100" : ""}
                   group-hover:grayscale-0 group-hover:opacity-100
                 `}
               />

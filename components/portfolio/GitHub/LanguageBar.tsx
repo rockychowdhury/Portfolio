@@ -26,22 +26,20 @@ export default function LanguageBar({ language, index }: LanguageBarProps) {
         </div>
       </div>
 
-      <div className="relative h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
+      <div className="relative h-2 w-full bg-secondary/80 rounded-full overflow-hidden">
         {/* Animated Bar */}
         <motion.div
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: language.percentage / 100 }}
-          viewport={{ once: true }}
+          initial={{ width: 0 }}
+          animate={{ width: `${language.percentage}%` }}
           transition={{
-            duration: 1,
-            delay: 0.1 + (index * 0.08),
+            duration: 1.2,
+            delay: 0.2 + (index * 0.1),
             ease: [0.25, 0.4, 0.25, 1],
           }}
           style={{
-            backgroundColor: language.color,
-            originX: 0,
+            backgroundColor: language.color || "#3b82f6",
           }}
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-y-0 left-0 h-full"
         />
 
         {/* Shimmer Sweep */}
