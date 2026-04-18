@@ -89,7 +89,7 @@ export default function ProjectsSection() {
 
   // Monitor scroll progress to force the first project into focus during the intro phase
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (latest < 0.2 && featured.length > 0) {
+    if (latest < 0.05 && featured.length > 0) {
       if (activeId !== featured[0].id) {
         setActiveId(featured[0].id);
       }

@@ -19,8 +19,8 @@ interface ProjectRowProps {
 
 export function ProjectRow({ project, isActive, onActive, index }: ProjectRowProps) {
   const { ref, inView } = useInView({
-    threshold: 0.5,
-    rootMargin: "-25% 0px -40% 0px",
+    threshold: 0.2,
+    rootMargin: "-20% 0px -20% 0px",
   });
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export function ProjectRow({ project, isActive, onActive, index }: ProjectRowPro
 
         {/* Action Buttons */}
         <div className={clsx(
-          "flex flex-wrap items-center gap-4 mt-8 transition-all duration-700 delay-100",
+          "flex flex-wrap items-center gap-4 mt-8 transition-all duration-500",
           isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           {project.liveLink && (

@@ -16,7 +16,7 @@ export function ProjectWindowPreview({ project }: ProjectWindowPreviewProps) {
       url={project.liveLink || project.previewLink}
       className="w-full"
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.div
           key={project.id || project._id}
           className="absolute inset-0 z-10"
