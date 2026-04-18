@@ -355,10 +355,7 @@ export default function HeroSection({
             />
           </motion.div>
 
-          {/* Subtle decoration */}
-          <div className="absolute -right-4 bottom-1/4 hidden h-8 w-8 items-center justify-center lg:flex">
-            <div className="size-3 border-r-2 border-b-2 border-border rotate-45" />
-          </div>
+
         </div>
       </div>
     </section>
