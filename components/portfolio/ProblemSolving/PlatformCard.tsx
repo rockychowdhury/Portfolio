@@ -55,7 +55,7 @@ export default function PlatformCard({
 
   if (loading) {
     return (
-      <div className="h-[380px] bg-secondary/5 border border-border/10 rounded-[2rem] animate-pulse" />
+      <div className="h-[460px] bg-secondary/5 border border-border/10 rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] animate-pulse" />
     );
   }
 
@@ -75,7 +75,7 @@ export default function PlatformCard({
       href={profileUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex flex-col rounded-[2.5rem] bg-transparent p-7 transition-all duration-700 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] min-h-[440px]"
+      className="group relative flex flex-col rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] bg-transparent p-8 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] min-h-[460px] overflow-hidden"
       style={{ 
         // @ts-ignore
         '--hover-color': color 
@@ -86,38 +86,42 @@ export default function PlatformCard({
       transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
     >
       {/* Clipped Background & Border Layer */}
-      <div className="absolute inset-0 rounded-[2.5rem] border border-border/10 pointer-events-none z-0">
-        {/* Inner background container with slight inset to avoid cropping the border */}
-        <div className="absolute inset-[1px] rounded-[2.4rem] overflow-hidden">
+      <div className="absolute inset-0 rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] border border-border/10 pointer-events-none z-0">
+        {/* Inner background container */}
+        <div className="absolute inset-[1px] rounded-tl-[3.4rem] rounded-br-[3.4rem] rounded-tr-[1.4rem] rounded-bl-[1.4rem] overflow-hidden">
           {/* Base Background - Theme Aware */}
-          <div className="absolute inset-0 bg-card" />
+          <div className="absolute inset-0 bg-card/80 backdrop-blur-sm" />
 
-          {/* Premium Gradient Background - Persistent with hover enhancement */}
+          {/* Premium Mesh Gradient Background */}
           <div 
-            className="absolute inset-0 opacity-100 transition-opacity duration-700"
+            className="absolute inset-0 opacity-100 transition-all duration-1000 group-hover:scale-110"
             style={{ 
-              background: `radial-gradient(circle at 0% 0%, ${color}18 0%, transparent 80%), 
-                           radial-gradient(circle at 100% 100%, ${color}12 0%, transparent 80%)`,
+              background: `radial-gradient(circle at 0% 0%, ${color}25 0%, transparent 60%), 
+                           radial-gradient(circle at 100% 100%, ${color}15 0%, transparent 60%),
+                           radial-gradient(circle at 50% 50%, ${color}08 0%, transparent 100%)`,
             }}
           />
           
-          {/* Base Subtle Color to prevent "white bar" feel */}
-          <div className="absolute inset-0 bg-secondary/[0.01]" />
+          {/* Noise Texture Overlay */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
+
+          {/* Glass Header Inlay */}
+          <div className="absolute top-0 left-0 right-0 h-32 bg-white/[0.03] dark:bg-white/[0.01] border-b border-white/5 backdrop-blur-md" />
         </div>
         
         {/* Dynamic Hover Border */}
-        <div className="absolute inset-0 border border-transparent rounded-[2.5rem] transition-colors duration-700 group-hover:border-[var(--hover-color)]/30 z-20" />
+        <div className="absolute inset-0 border border-transparent rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] transition-all duration-700 group-hover:border-[var(--hover-color)]/40 group-hover:shadow-[inset_0_0_20px_rgba(255,255,255,0.02)] z-20" />
       </div>
 
       {/* Header Row */}
       <div className="flex items-start justify-between relative z-10 mb-8">
         <div className="flex items-center gap-4">
-          <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-secondary/10 p-3 border border-border/5 shadow-sm transition-transform duration-500 group-hover:scale-110">
+          <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white/[0.05] p-3.5 border border-white/10 shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
             <Image 
               src={iconPath} 
               alt={name} 
               fill 
-              className="object-contain p-1"
+              className="object-contain p-1.5 filter brightness-110"
             />
           </div>
           <div className="flex flex-col">
@@ -270,9 +274,9 @@ export default function PlatformCard({
       </div>
 
       {/* Sparkline Graph Area - Full Width at bottom */}
-      <div className="mt-auto pt-6 -mx-7 -mb-7 relative z-10 rounded-b-[2.5rem]">
-        <div className="h-24 w-full transition-all duration-700">
-           <MiniSparkline data={ratingGraph} color={color} width={500} height={100} strokeWidth={3} />
+      <div className="mt-auto pt-6 -mx-8 -mb-8 relative z-10 rounded-br-[3.5rem] rounded-bl-[1.5rem] overflow-hidden">
+        <div className="h-28 w-full transition-all duration-700 group-hover:scale-[1.02] origin-bottom">
+           <MiniSparkline data={ratingGraph} color={color} width={500} height={120} strokeWidth={3.5} />
         </div>
       </div>
     </motion.a>
