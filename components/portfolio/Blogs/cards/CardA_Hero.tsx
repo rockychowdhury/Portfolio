@@ -20,7 +20,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
       whileHover={{ y: -4 }}
       className="group relative flex flex-col rounded-[2.5rem] bg-white border border-border/60 overflow-hidden shadow-sm transition-all hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] dark:bg-zinc-800/80"
     >
-      <div className={`relative ${isPriority ? 'aspect-[16/8]' : 'aspect-[16/10]'} overflow-hidden`}>
+      <div className={`relative ${isPriority ? 'aspect-[16/8]' : 'aspect-video'} overflow-hidden`}>
         {blog.thumbnail_url && (
           <OptimizedImage 
             src={blog.thumbnail_url} 
@@ -36,7 +36,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
         </div>
       </div>
 
-      <div className="p-6 md:p-8">
+      <div className="p-5 md:p-6">
         <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4">
             {blog.tags.map((tag) => (
               <button

@@ -46,7 +46,7 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
         </div>
       </div>
 
-      <div className="p-6 md:p-8">
+      <div className="p-5 md:p-6">
         <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mb-6 line-clamp-2">
           {blog.title}
         </h3>

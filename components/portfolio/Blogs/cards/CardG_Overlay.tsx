@@ -19,7 +19,7 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-zinc-900 border border-border/80 overflow-hidden shadow-sm min-h-[400px] md:min-h-[450px]"
+      className="group relative flex flex-col rounded-[2.5rem] bg-zinc-900 border border-border/80 overflow-hidden shadow-sm min-h-[340px] md:min-h-[380px]"
     >
       {/* Full-Bleed Background Image */}
       {blog.thumbnail_url && (

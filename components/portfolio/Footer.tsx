@@ -55,9 +55,10 @@ export default function Footer() {
           whileInView={{ y: "0%", opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: premiumEase }}
-          className="text-[clamp(3rem,16vw,8rem)] md:text-[clamp(5rem,10.2vw,14rem)] font-black tracking-tighter leading-[0.8] text-foreground uppercase text-center translate-y-[10%] px-4"
+          className="text-[clamp(3rem,15vw,8rem)] md:text-[clamp(5rem,10.2vw,14rem)] font-black tracking-tighter leading-tight md:leading-[0.8] text-foreground uppercase text-center translate-y-0 md:translate-y-[10%] px-4 flex flex-col md:block"
         >
-          ROCKY <span className="hidden md:inline opacity-10">CHOWDHURY</span>
+          <span>ROCKY</span>{" "}
+          <span className="opacity-20 md:opacity-10">CHOWDHURY</span>
         </motion.h1>
       </div>
 

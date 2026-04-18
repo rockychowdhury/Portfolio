@@ -17,10 +17,10 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ scale: 1.01 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-foreground text-background p-8 md:p-10 min-h-[300px] justify-between overflow-hidden"
+      className="group relative flex flex-col rounded-[2.5rem] bg-foreground text-background p-6 md:p-8 min-h-[250px] justify-between overflow-hidden"
     >
-      <div className="absolute top-0 right-0 p-8 opacity-10">
-        <Quote size={80} fill="currentColor" />
+      <div className="absolute top-0 right-0 p-6 md:p-8 opacity-10">
+        <Quote size={60} fill="currentColor" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-4">
@@ -28,7 +28,7 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
             <PlatformBadge platform={blog.platform} className="bg-background text-foreground" />
         </div>
         
-        <h3 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight mt-6">
+        <h3 className="text-lg md:text-xl font-bold tracking-tight leading-tight mt-4">
           "{blog.title}"
         </h3>
       </div>

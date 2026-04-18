@@ -19,6 +19,20 @@ export default function BlogsSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Initial visible count adjustment for mobile/tablet
+  useEffect(() => {
+    const checkScreen = () => {
+      if (window.innerWidth < 1024) {
+        setVisibleCount(4);
+      } else {
+        setVisibleCount(ITEMS_PER_PAGE);
+      }
+    };
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
   // Spotlight Logic
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -103,7 +117,45 @@ export default function BlogsSection() {
     }, 800);
   };
 
-  const displayedBlogs = filteredBlogs.slice(0, visibleCount);
+  const displayedBlogs = useMemo(() => {
+    const list = filteredBlogs;
+    if (list.length <= 4 || typeof window === "undefined" || window.innerWidth >= 1024) {
+      return list.slice(0, visibleCount);
+    }
+    
+    // On mobile, try to pick 4 different types for variety
+    const result: IBlog[] = [];
+    const usedIndices = new Set<number>();
+    
+    // 1. Always start with the first one (usually featured/hero)
+    result.push(list[0]);
+    usedIndices.add(0);
+
+    // 2. Find a dark quote or micro
+    const varietyIdx = list.findIndex((b, i) => i > 0 && (b.platform === "LinkedIn" || b.platform === "Hashnode"));
+    if (varietyIdx !== -1) {
+      result.push(list[varietyIdx]);
+      usedIndices.add(varietyIdx);
+    }
+
+    // 3. Find an overlay or medium post
+    const overlayIdx = list.findIndex((b, i) => i > 0 && !usedIndices.has(i) && (b.platform === "Medium" || b.thumbnail_url));
+    if (overlayIdx !== -1) {
+      result.push(list[overlayIdx]);
+      usedIndices.add(overlayIdx);
+    }
+
+    // 4. Fill the rest from the original order
+    for (let i = 0; i < list.length && result.length < 4; i++) {
+      if (!usedIndices.has(i)) {
+        result.push(list[i]);
+        usedIndices.add(i);
+      }
+    }
+
+    return result;
+  }, [filteredBlogs, visibleCount]);
+
   const hasMore = visibleCount < filteredBlogs.length;
 
   const blogsTitle = "Blogs &".split(" ");
