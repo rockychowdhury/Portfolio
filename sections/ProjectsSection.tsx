@@ -107,13 +107,13 @@ export default function ProjectsSection() {
       ) : (
         <>
           {/* Section Entrance Padding to avoid Navbar collision */}
-          <div className="pt-24 md:pt-40" />
+          <div className="pt-12 md:pt-10" />
 
           {/* Featured Projects - Sticky Layout */}
-          <section className="relative w-full pt-20 md:pt-40 pb-10 md:pb-20">
+          <section className="relative w-full pt-12 md:pt-10 pb-10 md:pb-20">
             <div className="container-main">
               {/* Cinematic Header */}
-              <div className="mb-32 lg:mb-48">
+              <div className="mb-16 lg:mb-48">
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
@@ -138,7 +138,7 @@ export default function ProjectsSection() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-                    className="mt-12 flex items-center gap-4"
+                    className="mt-6 lg:mt-12 flex items-center gap-4"
                   >
                     <div className="h-px w-8 bg-foreground/40" />
                     <p className="text-xs md:text-sm font-medium italic tracking-[0.1em] text-muted-foreground/40">
@@ -152,7 +152,7 @@ export default function ProjectsSection() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
                 {/* LEFT: 5/12 column span — scrollable project list */}
                 <div className="flex flex-col lg:col-span-5 relative z-20">
-                  <div className="h-[10vh] lg:h-[40vh]" aria-hidden />
+                  <div className="h-[5vh] lg:h-[40vh]" aria-hidden />
 
                   {featured.map((project, index) => (
                     <div key={project.id}>

@@ -594,7 +594,7 @@ export default function SkillsSection() {
     <section
       ref={sectionRef}
       id="skills"
-      className="relative w-full bg-background py-20 md:py-32 overflow-hidden"
+      className="relative w-full bg-background pt-20 pb-12 md:pt-32 md:pb-16 overflow-hidden"
     >
       <div className="container-main">
 

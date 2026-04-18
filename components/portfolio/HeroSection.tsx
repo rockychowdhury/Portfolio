@@ -164,7 +164,7 @@ export default function HeroSection({
           });
         }
       })
-      .catch(() => {}); // silent fail — cached data remains
+      .catch(() => { }); // silent fail — cached data remains
   }, []);
 
   // Smooth spring for subtle parallax on image
@@ -188,11 +188,11 @@ export default function HeroSection({
     <section
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen w-full overflow-hidden bg-background pt-24 lg:pt-0"
+      className="relative min-h-screen w-full overflow-hidden bg-background pt-20 lg:pt-0"
     >
       <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2">
         {/* ── Left Content ── */}
-        <div className="relative z-20 flex flex-1 flex-col justify-center py-12 lg:py-0">
+        <div className="relative z-20 flex flex-col lg:flex-1 lg:justify-center pt-10 pb-6 lg:py-0">
           {/* Vertical Label — Desktop Only */}
           <div className="absolute top-1/2 -left-12 hidden -translate-y-1/2 flex-col items-center gap-8 lg:flex">
             <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
@@ -213,7 +213,7 @@ export default function HeroSection({
             {/* Stats Row — pushed down */}
             <motion.div
               variants={fadeUp}
-              className="mb-12 mt-8 flex flex-wrap items-start gap-12 md:gap-20"
+              className="mb-8 mt-4 flex flex-wrap items-start gap-12 lg:mb-12 lg:mt-8 md:gap-20"
             >
               <div>
                 <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
@@ -257,7 +257,7 @@ export default function HeroSection({
                 variants={slideLeft}
                 initial="hidden"
                 animate={preloaderDone ? "visible" : "hidden"}
-                className="mt-10 flex items-center gap-4"
+                className="mt-6 lg:mt-10 flex items-center gap-4"
               >
                 <div className="h-px w-8 bg-foreground" />
                 <p className="text-lg font-medium text-foreground md:text-xl">
@@ -270,7 +270,7 @@ export default function HeroSection({
                 variants={fadeUp}
                 initial="hidden"
                 animate={preloaderDone ? "visible" : "hidden"}
-                className="mt-12 flex flex-wrap lg:flex-nowrap gap-4"
+                className="mt-8 lg:mt-12 flex flex-wrap lg:flex-nowrap gap-4"
               >
                 <a
                   href="https://linkedin.com/in/rockychowdhury1"
@@ -297,11 +297,11 @@ export default function HeroSection({
             </div>
 
             {/* Scroll Indicator — pushed inward with pl-12 */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-                transition={{ delay: 2 }}
-                className="mt-20 xl:mt-28 hidden lg:flex items-center gap-4 pl-20"
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 2 }}
+              className="mt-20 xl:mt-28 hidden lg:flex items-center gap-4 pl-20"
             >
               <div className="relative flex flex-col items-center">
                 <motion.div
@@ -332,7 +332,7 @@ export default function HeroSection({
         </div>
 
         {/* ── Right Content: Image ── */}
-        <div className="relative flex flex-1 items-end justify-center lg:h-screen lg:justify-end">
+        <div className="relative flex items-start justify-center lg:flex-1 lg:h-screen lg:items-end lg:justify-end">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
             animate={
@@ -342,14 +342,14 @@ export default function HeroSection({
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             style={{ x: imageX, y: imageY }}
-            className="relative h-[65vh] xs:h-[75vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-full 2xl:right-0"
+            className="relative h-[45vh] xs:h-[55vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-full 2xl:right-0"
           >
             <Image
               src="/profile.png"
               alt="Rocky Chowdhury — Software Engineer"
               fill
               unoptimized
-              className="object-contain object-bottom scale-[1.0] 2xl:scale-[1.0] 3xl:scale-[1.4] origin-bottom"
+              className="object-contain object-top lg:object-bottom scale-[1.0] 2xl:scale-[1.0] 3xl:scale-[1.4] origin-top lg:origin-bottom"
               sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />
