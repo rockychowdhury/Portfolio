@@ -27,7 +27,7 @@ export function AchievementsMarquee({ achievements }: Props) {
   );
 
   return (
-    <section className="relative w-full py-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
+    <section className="relative w-full py-16 sm:py-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
       {/* Futuristic Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Grid Overlay */}
@@ -38,7 +38,7 @@ export function AchievementsMarquee({ achievements }: Props) {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[128px]" />
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 mb-12">
+      <div className="container relative z-10 mx-auto px-4 mb-8 sm:mb-12">
         <div className="flex flex-col items-center gap-2">
           <div className="h-px w-12 bg-zinc-300 dark:bg-zinc-800" />
           <p className="text-center text-[10px] font-black tracking-[0.4em] uppercase
@@ -51,14 +51,12 @@ export function AchievementsMarquee({ achievements }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 relative z-10">
+      <div className="flex flex-col gap-4 sm:gap-6 relative z-10">
         {/* Row 1 — scrolls left */}
         <MarqueeRow achievements={rowOne} direction="left" speed={60} />
 
         {/* Row 2 — scrolls right (opposite) */}
-        <div className="hidden sm:block">
-          <MarqueeRow achievements={rowTwo} direction="right" speed={55} />
-        </div>
+        <MarqueeRow achievements={rowTwo} direction="right" speed={55} />
       </div>
     </section>
   );
