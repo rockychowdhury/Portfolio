@@ -83,7 +83,7 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
         
         <div 
           ref={scrollContainerRef}
-          className="scrollbar-hide overflow-x-auto overflow-y-hidden mask-fade-right"
+          className="scrollbar-hide overflow-x-auto overflow-y-hidden"
         >
           <div className="flex flex-col gap-2">
             <div className="flex gap-[3px] min-w-max pr-12 lg:pr-0">
