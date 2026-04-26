@@ -32,14 +32,13 @@ export async function GET() {
     const isStale = now - lastUpdated > REFRESH_INTERVAL_MS;
 
     if (isStale) {
-      console.log("Profile is stale, triggering background refresh...");
-      // DO NOT await this. Let it run in the background.
-      performUpdate(existingProfile).catch((err) =>
-        console.error("Background ProblemSolving refresh failed:", err)
-      );
+      console.log("Profile is stale, updating from APIs...");
+      // WAIT for the update to ensure the user gets fresh data and DB is synced
+      const updatedProfile = await performUpdate(existingProfile);
+      return NextResponse.json(updatedProfile);
     }
 
-    // 4. Always return the cached one immediately
+    // 4. Return cached one if fresh
     return NextResponse.json(existingProfile);
   } catch (error) {
     console.error("Problem solving stats API error:", error);
@@ -56,46 +55,59 @@ async function performUpdate(existingProfile?: any) {
     fetchGitHubStats(process.env.GITHUB_USERNAME || "rockychowdhury"),
   ]);
 
-  // SUCCESS-ONLY UPDATE:
-  // We only update MongoDB if we got valid responses from ALL major platforms.
-  // This prevents "zeroing out" the profile if an API flakes.
-  
-  if (!leetcode || !codeforces || !codechef || !githubRaw) {
-    console.warn("One or more platforms failed to fetch. Skipping MongoDB update.", {
-      leetcode: !!leetcode,
-      codeforces: !!codeforces,
-      codechef: !!codechef,
-      github: !!githubRaw,
+  // Transform GitHub data if successful
+  let githubTransformed = null;
+  if (githubRaw) {
+    const githubHeatmap: Record<string, number> = {};
+    githubRaw.heatmap.forEach((day: { date: string; count: number }) => {
+      githubHeatmap[day.date] = day.count;
     });
-    // Return old profile if we have it, so the UI still has data
-    return existingProfile;
+
+    githubTransformed = {
+      handle: githubRaw.handle,
+      repos: githubRaw.metrics.repos,
+      followers: githubRaw.metrics.followers,
+      contributions: githubRaw.metrics.commits,
+      allTimeContributions: githubRaw.metrics.allTimeContributions,
+      currentYearContributions: githubRaw.metrics.currentYearContributions,
+      previousYearContributions: githubRaw.metrics.previousYearContributions,
+      topLanguage: githubRaw.languages[0]?.name || "",
+      heatmap: githubHeatmap,
+    };
   }
 
-  // Map GitHub data to ProblemSolvingProfile schema
-  const githubHeatmap: Record<string, number> = {};
-  githubRaw.heatmap.forEach((day: { date: string; count: number }) => {
-    githubHeatmap[day.date] = day.count;
-  });
-
-  const githubTransformed = {
-    handle: githubRaw.handle,
-    repos: githubRaw.metrics.repos,
-    followers: githubRaw.metrics.followers,
-    contributions: githubRaw.metrics.commits,
-    allTimeContributions: githubRaw.metrics.allTimeContributions,
-    currentYearContributions: githubRaw.metrics.currentYearContributions,
-    previousYearContributions: githubRaw.metrics.previousYearContributions,
-    topLanguage: githubRaw.languages[0]?.name || "",
-    heatmap: githubHeatmap,
-  };
-
-  const profileData = {
-    leetcode,
-    codeforces,
-    codechef,
-    github: githubTransformed,
+  // Merge logic: use new data if available, otherwise keep existing
+  const profileData: any = {
     lastUpdated: new Date(),
   };
+
+  if (leetcode) profileData.leetcode = leetcode;
+  else if (existingProfile?.leetcode) profileData.leetcode = existingProfile.leetcode;
+
+  if (codeforces) profileData.codeforces = codeforces;
+  else if (existingProfile?.codeforces) profileData.codeforces = existingProfile.codeforces;
+
+  if (codechef) profileData.codechef = codechef;
+  else if (existingProfile?.codechef) profileData.codechef = existingProfile.codechef;
+
+  if (githubTransformed) profileData.github = githubTransformed;
+  else if (existingProfile?.github) profileData.github = existingProfile.github;
+
+  // Final check: if we still don't have mandatory fields (like handles), we can't save.
+  // This would only happen if it's the very first fetch and it fails.
+  if (!profileData.leetcode || !profileData.codeforces || !profileData.codechef || !profileData.github) {
+    console.warn("One or more platforms missing required data. Update might be incomplete.", {
+      hasLeetcode: !!profileData.leetcode,
+      hasCodeforces: !!profileData.codeforces,
+      hasCodechef: !!profileData.codechef,
+      hasGithub: !!profileData.github,
+    });
+    
+    // If we have nothing at all, return existing
+    if (!profileData.leetcode && !profileData.codeforces && !profileData.codechef && !profileData.github) {
+        return existingProfile;
+    }
+  }
 
   // Upsert into DB
   const doc = await ProblemSolvingProfile.findOneAndUpdate(
@@ -107,3 +119,4 @@ async function performUpdate(existingProfile?: any) {
   console.log("Problem Solving MongoDB cache updated successfully.");
   return doc;
 }
+
