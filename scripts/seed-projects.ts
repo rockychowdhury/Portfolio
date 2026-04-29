@@ -1,7 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import mongoose from "mongoose";
 import connectDB from "../lib/db/connect";
 import Project from "../lib/db/models/Project";
-import Skill from "../lib/db/models/Skill";
+import FeatureCard from "../lib/db/models/FeatureCard";
 
 async function seed() {
   try {
@@ -9,152 +12,166 @@ async function seed() {
     await connectDB();
     console.log("Connected!");
 
-    // 1. Clear existing projects
-    console.log("Clearing existing projects...");
+    // 1. Clear existing data
+    console.log("Clearing existing projects and feature cards...");
     await Project.deleteMany({});
-    console.log("Projects cleared.");
+    await FeatureCard.deleteMany({});
+    console.log("Data cleared.");
 
-    // 2. Fetch all skills for mapping
-    const allSkills = await Skill.find({});
-    const skillMap = new Map(allSkills.map(s => [s.name.toLowerCase().trim(), s._id]));
-
-    // Helper to find skill ID or a fallback
-    const findSkillId = (name: string) => {
-      const normalized = name.toLowerCase().trim();
-      // Try exact match
-      if (skillMap.has(normalized)) return skillMap.get(normalized);
-      // Try common variations
-      if (normalized === "tailwind") return skillMap.get("tailwind css");
-      if (normalized === "express.js") return skillMap.get("express");
-      if (normalized === "express") return skillMap.get("express");
-      return null;
-    };
-
-    // 3. Define projects from user request
+    // 2. Seed Projects (5 projects)
     const projectsData = [
       {
         title: "Petcareplus",
-        description: "A comprehensive pet care platform that connects pet owners with pet sitters and groomers.",
-        longDescription: "Petcareplus is a comprehensive pet care platform that connects pet owners with pet sitters and groomers. It provides a seamless experience for pet owners to find and book pet care services, as well as for pet sitters and groomers to manage their businesses. The platform features a user-friendly interface, secure payment processing, and a rating system to ensure quality service. Petcareplus is designed to make pet care easier and more accessible for everyone.",
+        description: "A comprehensive pet care platform connecting pet owners with sitters and groomers, featuring AI-driven suggestions and secure payment processing.",
+        readmeLink: "https://raw.githubusercontent.com/rockychowdhury/PetCarePlus-Django-React/main/README.md",
         thumbnail: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
-        skills: ["Django DRF", "Django-Q", "Google GenAI", "React", "PostgreSQL", "JWT", "Tailwind", "Docker"],
         githubLink: "https://github.com/rockychowdhury/PetCarePlus-Django-React",
         liveLink: "https://petcarepp.netlify.app/",
-        previewLink: "/assets/projectpreview/petcarepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: true,
-        order: 1
+        videoPreviewLink: "/assets/projectpreview/petcarepreview.webm",
+        youtubeLink: "https://youtu.be/rkMJ0rzXjfA",
+        order: 1,
       },
       {
         title: "Employee Management System",
-        description: "Role-based employee and payroll management dashboard.",
-        longDescription: "Role-based authentication and authorization using Firebase Auth and JWT. Real-time dashboards with full CRUD functionality for payroll and employee management. Responsive UI built with Tailwind CSS and React hooks for efficient state management",
+        description: "Role-based employee and payroll management dashboard with Firebase Auth, real-time CRUD dashboards, and responsive Tailwind UI.",
+        readmeLink: "https://raw.githubusercontent.com/rockychowdhury/Employee-Management-System/main/README.md",
         thumbnail: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
-        skills: ["React", "MongoDB", "JWT", "Express.js", "Firebase Auth", "Tailwind", "TanStack Query", "TanStack Table"],
         githubLink: "https://github.com/rockychowdhury/Employee-Management-System",
         liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: true,
-        order: 3
+        videoPreviewLink: "/assets/projectpreview/employeepreview.webm",
+        youtubeLink: "https://youtu.be/rkMJ0rzXjfA",
+        order: 2,
       },
       {
         title: "AltRec",
-        description: "Q&A-based personalized product recommendation platform.",
-        longDescription: "Secure product recommendation platform with Firebase Auth, JWT, and RBAC. Product query submission, tracking, and personalized recommendation workflow. Responsive dashboards powered by Express and MongoDB backend",
+        description: "Q&A-based personalized product recommendation platform with secure auth, RBAC, and a structured recommendation workflow.",
+        readmeLink: "https://raw.githubusercontent.com/rockychowdhury/Alternative-Product-Recommendation-Platform/main/README.md",
         thumbnail: "https://i.ibb.co.com/Kx2sNJsL/altrec.png",
-        skills: ["React", "Tailwind", "Node.js", "Express", "MongoDB", "Firebase Auth", "JWT"],
         githubLink: "https://github.com/rockychowdhury/Alternative-Product-Recommendation-Platform",
-        liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 2
+        liveLink: "https://altrec-project.web.app/",
+        videoPreviewLink: "/assets/projectpreview/employeepreview.webm",
+        youtubeLink: "https://youtu.be/rkMJ0rzXjfA",
+        order: 3,
       },
       {
-        title: "Smart Pet Assistant",
-        description: "AI-powered assistant for managing pet care and services.",
-        longDescription: "Smart Pet Assistant enhances pet care management by integrating AI-driven suggestions for grooming, feeding, and health routines. It allows pet owners to book services, track pet activities, and receive smart recommendations using Google GenAI. Built with a scalable Django backend and modern React frontend, ensuring secure authentication and smooth user experience.",
+        title: "MediSync",
+        description: "Healthcare scheduling platform with real-time queue management, role-based dashboards, and WebSocket-driven live updates.",
+        readmeLink: "https://raw.githubusercontent.com/rockychowdhury/MediSync/main/README.md",
         thumbnail: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
-        skills: ["Django DRF", "Django-Q", "Google GenAI", "React", "PostgreSQL", "JWT", "Tailwind", "Docker"],
+        githubLink: "https://github.com/rockychowdhury/MediSync",
+        liveLink: "https://medisync-app.vercel.app/",
+        videoPreviewLink: "/assets/projectpreview/petcarepreview.webm",
+        youtubeLink: "https://youtu.be/rkMJ0rzXjfA",
+        order: 4,
+      },
+      {
+        title: "DevConnect",
+        description: "Developer networking platform with real-time messaging, project collaboration boards, and skills-based matching.",
+        readmeLink: "https://raw.githubusercontent.com/rockychowdhury/PetCarePlus-Django-React/main/README.md",
+        thumbnail: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
         githubLink: "https://github.com/rockychowdhury/PetCarePlus-Django-React",
         liveLink: "https://petcarepp.netlify.app/",
-        previewLink: "/assets/projectpreview/petcarepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 4
+        videoPreviewLink: "/assets/projectpreview/employeepreview.webm",
+        youtubeLink: "https://youtu.be/rkMJ0rzXjfA",
+        order: 5,
       },
-      {
-        title: "HR Analytics Dashboard",
-        description: "Data-driven employee performance and payroll insights system.",
-        longDescription: "HR Analytics Dashboard provides insights into employee performance, salary distribution, and organizational growth trends. It includes role-based dashboards, payroll automation, and advanced filtering with real-time updates. Designed with scalable architecture using React and efficient backend APIs for enterprise-level usage.",
-        thumbnail: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
-        skills: ["React", "MongoDB", "JWT", "Express.js", "Firebase Auth", "Tailwind", "TanStack Query", "TanStack Table"],
-        githubLink: "https://github.com/rockychowdhury/Employee-Management-System",
-        liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 5
-      },
-      {
-        title: "Product Insight Hub",
-        description: "Platform for collecting and analyzing product recommendations.",
-        longDescription: "Product Insight Hub allows users to ask for product suggestions and receive personalized recommendations from the community. It includes secure authentication, query tracking, and a structured recommendation workflow. Built with a responsive UI and scalable backend APIs for handling multiple user interactions efficiently.",
-        thumbnail: "https://i.ibb.co.com/Kx2sNJsL/altrec.png",
-        skills: ["React", "Tailwind", "Node.js", "Express", "MongoDB", "Firebase Auth", "JWT"],
-        githubLink: "https://github.com/rockychowdhury/Alternative-Product-Recommendation-Platform",
-        liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 6
-      },
-      {
-        title: "Workforce Manager Pro",
-        description: "Advanced workforce and payroll management solution.",
-        longDescription: "Workforce Manager Pro is a full-featured employee management system with role-based access, payroll automation, and real-time updates. It provides intuitive dashboards for admins and employees, ensuring efficient workforce management and seamless data handling.",
-        thumbnail: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
-        skills: ["React", "MongoDB", "JWT", "Express.js", "Firebase Auth", "Tailwind", "TanStack Query", "TanStack Table"],
-        githubLink: "https://github.com/rockychowdhury/Employee-Management-System",
-        liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 7
-      },
-      {
-        title: "Smart Recommendation Engine",
-        description: "Personalized recommendation system using user queries.",
-        longDescription: "Smart Recommendation Engine processes user queries to deliver tailored product suggestions. It features authentication, role-based access, and efficient query handling. Designed for scalability and performance with modern backend technologies and optimized frontend rendering.",
-        thumbnail: "https://i.ibb.co.com/Kx2sNJsL/altrec.png",
-        skills: ["React", "Tailwind", "Node.js", "Express", "MongoDB", "Firebase Auth", "JWT"],
-        githubLink: "https://github.com/rockychowdhury/Alternative-Product-Recommendation-Platform",
-        liveLink: "https://employeemangement-2e41e.web.app/",
-        previewLink: "/assets/projectpreview/employeepreview.webm",
-        videoLink: "https://youtu.be/rkMJ0rzXjfA",
-        isFeatured: false,
-        order: 8
-      }
     ];
 
-    // 4. Map and save projects
-    console.log("Saving new projects...");
+    console.log("Saving projects...");
+    const savedProjects = [];
     for (const data of projectsData) {
-      const skillsIds = data.skills
-        .map(name => findSkillId(name))
-        .filter(id => !!id);
-
-      const project = new Project({
-        ...data,
-        skills: skillsIds
-      });
-
-      await project.save();
-      console.log(`Saved: ${data.title}`);
+      const project = new Project(data);
+      const saved = await project.save();
+      savedProjects.push(saved);
+      console.log(`  ✓ Saved project: ${data.title} (ID: ${saved._id})`);
     }
 
-    console.log("Seeding complete!");
+    // 3. Seed Feature Cards (8 cards)
+    const featureCardsData = [
+      {
+        projectId: savedProjects[0]._id.toString(),
+        headline: "AI-Powered Pet Recommendations",
+        subtext: "Google GenAI integration delivers personalized grooming and feeding suggestions based on pet profiles.",
+        image: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
+        ctaLabel: "See how →",
+        ctaLink: `/projects/${savedProjects[0]._id}#features`,
+        order: 1,
+      },
+      {
+        projectId: savedProjects[0]._id.toString(),
+        headline: "Background Task Queue",
+        subtext: "Django-Q handles async operations like email notifications and report generation without blocking the main thread.",
+        image: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
+        ctaLabel: "Read more →",
+        ctaLink: `/projects/${savedProjects[0]._id}#architecture`,
+        order: 2,
+      },
+      {
+        projectId: savedProjects[1]._id.toString(),
+        headline: "Role-Based Access Control",
+        subtext: "Firebase Auth + JWT provides granular admin, manager, and employee permissions across all dashboard views.",
+        image: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
+        ctaLabel: "See how →",
+        ctaLink: `/projects/${savedProjects[1]._id}#authentication`,
+        order: 3,
+      },
+      {
+        projectId: savedProjects[1]._id.toString(),
+        headline: "Real-Time Payroll Dashboard",
+        subtext: "TanStack Table powers sortable, filterable payroll views with instant data updates via TanStack Query.",
+        image: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
+        ctaLabel: "See how →",
+        ctaLink: `/projects/${savedProjects[1]._id}#payroll`,
+        order: 4,
+      },
+      {
+        projectId: savedProjects[2]._id.toString(),
+        headline: "Personalized Recommendation Engine",
+        subtext: "Smart query matching system delivers tailored product alternatives based on user preferences and community votes.",
+        image: "https://i.ibb.co.com/Kx2sNJsL/altrec.png",
+        ctaLabel: "Read more →",
+        ctaLink: `/projects/${savedProjects[2]._id}#recommendations`,
+        order: 5,
+      },
+      {
+        projectId: savedProjects[3]._id.toString(),
+        headline: "WebSocket Live Queue",
+        subtext: "Real-time patient queue updates via WebSocket connections eliminate the need for manual page refreshes.",
+        image: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
+        ctaLabel: "See how →",
+        ctaLink: `/projects/${savedProjects[3]._id}#real-time`,
+        order: 6,
+      },
+      {
+        projectId: savedProjects[3]._id.toString(),
+        headline: "Healthcare RBAC Dashboard",
+        subtext: "Doctor, receptionist, and admin roles each see customized dashboards with appropriate data access levels.",
+        image: "https://i.ibb.co.com/h1WL7WLb/petcareplus.png",
+        ctaLabel: "Read more →",
+        ctaLink: `/projects/${savedProjects[3]._id}#dashboard`,
+        order: 7,
+      },
+      {
+        projectId: savedProjects[4]._id.toString(),
+        headline: "Skills-Based Matching",
+        subtext: "Intelligent matching algorithm connects developers based on complementary skill sets and project interests.",
+        image: "https://i.ibb.co.com/WWgG8LdT/employeemanagement.png",
+        ctaLabel: "See how →",
+        ctaLink: `/projects/${savedProjects[4]._id}#matching`,
+        order: 8,
+      },
+    ];
+
+    console.log("Saving feature cards...");
+    for (const data of featureCardsData) {
+      const card = new FeatureCard(data);
+      await card.save();
+      console.log(`  ✓ Saved feature card: ${data.headline}`);
+    }
+
+    console.log("\n✅ Seeding complete!");
+    console.log(`   ${savedProjects.length} projects seeded`);
+    console.log(`   ${featureCardsData.length} feature cards seeded`);
   } catch (error) {
     console.error("SEEDING ERROR:", error);
   } finally {

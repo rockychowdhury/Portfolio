@@ -1,17 +1,3 @@
-Schema:
-{
-  id:
-  title:
-  description: (small - not rendered in ui just for reference)
-  readmeLink: for render details page
-  thumbnail: for placeholder of the container card while video does not start playing or not in focus.
-  githubLink: CTA
-  liveLink:CTA
-  videopreviewlink: auto play the video on the UI pause on hover.
-  youtubelink: CTA
-  order: for render order maintain.
-}
-
 
 
 
@@ -32,7 +18,19 @@ Like the current slider auto slide after a duration, the video will slides auto 
 Right after the project preview cards a small cards line with same sliding features will be rendered where each card will contain a problem or feature I solved or implemented in a specific project. It will fill with a image and text and CTA.
 the design of those card will be smaller than the project preview card but card layout must be premium and the message should be delivered clearly using those card showing my works breaking down into problems and features.
 
-
+Schema: changeable
+{
+  id:
+  title:
+  description: (small - not rendered in ui just for reference)
+  readmeLink: for render details page
+  thumbnail: for placeholder of the container card while video does not start playing or not in focus.
+  githubLink: CTA
+  liveLink:CTA
+  videopreviewlink: auto play the video on the UI pause on hover.
+  youtubelink: CTA
+  order: for render order maintain.
+}
 
 
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/connect";
-import Project from "@/lib/db/models/Project";
+import FeatureCard from "@/lib/db/models/FeatureCard";
 
 export const revalidate = 3600; // Cache for 1 hour
 
@@ -8,11 +8,11 @@ export async function GET() {
   try {
     await connectDB();
 
-    const projects = await Project.find({}).sort({ order: 1 });
+    const featureCards = await FeatureCard.find({}).sort({ order: 1 });
 
-    return NextResponse.json(projects);
+    return NextResponse.json(featureCards);
   } catch (error: any) {
-    console.error("[API] Projects error:", error);
+    console.error("[API] Feature cards error:", error);
     return NextResponse.json(
       {
         error: "Internal server error",
