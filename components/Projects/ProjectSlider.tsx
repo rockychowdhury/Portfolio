@@ -2,15 +2,28 @@
 
 import { useRef, useCallback, useEffect, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
 import { Project, FeatureCard as FeatureCardType } from "@/types/project";
 
 import ProjectVideo from "./ProjectVideo";
 import HoverButtons from "./HoverButtons";
 import FeatureCardRow from "./FeatureCardRow";
 
-// ─── Layout Constants ───
+// ─── Constants ───
 const SLIDE_DURATION = 0.55;
-const DEBOUNCE_MS = 600;
+const DEBOUNCE_MS = 650;
+const GAP = 10;
+
+// Card positions: left, center, right (percentages of viewport width)
+// Left card: 0% to 20% (width 20%), Center: 20%+gap to 80%-gap (width ~60%), Right: 80% to 100% (width 20%)
+const POSITIONS = {
+  left:   { x: 0,    width: 20, scale: 0.92, opacity: 0.6 },
+  center: { x: 20,   width: 60, scale: 1,    opacity: 1   },
+  right:  { x: 80,   width: 20, scale: 0.92, opacity: 0.6 },
+  // Off-screen positions for circular wrap
+  offLeft:  { x: -22, width: 20, scale: 0.92, opacity: 0 },
+  offRight: { x: 102, width: 20, scale: 0.92, opacity: 0 },
+};
 
 export default function ProjectSlider({
   projects,
@@ -24,15 +37,30 @@ export default function ProjectSlider({
   const isAnimating = useRef(false);
   const lastSlideTime = useRef(0);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Track which project index is at each position
+  const [slots, setSlots] = useState<{ left: number; center: number; right: number }>({
+    left: 0,
+    center: 0,
+    right: 0,
+  });
   const [isHovered, setIsHovered] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
 
   const isInView = useInView(sectionRef, { once: true, margin: "-30% 0px" });
-
   const n = projects.length;
-  const prevIndex = (activeIndex - 1 + n) % n;
-  const nextIndex = (activeIndex + 1) % n;
+
+  // Card refs for GSAP animation
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Initialize slots
+  useEffect(() => {
+    if (n < 3) return;
+    setSlots({
+      left: (n - 1) % n,  // last project wraps to left
+      center: 0,
+      right: 1 % n,
+    });
+  }, [n]);
 
   // ─── Entry Animation ───
   useEffect(() => {
@@ -41,24 +69,156 @@ export default function ProjectSlider({
     return () => clearTimeout(timer);
   }, [isInView, entryDone]);
 
-  // ─── Slide Transition ───
+  // ─── GSAP Slide Transition ───
   const slideTo = useCallback(
     (direction: "next" | "prev") => {
       const now = Date.now();
       if (isAnimating.current || now - lastSlideTime.current < DEBOUNCE_MS) return;
+      if (!cardRefs.current[0] || !cardRefs.current[1] || !cardRefs.current[2]) return;
       isAnimating.current = true;
       lastSlideTime.current = now;
 
+      // Pause current video
       if (videoRef.current) videoRef.current.pause();
 
-      setActiveIndex((prev) => {
-        if (direction === "next") return (prev + 1) % n;
-        return (prev - 1 + n) % n;
-      });
+      const leftEl = cardRefs.current[0]!;
+      const centerEl = cardRefs.current[1]!;
+      const rightEl = cardRefs.current[2]!;
 
-      setTimeout(() => {
-        isAnimating.current = false;
-      }, SLIDE_DURATION * 1000 + 100);
+      if (direction === "next") {
+        // Center → Left position (slide left, scale down, fade)
+        gsap.to(centerEl, {
+          left: "0%",
+          width: "20%",
+          scale: POSITIONS.left.scale,
+          opacity: POSITIONS.left.opacity,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // Right → Center position (slide left, scale up, full opacity)
+        gsap.to(rightEl, {
+          left: `calc(20% + ${GAP}px)`,
+          width: `calc(60% - ${GAP * 2}px)`,
+          scale: POSITIONS.center.scale,
+          opacity: POSITIONS.center.opacity,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // Old Left → Instantly teleport off-screen right, then no animation
+        gsap.set(leftEl, {
+          left: "80%",
+          width: "20%",
+          scale: POSITIONS.right.scale,
+          opacity: 0,
+        });
+        // Then fade in at right position
+        gsap.to(leftEl, {
+          opacity: POSITIONS.right.opacity,
+          duration: 0.2,
+          delay: SLIDE_DURATION * 0.7,
+        });
+
+        // Update slots after animation
+        setTimeout(() => {
+          setSlots((prev) => {
+            const newCenter = prev.right;
+            const newRight = (prev.right + 1) % n;
+            const newLeft = prev.center;
+            return { left: newLeft, center: newCenter, right: newRight };
+          });
+
+          // Reset GSAP transforms to match new positions
+          gsap.set(leftEl, {
+            left: "0%",
+            width: "20%",
+            scale: POSITIONS.left.scale,
+            opacity: POSITIONS.left.opacity,
+          });
+          gsap.set(centerEl, {
+            left: `calc(20% + ${GAP}px)`,
+            width: `calc(60% - ${GAP * 2}px)`,
+            scale: POSITIONS.center.scale,
+            opacity: POSITIONS.center.opacity,
+          });
+          gsap.set(rightEl, {
+            left: "80%",
+            width: "20%",
+            scale: POSITIONS.right.scale,
+            opacity: POSITIONS.right.opacity,
+          });
+
+          isAnimating.current = false;
+        }, SLIDE_DURATION * 1000 + 50);
+
+      } else {
+        // prev direction — mirror of next
+
+        // Center → Right position
+        gsap.to(centerEl, {
+          left: "80%",
+          width: "20%",
+          scale: POSITIONS.right.scale,
+          opacity: POSITIONS.right.opacity,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // Left → Center position
+        gsap.to(leftEl, {
+          left: `calc(20% + ${GAP}px)`,
+          width: `calc(60% - ${GAP * 2}px)`,
+          scale: POSITIONS.center.scale,
+          opacity: POSITIONS.center.opacity,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // Old Right → Teleport off-screen left, then position at left
+        gsap.set(rightEl, {
+          left: "-22%",
+          width: "20%",
+          scale: POSITIONS.left.scale,
+          opacity: 0,
+        });
+        gsap.to(rightEl, {
+          left: "0%",
+          opacity: POSITIONS.left.opacity,
+          duration: 0.2,
+          delay: SLIDE_DURATION * 0.7,
+        });
+
+        setTimeout(() => {
+          setSlots((prev) => {
+            const newCenter = prev.left;
+            const newLeft = (prev.left - 1 + n) % n;
+            const newRight = prev.center;
+            return { left: newLeft, center: newCenter, right: newRight };
+          });
+
+          gsap.set(leftEl, {
+            left: "0%",
+            width: "20%",
+            scale: POSITIONS.left.scale,
+            opacity: POSITIONS.left.opacity,
+          });
+          gsap.set(centerEl, {
+            left: `calc(20% + ${GAP}px)`,
+            width: `calc(60% - ${GAP * 2}px)`,
+            scale: POSITIONS.center.scale,
+            opacity: POSITIONS.center.opacity,
+          });
+          gsap.set(rightEl, {
+            left: "80%",
+            width: "20%",
+            scale: POSITIONS.right.scale,
+            opacity: POSITIONS.right.opacity,
+          });
+
+          isAnimating.current = false;
+        }, SLIDE_DURATION * 1000 + 50);
+      }
     },
     [n]
   );
@@ -77,69 +237,72 @@ export default function ProjectSlider({
     return () => window.removeEventListener("keydown", handleKey);
   }, [slideTo]);
 
-  if (!projects.length) return null;
+  // Cleanup GSAP tweens on unmount
+  useEffect(() => {
+    return () => {
+      cardRefs.current.forEach((el) => {
+        if (el) gsap.killTweensOf(el);
+      });
+    };
+  }, []);
 
-  const centerProject = projects[activeIndex];
-  const leftProject = projects[prevIndex];
-  const rightProject = projects[nextIndex];
+  if (!projects.length || n < 3) return null;
+
+  const leftProject = projects[slots.left];
+  const centerProject = projects[slots.center];
+  const rightProject = projects[slots.right];
 
   return (
     <div ref={sectionRef} className="w-full">
-      {/* ─── Slider Container — FULL VIEWPORT WIDTH ─── */}
+      {/* ─── Slider Container — FULL VIEWPORT ─── */}
       <div
         className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden"
-        style={{ height: "clamp(500px, 80vh, 900px)" }}
+        style={{ height: "clamp(480px, 75vh, 850px)" }}
       >
-        {/* LEFT flanking card — bleeds to left edge */}
+        {/* CARD 0 — starts at LEFT position */}
         <motion.div
-          className="absolute top-0 left-0 h-full cursor-pointer"
-          style={{ width: "22%", zIndex: 5 }}
-          initial={{ opacity: 0, x: -80 }}
+          ref={(el) => { cardRefs.current[0] = el; }}
+          className="absolute top-0 h-full cursor-pointer overflow-hidden"
+          style={{
+            left: "0%",
+            width: "20%",
+            borderRadius: "0 20px 20px 0",
+            willChange: "transform, opacity",
+          }}
+          initial={{ opacity: 0, x: -60 }}
           animate={{
-            opacity: entryDone ? 0.6 : 0,
-            x: entryDone ? 0 : -80,
-            scale: 0.92,
+            opacity: entryDone ? POSITIONS.left.opacity : 0,
+            x: entryDone ? 0 : -60,
+            scale: entryDone ? POSITIONS.left.scale : 0.92,
           }}
           transition={{
-            duration: SLIDE_DURATION,
+            duration: 0.6,
             ease: [0.65, 0, 0.35, 1],
             delay: entryDone ? 0 : 0.6,
           }}
           onClick={() => slideTo("prev")}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={leftProject.id || leftProject._id}
-              className="h-full w-full overflow-hidden"
-              style={{ borderRadius: "0 16px 16px 0" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <img
-                src={leftProject.thumbnail}
-                alt={leftProject.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-          </AnimatePresence>
+          <img
+            src={leftProject.thumbnail}
+            alt={leftProject.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </motion.div>
 
-        {/* CENTER card — large, full opacity */}
+        {/* CARD 1 — starts at CENTER position */}
         <motion.div
-          className="absolute top-0 h-full"
+          ref={(el) => { cardRefs.current[1] = el; }}
+          className="absolute top-0 h-full overflow-hidden rounded-[20px]"
           style={{
-            left: "20%",
-            right: "20%",
-            zIndex: 10,
+            left: `calc(20% + ${GAP}px)`,
+            width: `calc(60% - ${GAP * 2}px)`,
+            willChange: "transform, opacity",
           }}
           initial={{ y: 120, opacity: 0 }}
           animate={{
             y: entryDone ? 0 : 120,
             opacity: entryDone ? 1 : 0,
-            scale: 1,
           }}
           transition={{
             duration: 0.7,
@@ -148,109 +311,96 @@ export default function ProjectSlider({
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-[0_32px_80px_-16px_rgba(0,0,0,0.25)] border border-white/10">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={centerProject.id || centerProject._id}
-                className="absolute inset-0"
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-              >
-                <ProjectVideo
-                  ref={videoRef}
-                  src={centerProject.videoPreviewLink}
-                  thumbnail={centerProject.thumbnail}
-                  isActive={entryDone}
-                  isPaused={isHovered}
-                  onEnded={handleVideoEnded}
-                />
-              </motion.div>
-            </AnimatePresence>
+          <ProjectVideo
+            ref={videoRef}
+            key={`video-${slots.center}`}
+            src={centerProject.videoPreviewLink}
+            thumbnail={centerProject.thumbnail}
+            isActive={entryDone}
+            isPaused={isHovered}
+            onEnded={handleVideoEnded}
+          />
 
-            {/* Hover Buttons */}
-            <HoverButtons
-              isVisible={isHovered}
-              projectId={centerProject._id || centerProject.id}
-              liveLink={centerProject.liveLink}
-            />
+          {/* Hover Buttons */}
+          <HoverButtons
+            isVisible={isHovered}
+            projectId={centerProject._id || centerProject.id}
+            liveLink={centerProject.liveLink}
+          />
 
-            {/* Bottom gradient overlay for text */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none z-15" />
-
-            {/* Project info overlay at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 z-16 px-8 pb-6 flex items-end justify-between pointer-events-none">
-              <div className="flex items-center gap-4">
-                <span className="text-white/50 text-xs font-black tracking-[0.3em] uppercase font-mono">
-                  {String(activeIndex + 1).padStart(2, "0")}/{String(n).padStart(2, "0")}
-                </span>
-                <div className="h-px w-6 bg-white/20" />
-                <span className="text-white/90 text-base font-semibold tracking-tight">
+          {/* Bottom info */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+            <div className="bg-gradient-to-t from-black/50 via-black/15 to-transparent px-8 pb-5 pt-16">
+              <div className="flex items-center gap-3">
+                <span className="text-white/90 text-sm md:text-base font-semibold tracking-tight">
                   {centerProject.title}
+                </span>
+                <span className="text-white/40 text-xs font-mono font-bold tracking-widest">
+                  {String(slots.center + 1).padStart(2, "0")}/{String(n).padStart(2, "0")}
                 </span>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* RIGHT flanking card — bleeds to right edge */}
+        {/* CARD 2 — starts at RIGHT position */}
         <motion.div
-          className="absolute top-0 right-0 h-full cursor-pointer"
-          style={{ width: "22%", zIndex: 5 }}
-          initial={{ opacity: 0, x: 80 }}
+          ref={(el) => { cardRefs.current[2] = el; }}
+          className="absolute top-0 h-full cursor-pointer overflow-hidden"
+          style={{
+            left: "80%",
+            width: "20%",
+            borderRadius: "20px 0 0 20px",
+            willChange: "transform, opacity",
+          }}
+          initial={{ opacity: 0, x: 60 }}
           animate={{
-            opacity: entryDone ? 0.6 : 0,
-            x: entryDone ? 0 : 80,
-            scale: 0.92,
+            opacity: entryDone ? POSITIONS.right.opacity : 0,
+            x: entryDone ? 0 : 60,
+            scale: entryDone ? POSITIONS.right.scale : 0.92,
           }}
           transition={{
-            duration: SLIDE_DURATION,
+            duration: 0.6,
             ease: [0.65, 0, 0.35, 1],
             delay: entryDone ? 0 : 0.6,
           }}
           onClick={() => slideTo("next")}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={rightProject.id || rightProject._id}
-              className="h-full w-full overflow-hidden"
-              style={{ borderRadius: "16px 0 0 16px" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <img
-                src={rightProject.thumbnail}
-                alt={rightProject.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-          </AnimatePresence>
+          <img
+            src={rightProject.thumbnail}
+            alt={rightProject.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </motion.div>
-
-        {/* Slide indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-          {projects.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                if (i !== activeIndex) setActiveIndex(i);
-              }}
-              className={`transition-all duration-500 rounded-full ${
-                i === activeIndex
-                  ? "w-8 h-2 bg-white/90"
-                  : "w-2 h-2 bg-white/30 hover:bg-white/50"
-              }`}
-              aria-label={`Go to project ${i + 1}`}
-            />
-          ))}
-        </div>
       </div>
 
-      {/* ─── Feature Cards Row — full width ─── */}
+      {/* Slide indicators */}
+      <div className="flex items-center justify-center gap-2 mt-6">
+        {projects.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              // Calculate direction and slide
+              if (i === slots.center) return;
+              const diff = (i - slots.center + n) % n;
+              if (diff <= n / 2) {
+                slideTo("next");
+              } else {
+                slideTo("prev");
+              }
+            }}
+            className={`transition-all duration-500 rounded-full ${
+              i === slots.center
+                ? "w-8 h-2 bg-foreground/70"
+                : "w-2 h-2 bg-foreground/15 hover:bg-foreground/30"
+            }`}
+            aria-label={`Go to project ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* ─── Feature Cards Row ─── */}
       {featureCards.length > 0 && (
         <div className="w-screen left-1/2 -translate-x-1/2 relative mt-14 px-4 md:px-8">
           <FeatureCardRow
