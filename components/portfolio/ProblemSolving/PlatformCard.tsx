@@ -92,6 +92,7 @@ export default function PlatformCard({
   }
 
   const isLeetCode = name.toLowerCase().includes('leetcode');
+  const isCodeChef = name.toLowerCase().includes('codechef');
   const totalSolved = solveCount;
 
   const copyUsername = (e: React.MouseEvent) => {
@@ -154,7 +155,7 @@ export default function PlatformCard({
               src={iconPath} 
               alt={name} 
               fill 
-              className="object-contain p-1 filter drop-shadow-md"
+              className={`object-contain p-1 filter drop-shadow-md ${isCodeChef ? 'brightness-0 invert' : ''}`}
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
