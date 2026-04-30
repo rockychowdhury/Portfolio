@@ -170,7 +170,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
               onMouseLeave={() => setShowMore(false)}
             >
               <button 
-                className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 ${
+                className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 cursor-pointer ${
                   moreLinks.some(l => activeSection === l.href.replace("#", "")) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
                 style={{
@@ -236,7 +236,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             <span className="text-xs font-medium text-muted-foreground">{email}</span>
             <button
               onClick={copyEmail}
-              className="relative flex items-center justify-center p-1.5 rounded-full hover:bg-background transition-colors"
+              className="relative flex items-center justify-center p-1.5 rounded-full hover:bg-background transition-colors cursor-pointer"
               title="Copy Email"
             >
               <AnimatePresence mode="wait">

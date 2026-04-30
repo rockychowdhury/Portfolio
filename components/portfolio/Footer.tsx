@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="container-main">
         <div className="flex flex-col items-center gap-10">
           <div className="flex flex-wrap items-center justify-center w-full gap-x-8 gap-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 border-t border-foreground/5 pt-12">
-            <span className="text-center">{`© ${currentYear} // রকি চৌধুরী`}</span>
+            <span className="text-center">{`© ${currentYear} // Rocky Chowdhury`}</span>
           </div>
 
           {/* ── Floating Back to Top (Absolute in Footer) ── */}
