@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import Navbar from "@/components/portfolio/Navbar";
 import HeroSection from "@/components/portfolio/HeroSection";
 import SkillsSection from "@/components/portfolio/SkillsSection";
@@ -44,7 +45,13 @@ export default function Home() {
         <Preloader key="preloader" onComplete={handlePreloaderComplete} />
       )}
       <Navbar preloaderDone={preloaderDone} />
-      <main>
+      
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+        className={!preloaderDone ? "pointer-events-none" : ""}
+      >
         <HeroSection preloaderDone={preloaderDone} />
         <SkillsSection />
         <ProjectsSection />
@@ -56,9 +63,8 @@ export default function Home() {
         <JourneySection />
         <TestimonialsSection />
         <ContactSection />
-      </main>
-
-      <Footer />
+        <Footer />
+      </motion.main>
     </>
   );
 }
