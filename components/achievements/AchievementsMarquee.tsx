@@ -2,6 +2,7 @@
 
 import { MarqueeRow } from "./MarqueeRow";
 import { Achievement } from "./achievementsData";
+import SectionWrapper from "../portfolio/SectionWrapper";
 
 type Props = { achievements: Achievement[] };
 
@@ -27,7 +28,7 @@ export function AchievementsMarquee({ achievements }: Props) {
   );
 
   return (
-    <section className="relative w-full py-16 sm:py-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
+    <SectionWrapper id="achievements" className="relative w-full py-16 sm:py-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
       {/* Futuristic Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Grid Overlay */}
@@ -58,7 +59,7 @@ export function AchievementsMarquee({ achievements }: Props) {
         {/* Row 2 — scrolls right (opposite) */}
         <MarqueeRow achievements={rowTwo} direction="right" speed={55} />
       </div>
-    </section>
+    </SectionWrapper>
   );
 }
 

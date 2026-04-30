@@ -167,7 +167,7 @@ export default function HeroSection({
       .catch(() => { }); // silent fail — cached data remains
   }, []);
 
-  // Smooth spring for subtle parallax on image
+  // Smooth spring for subtle mouse parallax on image
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
   const imageX = useTransform(springX, [-500, 500], [5, -5]);

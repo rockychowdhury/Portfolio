@@ -13,10 +13,13 @@ export default function SectionWrapper({ children, id, className, ...props }: Se
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.05 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ 
+        duration: 0.8, 
+        ease: [0.25, 0.4, 0.25, 1], // Premium custom ease
+      }}
       className={className}
       {...props}
     >

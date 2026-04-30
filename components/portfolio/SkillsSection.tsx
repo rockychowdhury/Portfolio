@@ -443,10 +443,11 @@ function SkillTicker({ skills }: { skills: Skill[] }) {
     >
       <div
         ref={tickerRef}
-        className="flex items-center gap-6 whitespace-nowrap"
+        className="flex items-center gap-6 whitespace-nowrap transform-gpu"
         style={{
           animation: `tickerScroll 40s linear infinite`,
           animationPlayState: isPaused ? "paused" : "running",
+          willChange: "transform",
         }}
       >
         {/* Multiple duplicates to ensure it always fills any screen width immediately */}
@@ -733,8 +734,8 @@ export default function SkillsSection() {
 
       <style>{`
         @keyframes tickerScroll {
-          from { transform: translateX(0); }
-          to { transform: translateX(-25%); }
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-25%, 0, 0); }
         }
       `}</style>
     </section>
