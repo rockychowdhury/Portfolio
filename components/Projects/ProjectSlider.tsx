@@ -14,21 +14,9 @@ const DEBOUNCE_MS = 650;
 const GAP = 12;
 const VIDEO_FALLBACK_DURATION = 8;
 
-// ─── Per-project gradient pairs (derived from PROJECT_COLORS palette) ───
-const PROJECT_GRADIENTS = [
-  { from: "#6366f1", to: "#312e81" }, // indigo → deep navy
-  { from: "#f59e0b", to: "#c2410c" }, // amber → burnt orange
-  { from: "#10b981", to: "#065f46" }, // emerald → deep teal
-  { from: "#ef4444", to: "#881337" }, // red → dark rose
-  { from: "#8b5cf6", to: "#4c1d95" }, // violet → deep purple
-  { from: "#06b6d4", to: "#164e63" }, // cyan → dark cyan
-  { from: "#f97316", to: "#9a3412" }, // orange → dark orange
-  { from: "#ec4899", to: "#831843" }, // pink → dark magenta
-];
-
 // ─── Side card widths ───
 const SIDE_WIDTH = "13%";
-const SIDE_WIDTH_NUM = 13; // numeric for calc
+const SIDE_WIDTH_NUM = 13;
 
 // Position presets (GSAP targets)
 const POS_LEFT = { left: "0%", width: SIDE_WIDTH, borderRadius: "0 16px 16px 0" };
@@ -43,13 +31,8 @@ const POS_RIGHT = {
   borderRadius: "16px 0 0 16px",
 };
 
-// Side card opacity
-const SIDE_OPACITY = 0.3;
-
-function getGradient(projectIndex: number) {
-  const g = PROJECT_GRADIENTS[projectIndex % PROJECT_GRADIENTS.length];
-  return `linear-gradient(135deg, ${g.from} 0%, ${g.to} 100%)`;
-}
+// ─── Blur transition easing ───
+const BLUR_TRANSITION = "filter 0.7s cubic-bezier(0.25, 0.4, 0.25, 1), transform 0.7s cubic-bezier(0.25, 0.4, 0.25, 1)";
 
 export default function ProjectSlider({
   projects,
@@ -165,7 +148,7 @@ export default function ProjectSlider({
 
         gsap.to(centerEl, {
           ...POS_LEFT,
-          opacity: SIDE_OPACITY,
+          opacity: 1,
           zIndex: 5,
           duration: SLIDE_DURATION,
           ease: "power2.inOut",
@@ -181,7 +164,7 @@ export default function ProjectSlider({
 
         gsap.to(leftEl, {
           ...POS_RIGHT,
-          opacity: SIDE_OPACITY,
+          opacity: 1,
           zIndex: 5,
           duration: 0.3,
           delay: SLIDE_DURATION * 0.6,
@@ -220,7 +203,7 @@ export default function ProjectSlider({
 
         gsap.to(centerEl, {
           ...POS_RIGHT,
-          opacity: SIDE_OPACITY,
+          opacity: 1,
           zIndex: 5,
           duration: SLIDE_DURATION,
           ease: "power2.inOut",
@@ -236,7 +219,7 @@ export default function ProjectSlider({
 
         gsap.to(rightEl, {
           ...POS_LEFT,
-          opacity: SIDE_OPACITY,
+          opacity: 1,
           zIndex: 5,
           duration: 0.3,
           delay: SLIDE_DURATION * 0.6,
@@ -292,12 +275,10 @@ export default function ProjectSlider({
     const projIdx = cardData[elIdx];
     const project = projects[projIdx] || projects[0];
     const isCenter = roleMap.current.center === elIdx;
-    const gradient = getGradient(projIdx);
 
     // Determine initial position preset
     const initialPos =
       elIdx === 0 ? POS_LEFT : elIdx === 1 ? POS_CENTER : POS_RIGHT;
-    const initialOpacity = elIdx === 1 ? 1 : SIDE_OPACITY;
     const initialZIndex = elIdx === 1 ? 10 : 5;
 
     return (
@@ -311,7 +292,6 @@ export default function ProjectSlider({
           ...initialPos,
           borderRadius: initialPos.borderRadius,
           zIndex: initialZIndex,
-          opacity: initialOpacity,
         }}
         onClick={() => {
           if (roleMap.current.left === elIdx) slideTo("prev");
@@ -324,37 +304,36 @@ export default function ProjectSlider({
           if (roleMap.current.center === elIdx) setIsHovered(false);
         }}
       >
-        {/* ─── Gradient placeholder — always present as base ─── */}
+        {/* ─── Media layer — thumbnail base + blur on side cards ─── */}
         <div
           className="absolute inset-0 z-0"
-          style={{ background: gradient }}
+          style={{
+            filter: isCenter
+              ? "blur(0px) brightness(1)"
+              : "blur(24px) brightness(0.55)",
+            transform: isCenter ? "scale(1)" : "scale(1.15)",
+            transition: BLUR_TRANSITION,
+          }}
         >
-          {/* Title text — only rendered on center card to avoid clipped text on narrow side cards */}
-          {isCenter && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h3
-                className="text-white/90 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center px-12 select-none leading-tight"
-                style={{ textShadow: "0 4px 30px rgba(0,0,0,0.35)" }}
-              >
-                {project.title}
-              </h3>
-            </div>
-          )}
-        </div>
+          {/* Thumbnail — always visible as base layer */}
+          <img
+            src={project.thumbnail}
+            alt={project.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            draggable={false}
+          />
 
-        {/* Video — only on center card when available */}
-        {isCenter && project.videoPreviewLink && (
-          <div className="absolute inset-0 z-10">
+          {/* Video — only renders on center card */}
+          {isCenter && project.videoPreviewLink && (
             <ProjectVideo
               ref={videoRef}
               src={project.videoPreviewLink}
-              thumbnail={project.thumbnail}
               isActive={entryDone && isCenter}
               onEnded={handleVideoEnded}
               onLoadedMetadata={handleVideoMetadata}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Hover buttons — only on center */}
         {isCenter && (
@@ -370,7 +349,7 @@ export default function ProjectSlider({
 
   return (
     <div ref={sectionRef} className="w-full">
-      {/* ─── Slider Container — FULL VIEWPORT WIDTH ─── */}
+      {/* ─── Slider Container ─── */}
       <motion.div
         className="relative w-full overflow-hidden"
         style={{ aspectRatio: "16 / 9", maxHeight: "80vh" }}
@@ -381,25 +360,6 @@ export default function ProjectSlider({
         {renderCard(0)}
         {renderCard(1)}
         {renderCard(2)}
-
-        {/* Left edge vignette — blends side card into section background */}
-        <div
-          className="absolute top-0 left-0 h-full z-30 pointer-events-none"
-          style={{
-            width: "clamp(100px, 14vw, 200px)",
-            background:
-              "linear-gradient(to right, var(--background) 0%, var(--background) 15%, transparent 100%)",
-          }}
-        />
-        {/* Right edge vignette */}
-        <div
-          className="absolute top-0 right-0 h-full z-30 pointer-events-none"
-          style={{
-            width: "clamp(100px, 14vw, 200px)",
-            background:
-              "linear-gradient(to left, var(--background) 0%, var(--background) 15%, transparent 100%)",
-          }}
-        />
       </motion.div>
 
       {/* ─── Project Label + Line Progress Indicators ─── */}
