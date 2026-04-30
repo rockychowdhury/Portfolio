@@ -47,9 +47,11 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const isScrolled = window.scrollY > 20;
+      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+      
       if (window.scrollY < 100) {
-        setActiveSection("");
+        setActiveSection((prev) => (prev !== "" ? "" : prev));
       }
     };
     window.addEventListener("scroll", handleScroll);

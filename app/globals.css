@@ -145,11 +145,14 @@
   html {
     @apply font-sans;
     overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    overscroll-behavior: none; /* Prevents unpolished rubber-banding */
   }
 
 
@@ -240,15 +243,35 @@
   -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+/* --- Lenis Smooth Scrolling Optimizations --- */
+html.lenis,
+html.lenis body {
+  height: auto;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Optimize backdrop blurs for performance to prevent frame drops */
+.backdrop-blur-sm,
+.backdrop-blur-md, 
+.backdrop-blur-xl,
+.backdrop-blur-2xl {
+  transform: translateZ(0); /* Force GPU acceleration */
+  will-change: backdrop-filter;
 }
 
 .mask-fade-right {
