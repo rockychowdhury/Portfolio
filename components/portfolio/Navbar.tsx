@@ -27,8 +27,17 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
+const moreLinks = [
+  { label: "Problem Solving", href: "#problem-solving" },
+  { label: "Open Source", href: "#github" },
+  { label: "Journey", href: "#journey" },
+  { label: "Testimonials", href: "#testimonials" },
+  { label: "Achievements", href: "#achievements" },
+];
+
 export default function Navbar({ preloaderDone = true }: { preloaderDone?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [copied, setCopied] = useState(false);
@@ -37,7 +46,12 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      if (window.scrollY < 100) {
+        setActiveSection("");
+      }
+    };
     window.addEventListener("scroll", handleScroll);
     
     // Intersection Observer for active section
@@ -56,10 +70,15 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    navLinks.forEach((link) => {
+    const allLinks = [...navLinks, ...moreLinks];
+    allLinks.forEach((link) => {
       const element = document.getElementById(link.href.replace("#", ""));
       if (element) observer.observe(element);
     });
+    
+    // Observe hero section to reset active state when scrolling to top
+    const heroElement = document.getElementById("hero");
+    if (heroElement) observer.observe(heroElement);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -71,6 +90,17 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
     navigator.clipboard.writeText(email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setShowMore(false);
+    setIsOpen(false);
+    const id = href.replace("#", "");
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -113,6 +143,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 <a
                   key={link.label}
                   href={link.href}
+                  onClick={(e) => handleScroll(e, link.href)}
                   className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
@@ -131,6 +162,62 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 </a>
               );
             })}
+            
+            {/* More Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowMore(true)}
+              onMouseLeave={() => setShowMore(false)}
+            >
+              <button 
+                className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 ${
+                  moreLinks.some(l => activeSection === l.href.replace("#", "")) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+                style={{
+                  animation: preloaderDone ? `fadeUp 400ms ease ${400 + navLinks.length * 60}ms forwards` : "none",
+                }}
+              >
+                More
+                <svg className={`w-3 h-3 transition-transform duration-300 ${showMore ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                {moreLinks.some(l => activeSection === l.href.replace("#", "")) && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 z-[-1] rounded-full bg-background border border-border/50 shadow-sm"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {showMore && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full left-0 mt-2 w-48 bg-background/90 backdrop-blur-xl border border-border/50 rounded-2xl p-2 shadow-2xl overflow-hidden"
+                  >
+                    {moreLinks.map((link) => {
+                      const isActive = activeSection === link.href.replace("#", "");
+                      return (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          onClick={(e) => handleScroll(e, link.href)}
+                          className={`block px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                            isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          }`}
+                        >
+                          {link.label}
+                        </a>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
 
@@ -225,12 +312,12 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden bg-background/95 backdrop-blur-xl lg:hidden"
           >
-            <div className="flex flex-col gap-2 px-6 py-8">
-              {navLinks.map((link) => (
-                <Link
+            <div className="flex flex-col gap-2 px-6 py-8 h-full overflow-y-auto">
+              {[...navLinks, ...moreLinks].map((link) => (
+                <a
                   key={link.label}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => handleScroll(e, link.href)}
                   className={`flex items-center justify-between group rounded-2xl px-5 py-4 text-base font-medium transition-all ${
                     activeSection === link.href.replace("#", "") 
                       ? "bg-secondary text-foreground" 
@@ -239,7 +326,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 >
                   {link.label}
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                </Link>
+                </a>
               ))}
               
               <div className="mt-6 flex flex-col gap-4">
