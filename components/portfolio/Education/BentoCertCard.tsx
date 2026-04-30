@@ -11,9 +11,10 @@ import SkillTags from "./SkillTags";
 interface Props {
   item: ICertification;
   index: number;
+  isVisible?: boolean;
 }
 
-export default function BentoCertCard({ item, index }: Props) {
+export default function BentoCertCard({ item, index, isVisible = true }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const isEducation = item.type === "education";
 
@@ -26,11 +27,10 @@ export default function BentoCertCard({ item, index }: Props) {
     <>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
+        animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
         transition={{ 
           duration: 0.8, 
-          delay: index * 0.05,
+          delay: 1.0 + index * 0.1,
           ease: [0.215, 0.61, 0.355, 1] 
         }}
         whileHover={{ y: -8 }}

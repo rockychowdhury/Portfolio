@@ -5,9 +5,10 @@ import BentoCertCard from "./BentoCertCard";
 
 interface Props {
   data: ICertification[];
+  isVisible?: boolean;
 }
 
-export default function BentoGrid({ data }: Props) {
+export default function BentoGrid({ data, isVisible }: Props) {
   // Sort: Education first, then certifications by order
   const sortedData = [...data].sort((a, b) => {
     if (a.type === "education") return -1;
@@ -22,6 +23,7 @@ export default function BentoGrid({ data }: Props) {
           key={item._id} 
           item={item} 
           index={index} 
+          isVisible={isVisible}
         />
       ))}
     </div>

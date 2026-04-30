@@ -13,7 +13,7 @@ export default function Education() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isTitleInView = useInView(sectionRef, { once: true, margin: "-10%" });
+  const isSectionInView = useInView(sectionRef, { once: true, margin: "-10%" });
 
   const educationTitle = "Education &".split(" ");
   const certsTitle = "Certifications.".split("");
@@ -61,7 +61,7 @@ export default function Education() {
 
   return (
     <SectionWrapper id="education" className="relative py-24 lg:py-40 bg-background overflow-hidden">
-      <div className="container-main relative z-10">
+      <div className="container-main relative z-10" ref={sectionRef}>
         
         {/* Section Header */}
         <div className="mb-24 lg:mb-32 flex flex-col items-start">
@@ -74,7 +74,7 @@ export default function Education() {
                     custom={i + (wordIdx * 10)}
                     variants={letterAnimation}
                     initial="hidden"
-                    animate={isTitleInView ? "visible" : "hidden"}
+                    animate={isSectionInView ? "visible" : "hidden"}
                     className="inline-block origin-bottom"
                   >
                     {letter}
@@ -89,7 +89,7 @@ export default function Education() {
                   custom={i + 20}
                   variants={letterAnimation}
                   initial="hidden"
-                  animate={isTitleInView ? "visible" : "hidden"}
+                  animate={isSectionInView ? "visible" : "hidden"}
                   className="inline-block origin-bottom text-muted-foreground/20"
                 >
                   {letter}
@@ -100,12 +100,12 @@ export default function Education() {
         </div>
 
         {/* Bento Grid Container */}
-        <div className="relative min-h-[400px]" ref={sectionRef}>
+        <div className="relative min-h-[400px]">
           {isLoading ? (
             <EducationSkeleton />
           ) : (
             <>
-              <BentoGrid data={visibleData} />
+              <BentoGrid data={visibleData} isVisible={isSectionInView} />
               
               {remainingCerts.length > 0 && (
                  <ShowAllButton 

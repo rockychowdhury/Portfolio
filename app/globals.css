@@ -223,13 +223,7 @@
   color: #F8F8F8;
 }
 
-/* Theme change smooth transition — targeted root elements only for performance */
-html.theme-transitioning,
-html.theme-transitioning body {
-  transition: background-color 0.5s ease,
-    color 0.3s ease,
-    border-color 0.5s ease !important;
-}
+
 
 @keyframes shimmer {
   0% {

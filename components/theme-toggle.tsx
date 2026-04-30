@@ -13,19 +13,9 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  const handleToggle = () => {
+  const handleToggle = (event: React.MouseEvent) => {
     const newTheme = theme === "light" ? "dark" : "light";
-
-    // Enable smooth color transitions on all elements
-    document.documentElement.classList.add("theme-transitioning");
-
-    // Toggle the theme
     setTheme(newTheme);
-
-    // Remove transition class after animation completes
-    setTimeout(() => {
-      document.documentElement.classList.remove("theme-transitioning");
-    }, 500);
   };
 
   if (!mounted) return <div className="p-2 h-9 w-9" />;
