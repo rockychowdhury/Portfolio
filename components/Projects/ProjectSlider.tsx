@@ -300,7 +300,7 @@ export default function ProjectSlider({
           <img
             src={project.thumbnail}
             alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-top"
             draggable={false}
           />
 
@@ -319,7 +319,7 @@ export default function ProjectSlider({
             <img
               src={project.thumbnail}
               alt=""
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
               draggable={false}
             />
           </div>
@@ -352,7 +352,7 @@ export default function ProjectSlider({
     <div ref={sectionRef} className="w-full">
       <motion.div
         className="relative w-full overflow-hidden"
-        style={{ aspectRatio: isMobile ? "4 / 5" : "16 / 9.3", maxHeight: isMobile ? "60vh" : "80vh" }}
+        style={{ aspectRatio: isMobile ? "4 / 5" : "16 / 10", maxHeight: isMobile ? "60vh" : "80vh" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: entryDone ? 1 : 0 }}
         transition={{ duration: 0.6 }}

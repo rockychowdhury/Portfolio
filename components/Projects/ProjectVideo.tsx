@@ -43,7 +43,7 @@ const ProjectVideo = forwardRef<HTMLVideoElement, ProjectVideoProps>(
         preload={isActive ? "auto" : "none"}
         onEnded={onEnded}
         onLoadedMetadata={onLoadedMetadata}
-        className="absolute inset-0 w-full h-full object-cover z-10"
+        className="absolute inset-0 w-full h-full object-cover object-top z-10"
         style={{ willChange: "transform" }}
       />
     );
