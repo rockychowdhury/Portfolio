@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Project, FeatureCard } from "@/types/project";
+import { Project } from "@/types/project";
 import ProjectSlider from "./ProjectSlider";
 
 const headerLetters = "PROJECTS".split("");
@@ -23,19 +23,13 @@ const letterAnimation = {
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [featureCards, setFeatureCards] = useState<FeatureCard[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [projectsRes, cardsRes] = await Promise.all([
-          fetch("/api/projects"),
-          fetch("/api/feature-cards"),
-        ]);
-
+        const projectsRes = await fetch("/api/projects");
         const projectsData = await projectsRes.json();
-        const cardsData = await cardsRes.json();
 
         if (projectsRes.ok) {
           const mapped = projectsData.map((p: any) => ({
@@ -43,14 +37,6 @@ export default function ProjectsSection() {
             id: p._id,
           }));
           setProjects(mapped);
-        }
-
-        if (cardsRes.ok) {
-          const mappedCards = cardsData.map((c: any) => ({
-            ...c,
-            id: c._id,
-          }));
-          setFeatureCards(mappedCards);
         }
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -75,7 +61,7 @@ export default function ProjectsSection() {
           <section className="relative w-full pt-12 md:pt-10 pb-10 md:pb-20">
             {/* Section Header — constrained */}
             <div className="container-main">
-              <div className="mb-12 lg:mb-16">
+              <div className="mb-16 lg:mb-20">
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
@@ -118,10 +104,7 @@ export default function ProjectsSection() {
 
             {/* Slider — FULL WIDTH, breaks out of container */}
             {projects.length > 0 && (
-              <ProjectSlider
-                projects={projects}
-                featureCards={featureCards}
-              />
+              <ProjectSlider projects={projects} />
             )}
           </section>
         </>

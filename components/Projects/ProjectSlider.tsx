@@ -1,226 +1,271 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { Project, FeatureCard as FeatureCardType } from "@/types/project";
+import { Project } from "@/types/project";
 
 import ProjectVideo from "./ProjectVideo";
 import HoverButtons from "./HoverButtons";
-import FeatureCardRow from "./FeatureCardRow";
 
 // ─── Constants ───
 const SLIDE_DURATION = 0.55;
 const DEBOUNCE_MS = 650;
 const GAP = 10;
+const VIDEO_FALLBACK_DURATION = 8; // seconds, used when no video or duration unavailable
 
-// Card positions: left, center, right (percentages of viewport width)
-// Left card: 0% to 20% (width 20%), Center: 20%+gap to 80%-gap (width ~60%), Right: 80% to 100% (width 20%)
-const POSITIONS = {
-  left:   { x: 0,    width: 20, scale: 0.92, opacity: 0.6 },
-  center: { x: 20,   width: 60, scale: 1,    opacity: 1   },
-  right:  { x: 80,   width: 20, scale: 0.92, opacity: 0.6 },
-  // Off-screen positions for circular wrap
-  offLeft:  { x: -22, width: 20, scale: 0.92, opacity: 0 },
-  offRight: { x: 102, width: 20, scale: 0.92, opacity: 0 },
+// ─── Per-project gradient pairs (derived from PROJECT_COLORS palette) ───
+const PROJECT_GRADIENTS = [
+  { from: "#6366f1", to: "#312e81" }, // indigo → deep navy
+  { from: "#f59e0b", to: "#c2410c" }, // amber → burnt orange
+  { from: "#10b981", to: "#065f46" }, // emerald → deep teal
+  { from: "#ef4444", to: "#881337" }, // red → dark rose
+  { from: "#8b5cf6", to: "#4c1d95" }, // violet → deep purple
+  { from: "#06b6d4", to: "#164e63" }, // cyan → dark cyan
+  { from: "#f97316", to: "#9a3412" }, // orange → dark orange
+  { from: "#ec4899", to: "#831843" }, // pink → dark magenta
+];
+
+// Position presets (GSAP targets) — 10% side cards
+const POS_LEFT = { left: "0%", width: "10%", borderRadius: "0 20px 20px 0" };
+const POS_CENTER = {
+  left: `calc(10% + ${GAP}px)`,
+  width: `calc(80% - ${GAP * 2}px)`,
+  borderRadius: "20px",
 };
+const POS_RIGHT = { left: "90%", width: "10%", borderRadius: "20px 0 0 20px" };
+
+// Side card opacity
+const SIDE_OPACITY = 0.35;
+
+function getGradient(projectIndex: number) {
+  const g = PROJECT_GRADIENTS[projectIndex % PROJECT_GRADIENTS.length];
+  return `linear-gradient(135deg, ${g.from}, ${g.to})`;
+}
 
 export default function ProjectSlider({
   projects,
-  featureCards,
 }: {
   projects: Project[];
-  featureCards: FeatureCardType[];
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isAnimating = useRef(false);
   const lastSlideTime = useRef(0);
 
-  // Track which project index is at each position
-  const [slots, setSlots] = useState<{ left: number; center: number; right: number }>({
+  // Which project index each of the 3 card elements shows
+  const [cardData, setCardData] = useState<[number, number, number]>([0, 0, 0]);
+  // Which card element (0, 1, 2) is currently at which position
+  const roleMap = useRef<{ left: number; center: number; right: number }>({
     left: 0,
-    center: 0,
-    right: 0,
+    center: 1,
+    right: 2,
   });
+
   const [isHovered, setIsHovered] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
+  const [centerIndex, setCenterIndex] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(VIDEO_FALLBACK_DURATION);
 
-  const isInView = useInView(sectionRef, { once: true, margin: "-30% 0px" });
+  // Track a key that resets when center changes, to restart progress animation
+  const [progressKey, setProgressKey] = useState(0);
+
+  const isInView = useRef(false);
   const n = projects.length;
 
-  // Card refs for GSAP animation
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Card DOM refs
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 
-  // Initialize slots
+  // Initialize card data
   useEffect(() => {
     if (n < 3) return;
-    setSlots({
-      left: (n - 1) % n,  // last project wraps to left
-      center: 0,
-      right: 1 % n,
-    });
+    setCardData([(n - 1) % n, 0, 1 % n]); // left, center, right
+    setCenterIndex(0);
   }, [n]);
 
-  // ─── Entry Animation ───
+  // Entry animation via IntersectionObserver
   useEffect(() => {
-    if (!isInView || entryDone) return;
-    const timer = setTimeout(() => setEntryDone(true), 100);
-    return () => clearTimeout(timer);
-  }, [isInView, entryDone]);
+    const el = sectionRef.current;
+    if (!el) return;
 
-  // ─── GSAP Slide Transition ───
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isInView.current) {
+          isInView.current = true;
+          setTimeout(() => setEntryDone(true), 100);
+        }
+      },
+      { rootMargin: "-30% 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Handle video metadata loaded — read actual duration
+  const handleVideoMetadata = useCallback(() => {
+    const video = videoRef.current;
+    if (video && video.duration && isFinite(video.duration)) {
+      setVideoDuration(video.duration);
+    } else {
+      setVideoDuration(VIDEO_FALLBACK_DURATION);
+    }
+    // Reset progress animation
+    setProgressKey((k) => k + 1);
+  }, []);
+
+  // When center changes, reset duration to fallback until video loads
+  useEffect(() => {
+    const centerProject = projects[centerIndex];
+    if (!centerProject?.videoPreviewLink) {
+      setVideoDuration(VIDEO_FALLBACK_DURATION);
+    }
+    setProgressKey((k) => k + 1);
+  }, [centerIndex, projects]);
+
+  // ─── Slide Transition ───
   const slideTo = useCallback(
     (direction: "next" | "prev") => {
       const now = Date.now();
       if (isAnimating.current || now - lastSlideTime.current < DEBOUNCE_MS) return;
-      if (!cardRefs.current[0] || !cardRefs.current[1] || !cardRefs.current[2]) return;
       isAnimating.current = true;
       lastSlideTime.current = now;
 
-      // Pause current video
       if (videoRef.current) videoRef.current.pause();
 
-      const leftEl = cardRefs.current[0]!;
-      const centerEl = cardRefs.current[1]!;
-      const rightEl = cardRefs.current[2]!;
+      const { left: leftIdx, center: centerIdx, right: rightIdx } = roleMap.current;
+      const leftEl = cardRefs.current[leftIdx];
+      const centerEl = cardRefs.current[centerIdx];
+      const rightEl = cardRefs.current[rightIdx];
+
+      if (!leftEl || !centerEl || !rightEl) {
+        isAnimating.current = false;
+        return;
+      }
 
       if (direction === "next") {
-        // Center → Left position (slide left, scale down, fade)
-        gsap.to(centerEl, {
-          left: "0%",
-          width: "20%",
-          scale: POSITIONS.left.scale,
-          opacity: POSITIONS.left.opacity,
-          duration: SLIDE_DURATION,
-          ease: "power2.inOut",
-        });
+        const newCenterProjectIndex = cardData[rightIdx];
+        const newRightProjectIndex = (newCenterProjectIndex + 1) % n;
 
-        // Right → Center position (slide left, scale up, full opacity)
-        gsap.to(rightEl, {
-          left: `calc(20% + ${GAP}px)`,
-          width: `calc(60% - ${GAP * 2}px)`,
-          scale: POSITIONS.center.scale,
-          opacity: POSITIONS.center.opacity,
-          duration: SLIDE_DURATION,
-          ease: "power2.inOut",
-        });
-
-        // Old Left → Instantly teleport off-screen right, then no animation
+        // 1. Teleport left card off-screen instantly
         gsap.set(leftEl, {
-          left: "80%",
-          width: "20%",
-          scale: POSITIONS.right.scale,
+          left: "102%",
+          width: "10%",
           opacity: 0,
+          zIndex: 1,
+          borderRadius: "20px 0 0 20px",
         });
-        // Then fade in at right position
+
+        // 2. Update teleported card's data (invisible, no blink)
+        setCardData((prev) => {
+          const next = [...prev] as [number, number, number];
+          next[leftIdx] = newRightProjectIndex;
+          return next;
+        });
+
+        // 3. Center → left (shrink + dim)
+        gsap.to(centerEl, {
+          ...POS_LEFT,
+          opacity: SIDE_OPACITY,
+          zIndex: 5,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // 4. Right → center (grow + brighten)
+        gsap.to(rightEl, {
+          ...POS_CENTER,
+          opacity: 1,
+          zIndex: 10,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // 5. Fade teleported card in at right position
         gsap.to(leftEl, {
-          opacity: POSITIONS.right.opacity,
-          duration: 0.2,
-          delay: SLIDE_DURATION * 0.7,
+          ...POS_RIGHT,
+          opacity: SIDE_OPACITY,
+          zIndex: 5,
+          duration: 0.3,
+          delay: SLIDE_DURATION * 0.6,
+          ease: "power2.out",
         });
 
-        // Update slots after animation
+        roleMap.current = {
+          left: centerIdx,
+          center: rightIdx,
+          right: leftIdx,
+        };
+
+        setCenterIndex(newCenterProjectIndex);
+
         setTimeout(() => {
-          setSlots((prev) => {
-            const newCenter = prev.right;
-            const newRight = (prev.right + 1) % n;
-            const newLeft = prev.center;
-            return { left: newLeft, center: newCenter, right: newRight };
-          });
-
-          // Reset GSAP transforms to match new positions
-          gsap.set(leftEl, {
-            left: "0%",
-            width: "20%",
-            scale: POSITIONS.left.scale,
-            opacity: POSITIONS.left.opacity,
-          });
-          gsap.set(centerEl, {
-            left: `calc(20% + ${GAP}px)`,
-            width: `calc(60% - ${GAP * 2}px)`,
-            scale: POSITIONS.center.scale,
-            opacity: POSITIONS.center.opacity,
-          });
-          gsap.set(rightEl, {
-            left: "80%",
-            width: "20%",
-            scale: POSITIONS.right.scale,
-            opacity: POSITIONS.right.opacity,
-          });
-
           isAnimating.current = false;
-        }, SLIDE_DURATION * 1000 + 50);
+        }, SLIDE_DURATION * 1000 + 80);
 
       } else {
-        // prev direction — mirror of next
+        // PREV direction — mirror
+        const newCenterProjectIndex = cardData[leftIdx];
+        const newLeftProjectIndex = (newCenterProjectIndex - 1 + n) % n;
 
-        // Center → Right position
-        gsap.to(centerEl, {
-          left: "80%",
-          width: "20%",
-          scale: POSITIONS.right.scale,
-          opacity: POSITIONS.right.opacity,
-          duration: SLIDE_DURATION,
-          ease: "power2.inOut",
-        });
-
-        // Left → Center position
-        gsap.to(leftEl, {
-          left: `calc(20% + ${GAP}px)`,
-          width: `calc(60% - ${GAP * 2}px)`,
-          scale: POSITIONS.center.scale,
-          opacity: POSITIONS.center.opacity,
-          duration: SLIDE_DURATION,
-          ease: "power2.inOut",
-        });
-
-        // Old Right → Teleport off-screen left, then position at left
+        // 1. Teleport right card off-screen left
         gsap.set(rightEl, {
-          left: "-22%",
-          width: "20%",
-          scale: POSITIONS.left.scale,
+          left: "-12%",
+          width: "10%",
           opacity: 0,
+          zIndex: 1,
+          borderRadius: "0 20px 20px 0",
         });
+
+        // 2. Update teleported card's data
+        setCardData((prev) => {
+          const next = [...prev] as [number, number, number];
+          next[rightIdx] = newLeftProjectIndex;
+          return next;
+        });
+
+        // 3. Center → right (shrink + dim)
+        gsap.to(centerEl, {
+          ...POS_RIGHT,
+          opacity: SIDE_OPACITY,
+          zIndex: 5,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // 4. Left → center (grow + brighten)
+        gsap.to(leftEl, {
+          ...POS_CENTER,
+          opacity: 1,
+          zIndex: 10,
+          duration: SLIDE_DURATION,
+          ease: "power2.inOut",
+        });
+
+        // 5. Fade teleported card in at left position
         gsap.to(rightEl, {
-          left: "0%",
-          opacity: POSITIONS.left.opacity,
-          duration: 0.2,
-          delay: SLIDE_DURATION * 0.7,
+          ...POS_LEFT,
+          opacity: SIDE_OPACITY,
+          zIndex: 5,
+          duration: 0.3,
+          delay: SLIDE_DURATION * 0.6,
+          ease: "power2.out",
         });
+
+        roleMap.current = {
+          left: rightIdx,
+          center: leftIdx,
+          right: centerIdx,
+        };
+
+        setCenterIndex(newCenterProjectIndex);
 
         setTimeout(() => {
-          setSlots((prev) => {
-            const newCenter = prev.left;
-            const newLeft = (prev.left - 1 + n) % n;
-            const newRight = prev.center;
-            return { left: newLeft, center: newCenter, right: newRight };
-          });
-
-          gsap.set(leftEl, {
-            left: "0%",
-            width: "20%",
-            scale: POSITIONS.left.scale,
-            opacity: POSITIONS.left.opacity,
-          });
-          gsap.set(centerEl, {
-            left: `calc(20% + ${GAP}px)`,
-            width: `calc(60% - ${GAP * 2}px)`,
-            scale: POSITIONS.center.scale,
-            opacity: POSITIONS.center.opacity,
-          });
-          gsap.set(rightEl, {
-            left: "80%",
-            width: "20%",
-            scale: POSITIONS.right.scale,
-            opacity: POSITIONS.right.opacity,
-          });
-
           isAnimating.current = false;
-        }, SLIDE_DURATION * 1000 + 50);
+        }, SLIDE_DURATION * 1000 + 80);
       }
     },
-    [n]
+    [n, cardData]
   );
 
   const handleVideoEnded = useCallback(() => {
@@ -237,7 +282,7 @@ export default function ProjectSlider({
     return () => window.removeEventListener("keydown", handleKey);
   }, [slideTo]);
 
-  // Cleanup GSAP tweens on unmount
+  // Cleanup GSAP on unmount
   useEffect(() => {
     return () => {
       cardRefs.current.forEach((el) => {
@@ -248,168 +293,165 @@ export default function ProjectSlider({
 
   if (!projects.length || n < 3) return null;
 
-  const leftProject = projects[slots.left];
-  const centerProject = projects[slots.center];
-  const rightProject = projects[slots.right];
+  // Derive center project for label
+  const centerElIdx = roleMap.current.center;
+  const centerProject = projects[cardData[centerElIdx]] || projects[0];
+
+  // ─── Render a card element ───
+  const renderCard = (elIdx: number) => {
+    const projIdx = cardData[elIdx];
+    const project = projects[projIdx] || projects[0];
+    const isCenter = roleMap.current.center === elIdx;
+    const isSide = !isCenter;
+    const gradient = getGradient(projIdx);
+
+    return (
+      <div
+        key={`card-el-${elIdx}`}
+        ref={(el) => { cardRefs.current[elIdx] = el; }}
+        className="absolute top-0 h-full overflow-hidden"
+        style={{
+          willChange: "transform, opacity",
+          cursor: isCenter ? "default" : "pointer",
+          ...(elIdx === 0 ? { ...POS_LEFT, borderRadius: POS_LEFT.borderRadius, zIndex: 5, opacity: SIDE_OPACITY } : {}),
+          ...(elIdx === 1 ? { ...POS_CENTER, borderRadius: POS_CENTER.borderRadius, zIndex: 10, opacity: 1 } : {}),
+          ...(elIdx === 2 ? { ...POS_RIGHT, borderRadius: POS_RIGHT.borderRadius, zIndex: 5, opacity: SIDE_OPACITY } : {}),
+        }}
+        onClick={() => {
+          if (roleMap.current.left === elIdx) slideTo("prev");
+          if (roleMap.current.right === elIdx) slideTo("next");
+        }}
+        onMouseEnter={() => {
+          if (roleMap.current.center === elIdx) setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          if (roleMap.current.center === elIdx) setIsHovered(false);
+        }}
+      >
+        {/* ─── Gradient placeholder as base layer (always present) ─── */}
+        <div
+          className="absolute inset-0 z-0 flex items-center justify-center"
+          style={{ background: gradient }}
+        >
+          <h3
+            className="text-white text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center px-8 select-none"
+            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+          >
+            {project.title}
+          </h3>
+        </div>
+
+        {/* Video only on center card element */}
+        {isCenter && project.videoPreviewLink && (
+          <div className="absolute inset-0 z-10">
+            <ProjectVideo
+              ref={videoRef}
+              src={project.videoPreviewLink}
+              thumbnail={project.thumbnail}
+              isActive={entryDone && isCenter}
+              onEnded={handleVideoEnded}
+              onLoadedMetadata={handleVideoMetadata}
+            />
+          </div>
+        )}
+
+        {/* Hover buttons only on center */}
+        {isCenter && (
+          <HoverButtons
+            isVisible={isHovered}
+            projectId={project._id || project.id}
+            liveLink={project.liveLink}
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <div ref={sectionRef} className="w-full">
-      {/* ─── Slider Container — FULL VIEWPORT ─── */}
-      <div
+      {/* ─── Slider — FULL VIEWPORT ─── */}
+      <motion.div
         className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden"
         style={{ height: "clamp(480px, 75vh, 850px)" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: entryDone ? 1 : 0 }}
+        transition={{ duration: 0.5 }}
       >
-        {/* CARD 0 — starts at LEFT position */}
-        <motion.div
-          ref={(el) => { cardRefs.current[0] = el; }}
-          className="absolute top-0 h-full cursor-pointer overflow-hidden"
+        {renderCard(0)}
+        {renderCard(1)}
+        {renderCard(2)}
+
+        {/* Left vignette mask */}
+        <div
+          className="absolute top-0 left-0 h-full z-30 pointer-events-none"
           style={{
-            left: "0%",
-            width: "20%",
-            borderRadius: "0 20px 20px 0",
-            willChange: "transform, opacity",
+            width: "120px",
+            background: "linear-gradient(to right, var(--background), transparent)",
           }}
-          initial={{ opacity: 0, x: -60 }}
-          animate={{
-            opacity: entryDone ? POSITIONS.left.opacity : 0,
-            x: entryDone ? 0 : -60,
-            scale: entryDone ? POSITIONS.left.scale : 0.92,
-          }}
-          transition={{
-            duration: 0.6,
-            ease: [0.65, 0, 0.35, 1],
-            delay: entryDone ? 0 : 0.6,
-          }}
-          onClick={() => slideTo("prev")}
-        >
-          <img
-            src={leftProject.thumbnail}
-            alt={leftProject.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </motion.div>
-
-        {/* CARD 1 — starts at CENTER position */}
-        <motion.div
-          ref={(el) => { cardRefs.current[1] = el; }}
-          className="absolute top-0 h-full overflow-hidden rounded-[20px]"
+        />
+        {/* Right vignette mask */}
+        <div
+          className="absolute top-0 right-0 h-full z-30 pointer-events-none"
           style={{
-            left: `calc(20% + ${GAP}px)`,
-            width: `calc(60% - ${GAP * 2}px)`,
-            willChange: "transform, opacity",
+            width: "120px",
+            background: "linear-gradient(to left, var(--background), transparent)",
           }}
-          initial={{ y: 120, opacity: 0 }}
-          animate={{
-            y: entryDone ? 0 : 120,
-            opacity: entryDone ? 1 : 0,
-          }}
-          transition={{
-            duration: 0.7,
-            ease: [0.25, 0.4, 0.25, 1],
-          }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <ProjectVideo
-            ref={videoRef}
-            key={`video-${slots.center}`}
-            src={centerProject.videoPreviewLink}
-            thumbnail={centerProject.thumbnail}
-            isActive={entryDone}
-            isPaused={isHovered}
-            onEnded={handleVideoEnded}
-          />
+        />
+      </motion.div>
 
-          {/* Hover Buttons */}
-          <HoverButtons
-            isVisible={isHovered}
-            projectId={centerProject._id || centerProject.id}
-            liveLink={centerProject.liveLink}
-          />
+      {/* ─── Project Label + Line Indicators ─── */}
+      <div className="flex flex-col items-center gap-4 mt-8">
+        {/* Project name + counter in small-caps */}
+        <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60">
+          {centerProject.title} — {String(centerIndex + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
+        </p>
 
-          {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-            <div className="bg-gradient-to-t from-black/50 via-black/15 to-transparent px-8 pb-5 pt-16">
-              <div className="flex items-center gap-3">
-                <span className="text-white/90 text-sm md:text-base font-semibold tracking-tight">
-                  {centerProject.title}
-                </span>
-                <span className="text-white/40 text-xs font-mono font-bold tracking-widest">
-                  {String(slots.center + 1).padStart(2, "0")}/{String(n).padStart(2, "0")}
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        {/* Line indicators */}
+        <div className="flex items-center gap-1.5">
+          {projects.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                if (i === centerIndex) return;
+                const diff = (i - centerIndex + n) % n;
+                if (diff <= n / 2) {
+                  slideTo("next");
+                } else {
+                  slideTo("prev");
+                }
+              }}
+              className="relative rounded-full overflow-hidden transition-all duration-500"
+              style={{
+                width: i === centerIndex ? "40px" : "20px",
+                height: "3px",
+              }}
+              aria-label={`Go to project ${i + 1}`}
+            >
+              {/* Inactive background track */}
+              <div className="absolute inset-0 bg-foreground/15 rounded-full" />
 
-        {/* CARD 2 — starts at RIGHT position */}
-        <motion.div
-          ref={(el) => { cardRefs.current[2] = el; }}
-          className="absolute top-0 h-full cursor-pointer overflow-hidden"
-          style={{
-            left: "80%",
-            width: "20%",
-            borderRadius: "20px 0 0 20px",
-            willChange: "transform, opacity",
-          }}
-          initial={{ opacity: 0, x: 60 }}
-          animate={{
-            opacity: entryDone ? POSITIONS.right.opacity : 0,
-            x: entryDone ? 0 : 60,
-            scale: entryDone ? POSITIONS.right.scale : 0.92,
-          }}
-          transition={{
-            duration: 0.6,
-            ease: [0.65, 0, 0.35, 1],
-            delay: entryDone ? 0 : 0.6,
-          }}
-          onClick={() => slideTo("next")}
-        >
-          <img
-            src={rightProject.thumbnail}
-            alt={rightProject.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </motion.div>
-      </div>
-
-      {/* Slide indicators */}
-      <div className="flex items-center justify-center gap-2 mt-6">
-        {projects.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              // Calculate direction and slide
-              if (i === slots.center) return;
-              const diff = (i - slots.center + n) % n;
-              if (diff <= n / 2) {
-                slideTo("next");
-              } else {
-                slideTo("prev");
-              }
-            }}
-            className={`transition-all duration-500 rounded-full ${
-              i === slots.center
-                ? "w-8 h-2 bg-foreground/70"
-                : "w-2 h-2 bg-foreground/15 hover:bg-foreground/30"
-            }`}
-            aria-label={`Go to project ${i + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* ─── Feature Cards Row ─── */}
-      {featureCards.length > 0 && (
-        <div className="w-screen left-1/2 -translate-x-1/2 relative mt-14 px-4 md:px-8">
-          <FeatureCardRow
-            featureCards={featureCards}
-            projects={projects}
-            activeProjectId={centerProject._id || centerProject.id}
-          />
+              {/* Active fill — animates left-to-right as progress */}
+              {i === centerIndex && (
+                <motion.div
+                  key={`progress-${centerIndex}-${progressKey}`}
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: "var(--foreground)",
+                    opacity: 0.7,
+                    transformOrigin: "left center",
+                  }}
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{
+                    duration: videoDuration,
+                    ease: "linear",
+                  }}
+                />
+              )}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

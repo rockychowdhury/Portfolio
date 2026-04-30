@@ -15,15 +15,12 @@ export default function FeatureCard({
   projectName,
 }: FeatureCardProps) {
   return (
-    <a
-      href={card.ctaLink}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block w-[320px] rounded-xl overflow-hidden bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+    <div
+      className="group block w-full h-full rounded-2xl overflow-hidden bg-card border border-border/30 transition-all duration-300 hover:-translate-y-1"
       style={{ willChange: "transform" }}
     >
-      {/* Image — top 55% */}
-      <div className="relative w-full h-[110px] overflow-hidden">
+      {/* Image — top portion, fills proportionally */}
+      <div className="relative w-full aspect-[16/10] overflow-hidden">
         <img
           src={card.image}
           alt={card.headline}
@@ -44,19 +41,24 @@ export default function FeatureCard({
         </div>
       </div>
 
-      {/* Text — bottom 45% */}
-      <div className="p-4 flex flex-col gap-2">
-        <h4 className="text-sm font-bold text-foreground leading-snug tracking-tight line-clamp-2">
+      {/* Text — bottom portion */}
+      <div className="p-4 flex flex-col gap-1.5">
+        <h4 className="text-sm font-bold text-foreground leading-snug tracking-tight line-clamp-1">
           {card.headline}
         </h4>
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
           {card.subtext}
         </p>
-        <div className="flex items-center gap-1 mt-1 text-xs font-semibold text-foreground/60 group-hover:text-foreground transition-colors">
+        <a
+          href={card.ctaLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 mt-1 text-xs font-semibold text-foreground/50 hover:text-foreground transition-colors w-fit"
+        >
           {card.ctaLabel}
           <ArrowRight className="size-3 group-hover:translate-x-[3px] transition-transform" />
-        </div>
+        </a>
       </div>
-    </a>
+    </div>
   );
 }
