@@ -1,8 +1,8 @@
-import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useSpring, useTransform, AnimatePresence, useMotionValue } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import MiniSparkline from "./MiniSparkline";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, ExternalLink } from "lucide-react";
 
 interface PlatformCardProps {
   name: string;
@@ -16,7 +16,6 @@ interface PlatformCardProps {
   color: string;
   profileUrl: string;
   loading?: boolean;
-  // Specific for LeetCode circle graph
   solvedStats?: {
     easy: number;
     medium: number;
@@ -52,10 +51,43 @@ export default function PlatformCard({
   percentageDisplay,
 }: PlatformCardProps) {
   const [copied, setCopied] = useState(false);
+  const cardRef = useRef<HTMLAnchorElement>(null);
+
+  // --- 3D Hover & Spotlight Effects ---
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [5, -5]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-5, 5]);
+  
+  const springConfig = { damping: 20, stiffness: 100, mass: 0.5 };
+  const springRotateX = useSpring(rotateX, springConfig);
+  const springRotateY = useSpring(rotateY, springConfig);
+
+  const spotlightBackground = useTransform(
+    [mouseX, mouseY],
+    ([x, y]) => `radial-gradient(circle at ${(x as number + 0.5) * 100}% ${(y as number + 0.5) * 100}%, var(--brand-color) 0%, transparent 50%)`
+  );
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Normalize coordinates from -0.5 to 0.5
+    mouseX.set((x / rect.width) - 0.5);
+    mouseY.set((y / rect.height) - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   if (loading) {
     return (
-      <div className="h-[460px] bg-secondary/5 border border-border/10 rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] animate-pulse" />
+      <div className="h-[460px] bg-secondary/5 border border-border/10 rounded-3xl animate-pulse" />
     );
   }
 
@@ -72,86 +104,81 @@ export default function PlatformCard({
 
   return (
     <motion.a
+      ref={cardRef}
       href={profileUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex flex-col rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] bg-transparent p-8 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] min-h-[460px] overflow-hidden"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group relative flex flex-col rounded-3xl bg-transparent p-8 transition-shadow duration-700 hover:shadow-2xl min-h-[460px] cursor-pointer"
       style={{ 
+        rotateX: springRotateX,
+        rotateY: springRotateY,
+        transformStyle: "preserve-3d",
         // @ts-ignore
-        '--hover-color': color 
+        '--brand-color': color 
       }}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
     >
-      {/* Clipped Background & Border Layer */}
-      <div className="absolute inset-0 rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] border border-border/10 pointer-events-none z-0">
-        {/* Inner background container */}
-        <div className="absolute inset-[1px] rounded-tl-[3.4rem] rounded-br-[3.4rem] rounded-tr-[1.4rem] rounded-bl-[1.4rem] overflow-hidden">
-          {/* Base Background - Theme Aware */}
-          <div className="absolute inset-0 bg-card/80 backdrop-blur-sm" />
-
-          {/* Premium Mesh Gradient Background */}
-          <div 
-            className="absolute inset-0 opacity-100 transition-all duration-1000 group-hover:scale-110"
-            style={{ 
-              background: `radial-gradient(circle at 0% 0%, ${color}25 0%, transparent 60%), 
-                           radial-gradient(circle at 100% 100%, ${color}15 0%, transparent 60%),
-                           radial-gradient(circle at 50% 50%, ${color}08 0%, transparent 100%)`,
-            }}
-          />
-          
-          {/* Noise Texture Overlay */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
-
-          {/* Glass Header Inlay */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-white/[0.03] dark:bg-white/[0.01] border-b border-white/5 backdrop-blur-md" />
-        </div>
-        
-        {/* Dynamic Hover Border */}
-        <div className="absolute inset-0 border border-transparent rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-[1.5rem] rounded-bl-[1.5rem] transition-all duration-700 group-hover:border-[var(--hover-color)]/40 group-hover:shadow-[inset_0_0_20px_rgba(255,255,255,0.02)] z-20" />
+      {/* ── Background & Borders ── */}
+      <div className="absolute inset-0 rounded-3xl border border-white/5 bg-[#0a0a0a]/90 backdrop-blur-xl overflow-hidden -z-10 shadow-inner">
+        {/* Spotlight Follower */}
+        <motion.div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: spotlightBackground,
+            mixBlendMode: "screen",
+            opacity: 0.15
+          }}
+        />
+        {/* Subtle Brand Glow */}
+        <div 
+          className="absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[100px] opacity-20 pointer-events-none"
+          style={{ backgroundColor: color }}
+        />
+        {/* Noise Texture */}
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
-      {/* Header Row */}
-      <div className="flex items-start justify-between relative z-10 mb-8">
+      <div className="absolute inset-0 rounded-3xl border border-transparent group-hover:border-[var(--brand-color)]/30 transition-colors duration-500 pointer-events-none -z-10" />
+
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between relative z-10 mb-8" style={{ transform: "translateZ(30px)" }}>
         <div className="flex items-center gap-4">
-          <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white/[0.05] p-3.5 border border-white/10 shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
+          {/* Logo Container */}
+          <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white/5 p-3 border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
             <Image 
               src={iconPath} 
               alt={name} 
               fill 
-              className="object-contain p-1.5 filter brightness-110"
+              className="object-contain p-1 filter drop-shadow-md"
             />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
+          
           <div className="flex flex-col">
-            <h3 className="text-xl font-bold tracking-tight text-foreground leading-none mb-1.5">{name}</h3>
+            <h3 className="text-xl font-bold tracking-tight text-white leading-none mb-1.5 flex items-center gap-2">
+              {name}
+              <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-[var(--brand-color)] transition-colors" />
+            </h3>
             <div className="flex items-center gap-1.5 group/copy relative z-30">
-              <span className="text-[10px] font-mono font-bold text-muted-foreground/30 uppercase tracking-widest">{username}</span>
+              <span className="text-[10px] font-mono font-medium text-white/40 uppercase tracking-widest">{username}</span>
               <button 
                 onClick={copyUsername}
-                className="relative p-1 rounded-md bg-secondary/0 hover:bg-secondary/50 transition-colors duration-300 cursor-pointer"
+                className="relative p-1 rounded-md hover:bg-white/10 transition-colors duration-300"
                 title="Copy Username"
               >
                 <AnimatePresence mode="wait">
                   {copied ? (
-                    <motion.div
-                      key="check"
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.5, opacity: 0 }}
-                    >
-                      <Check className="size-2.5 text-green-500" />
+                    <motion.div key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                      <Check className="w-3 h-3 text-green-400" />
                     </motion.div>
                   ) : (
-                    <motion.div
-                      key="copy"
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.5, opacity: 0 }}
-                      className="opacity-0 group-hover/copy:opacity-100 transition-opacity"
-                    >
-                      <Copy className="size-2.5 text-muted-foreground/80" />
+                    <motion.div key="copy" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} className="opacity-0 group-hover/copy:opacity-100 transition-opacity">
+                      <Copy className="w-3 h-3 text-white/40 hover:text-white" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -160,124 +187,79 @@ export default function PlatformCard({
           </div>
         </div>
         
-        <div className="flex flex-col items-end text-right">
-          <div className="mb-2">
-            {isLeetCode && percentageDisplay ? (
-               <div className="flex flex-col items-end">
-                  <span className="text-xl font-black leading-none" style={{ color: color }}>{percentageDisplay}</span>
-                  <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] mt-1.5">in global</span>
-               </div>
-            ) : (
-              <span className="text-xl font-black leading-none block" style={{ color: color }}>
-                {rankDisplay}
-              </span>
-            )}
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Peak</span>
-            <span className="text-sm font-black tabular-nums" style={{ color: color }}>
-              <Counter value={maxRating} />
+        {/* Status Pill */}
+        <div className="flex flex-col items-end">
+          <div className="px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center gap-2 shadow-sm">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+            <span className="text-xs font-bold tracking-wide" style={{ color: color }}>
+              {isLeetCode && percentageDisplay ? percentageDisplay : rankDisplay}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Body Stats Area - flex-1 to push footer down */}
-      <div className="flex-1 flex flex-col justify-center relative z-10">
-        <div className="flex items-center justify-between gap-6">
-          {isLeetCode && solvedStats ? (
-            <div className="flex flex-col md:flex-row items-center gap-6 flex-1">
-               {/* LeetCode Donut Chart */}
-               <div className="relative h-28 w-28 transition-transform duration-700 group-hover:scale-105">
-                  <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-                    <circle cx="50" cy="50" r="42" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-muted-foreground/5" />
-                    <motion.circle 
-                      cx="50" cy="50" r="42" fill="transparent" stroke="#00b8a3" strokeWidth="10"
-                      strokeDasharray="263.89"
-                      initial={{ strokeDashoffset: 263.89 }}
-                      whileInView={{ strokeDashoffset: 263.89 - (solvedStats.easy / totalSolved) * 263.89 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, ease: "circOut" }}
-                      strokeLinecap="round"
-                    />
-                    <motion.circle 
-                      cx="50" cy="50" r="42" fill="transparent" stroke="#ffc01e" strokeWidth="10"
-                      strokeDasharray="263.89"
-                      initial={{ strokeDashoffset: 263.89 }}
-                      whileInView={{ strokeDashoffset: 263.89 - (solvedStats.medium / totalSolved) * 263.89 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, delay: 0.2, ease: "circOut" }}
-                      strokeLinecap="round"
-                      transform={`rotate(${(solvedStats.easy / totalSolved) * 360} 50 50)`}
-                    />
-                    <motion.circle 
-                      cx="50" cy="50" r="42" fill="transparent" stroke="#ff375f" strokeWidth="10"
-                      strokeDasharray="263.89"
-                      initial={{ strokeDashoffset: 263.89 }}
-                      whileInView={{ strokeDashoffset: 263.89 - (solvedStats.hard / totalSolved) * 263.89 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, delay: 0.4, ease: "circOut" }}
-                      strokeLinecap="round"
-                      transform={`rotate(${((solvedStats.easy + solvedStats.medium) / totalSolved) * 360} 50 50)`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                     <span className="text-xl font-black text-foreground leading-none"><Counter value={totalSolved} /></span>
-                     <span className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-widest mt-1.5">Solved</span>
+      {/* ── Body Stats ── */}
+      <div className="flex-1 flex flex-col justify-center relative z-10" style={{ transform: "translateZ(40px)" }}>
+        <div className="flex flex-col gap-8">
+          
+          {/* Row 1: Problems Solved */}
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+              Problems Solved
+            </span>
+            
+            <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+              <div className="text-6xl lg:text-7xl font-black text-white tracking-tighter tabular-nums drop-shadow-lg leading-none">
+                <Counter value={solveCount} />
+              </div>
+              
+              {isLeetCode && solvedStats && (
+                <div className="flex items-center gap-2 pb-1.5">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/5 shadow-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00b8a3]" />
+                    <span className="text-sm font-bold text-white/80">{solvedStats.easy}</span>
                   </div>
-               </div>
-               
-               <div className="flex flex-col md:flex-row flex-1 justify-between items-center md:ml-2 gap-6 md:gap-0">
-                  <div className="flex flex-col gap-2">
-                     <div className="flex items-center gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00b8a3]" />
-                        <span className="text-[10px] font-bold text-muted-foreground/60 w-12">Easy</span>
-                        <span className="text-xs font-black text-foreground tabular-nums">{solvedStats.easy}</span>
-                     </div>
-                     <div className="flex items-center gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#ffc01e]" />
-                        <span className="text-[10px] font-bold text-muted-foreground/60 w-12">Medium</span>
-                        <span className="text-xs font-black text-foreground tabular-nums">{solvedStats.medium}</span>
-                     </div>
-                     <div className="flex items-center gap-2.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#ff375f]" />
-                        <span className="text-[10px] font-bold text-muted-foreground/60 w-12">Hard</span>
-                        <span className="text-xs font-black text-foreground tabular-nums">{solvedStats.hard}</span>
-                     </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/5 shadow-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#ffc01e]" />
+                    <span className="text-sm font-bold text-white/80">{solvedStats.medium}</span>
                   </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/5 shadow-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#ff375f]" />
+                    <span className="text-sm font-bold text-white/80">{solvedStats.hard}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-                  <div className="flex flex-col items-center md:items-end gap-1">
-                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Contests</span>
-                     <div className="text-3xl md:text-4xl font-black text-foreground/90 tracking-tighter tabular-nums">
-                        <Counter value={contestCount} />
-                     </div>
-                  </div>
-               </div>
-            </div>
-          ) : (
-            <div className="flex flex-1 justify-between items-center">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Solved</span>
-                <div className="text-4xl md:text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
-                  <Counter value={solveCount} />
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1.5">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Contests</span>
-                <div className="text-4xl md:text-5xl font-black text-foreground/80 tracking-tighter tabular-nums">
-                  <Counter value={contestCount} />
-                </div>
+          {/* Row 2: Contests & Peak Rating */}
+          <div className="flex items-center gap-10">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Contests</span>
+              <div className="text-3xl font-black text-white/80 tracking-tighter tabular-nums leading-none">
+                <Counter value={contestCount} />
               </div>
             </div>
-          )}
+
+            {maxRating > 0 && (
+              <div className="flex flex-col border-l border-white/10 pl-6">
+                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Peak Rating</span>
+                <div className="text-3xl font-black tracking-tighter tabular-nums leading-none" style={{ color: color }}>
+                  <Counter value={maxRating} />
+                </div>
+              </div>
+            )}
+          </div>
+          
         </div>
       </div>
 
-      {/* Sparkline Graph Area - Full Width at bottom */}
-      <div className="mt-auto pt-6 -mx-8 -mb-8 relative z-10 rounded-br-[3.5rem] rounded-bl-[1.5rem] overflow-hidden">
-        <div className="h-28 w-full transition-all duration-700 group-hover:scale-[1.02] origin-bottom">
-           <MiniSparkline data={ratingGraph} color={color} width={500} height={120} strokeWidth={3.5} />
-        </div>
+      {/* ── Graph Footer ── */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none rounded-b-3xl overflow-hidden -z-0 opacity-80 mix-blend-screen">
+        {/* Fade mask for smooth integration */}
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[#0a0a0a]/50 to-[#0a0a0a] z-10" />
+        <MiniSparkline data={ratingGraph} color={color} width={400} height={128} strokeWidth={2} />
       </div>
     </motion.a>
   );

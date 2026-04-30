@@ -7,6 +7,7 @@ import {
   useSpring,
   useInView,
   animate,
+  AnimatePresence,
 } from "framer-motion";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
@@ -114,12 +115,23 @@ export default function HeroSection({
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Real stats
   const [stats, setStats] = useState({
     totalSolved: 0,
     projectCount: 0,
   });
   const [statsLoaded, setStatsLoaded] = useState(false);
+
+  // Title Carousel
+  const titles = ["Software Engineer", "Full Stack dev", "Problem Solver"];
+  const [titleIndex, setTitleIndex] = useState(0);
+
+  useEffect(() => {
+    if (!preloaderDone) return;
+    const interval = setInterval(() => {
+      setTitleIndex((prev) => (prev + 1) % titles.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [preloaderDone]);
 
   const resumeUrl =
     process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
@@ -259,10 +271,52 @@ export default function HeroSection({
                 animate={preloaderDone ? "visible" : "hidden"}
                 className="mt-6 lg:mt-10 flex items-center gap-4"
               >
-                <div className="h-px w-8 bg-foreground" />
-                <p className="text-lg font-medium text-foreground md:text-xl">
-                  It&apos;s Rocky Chowdhury a Software Engineer
-                </p>
+                <div className="h-px w-8 bg-foreground shrink-0" />
+                <div className="text-lg font-medium text-foreground md:text-xl flex flex-wrap items-center gap-[0.3em]">
+                  It&apos;s Rocky Chowdhury a 
+                  <div 
+                    className="relative flex h-[1.5em] w-[200px]"
+                    style={{ perspective: "800px" }}
+                  >
+                    <AnimatePresence mode="popLayout">
+                      <motion.div
+                        key={titleIndex}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={{
+                          hidden: { opacity: 1 },
+                          visible: { opacity: 1, transition: { staggerChildren: 0.035 } },
+                          exit: { opacity: 1, transition: { staggerChildren: 0.035 } }
+                        }}
+                        className="absolute left-0 top-0 bottom-0 flex items-center whitespace-nowrap font-bold text-foreground"
+                        style={{ transformStyle: "preserve-3d" }}
+                      >
+                        {titles[titleIndex].split("").map((char, i) => (
+                          <motion.span
+                            key={i}
+                            variants={{
+                              hidden: { rotateX: -90, y: 15, opacity: 0 },
+                              visible: { rotateX: 0, y: 0, opacity: 1 },
+                              exit: { rotateX: 90, y: -15, opacity: 0 }
+                            }}
+                            transition={{
+                              duration: 0.5,
+                              ease: [0.23, 1, 0.32, 1],
+                            }}
+                            style={{ 
+                              display: "inline-block", 
+                              transformOrigin: "50% 50% -8px",
+                              whiteSpace: "pre" 
+                            }}
+                          >
+                            {char}
+                          </motion.span>
+                        ))}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Recruiter CTAs */}

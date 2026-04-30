@@ -87,7 +87,14 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
       <nav className={`flex w-full max-w-[1400px] mx-auto items-center justify-between transition-all duration-500 ${scrolled ? 'px-4' : 'px-4 xs:px-6 md:px-12 lg:px-20'}`}>
         <div className="flex items-center gap-10">
           {/* Logo — anchor for preloader morph target */}
-          <Link href="/" className="group flex items-center">
+          <Link 
+            href="#hero" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="group flex items-center"
+          >
             <span
               id="navbar-logo-anchor"
               className={`text-xl font-black uppercase tracking-tighter text-foreground ${

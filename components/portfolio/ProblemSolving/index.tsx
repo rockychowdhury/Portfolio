@@ -154,7 +154,7 @@ export default function ProblemSolvingSection() {
           />
         </div>
 
-        {/* Main Grid for Cards - Now 3 Columns */}
+        {/* Main Grid for Cards - Premium 3-Column Layout */}
         <div className="flex justify-center w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
             {/* LeetCode Card */}
