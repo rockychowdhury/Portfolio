@@ -68,7 +68,7 @@ export default function ProjectsSection() {
                   viewport={{ once: true }}
                   className="flex flex-col"
                 >
-                  <h2 className="flex flex-wrap items-end text-[clamp(3.5rem,9vw,7rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
+                  <h2 className="flex flex-wrap items-end text-[clamp(2.5rem,9vw,7rem)] font-medium leading-[1.1] tracking-tighter text-foreground">
                     {headerLetters.map((letter, i) => (
                       <motion.span
                         key={i}
