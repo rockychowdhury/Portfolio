@@ -688,26 +688,69 @@ export default function SkillsSection() {
 
         {/* Top Skills Prominent Bar */}
         {topSkills.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1, delay: 1 }}
-            className="relative z-20 flex items-center justify-center gap-2 md:gap-4 flex-wrap mb-16 md:mb-20"
-          >
-            <span className="text-[10px] md:text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mr-2">Top Skills ›</span>
-            {topSkills.map((s) => {
-              const Icon = getIcon(s.icon, s.icon_group);
-              return (
-                <div
-                  key={s._id}
-                  className="flex items-center gap-2 px-2 py-1 transition-all duration-300 group hover:scale-110"
-                >
-                  {Icon && <Icon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-foreground transition-colors" style={{ color: s.color }} />}
-                  <span className="text-sm md:text-base font-medium text-muted-foreground group-hover:text-foreground transition-colors">{s.name}</span>
-                </div>
-              )
-            })}
-          </motion.div>
+          <div className="relative z-20 flex flex-col items-center mb-16 md:mb-24">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={isTitleInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex items-center gap-3 mb-8"
+            >
+              <div className="h-px w-8 bg-foreground/10" />
+              <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.3em]">Core Expertise</span>
+              <div className="h-px w-8 bg-foreground/10" />
+            </motion.div>
+
+            <motion.div
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.1, delayChildren: 1.1 }
+                }
+              }}
+              initial="hidden"
+              animate={isTitleInView ? "visible" : "hidden"}
+              className="flex items-center justify-center gap-3 md:gap-5 flex-wrap px-4 max-w-5xl"
+            >
+              {topSkills.map((s) => {
+                const Icon = getIcon(s.icon, s.icon_group);
+                return (
+                  <motion.div
+                    key={s._id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20, scale: 0.9, filter: "blur(10px)" },
+                      visible: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+                    }}
+                    whileHover={{ 
+                      y: -8, 
+                      scale: 1.05,
+                      transition: { duration: 0.3, ease: "easeOut" }
+                    }}
+                    className="relative flex items-center gap-3 px-5 py-3 rounded-[20px] bg-secondary/20 backdrop-blur-md border border-white/5 transition-all duration-500 group hover:bg-secondary/40 hover:border-white/10 cursor-default shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] overflow-hidden"
+                  >
+                    {/* Brand Glow on Hover */}
+                    <div 
+                      className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-700 pointer-events-none"
+                      style={{ backgroundColor: s.color || 'var(--primary)' }}
+                    />
+                    
+                    {/* Subtle Shine Effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
+                    {Icon && (
+                      <Icon 
+                        className="w-6 h-6 md:w-7 md:h-7 text-muted-foreground transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" 
+                        style={{ color: s.color }} 
+                      />
+                    )}
+                    <span className="text-sm md:text-lg font-black text-foreground/70 group-hover:text-foreground transition-colors tracking-tight">
+                      {s.name}
+                    </span>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
         )}
 
         {/* Shape Groups */}
