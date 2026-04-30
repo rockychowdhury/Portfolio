@@ -46,7 +46,7 @@ const ProjectVideo = forwardRef<HTMLVideoElement, ProjectVideoProps>(
         <img
           src={thumbnail}
           alt="Project preview"
-          className="absolute inset-0 w-full h-full object-cover z-0"
+          className="absolute inset-0 w-full h-full object-contain z-0"
         />
 
         {/* Video element */}
@@ -58,7 +58,7 @@ const ProjectVideo = forwardRef<HTMLVideoElement, ProjectVideoProps>(
           preload={isActive ? "auto" : "none"}
           onEnded={onEnded}
           onLoadedMetadata={onLoadedMetadata}
-          className="absolute inset-0 w-full h-full object-cover z-10"
+          className="absolute inset-0 w-full h-full object-contain z-10"
           style={{ willChange: "transform" }}
         />
       </div>

@@ -21,6 +21,7 @@ export default function Preloader({
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     const totalLetterTime = LETTERS.length * 120 + 400;
 
@@ -63,6 +64,7 @@ export default function Preloader({
 
   const handleMorphComplete = () => {
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     onComplete?.();
   };
 

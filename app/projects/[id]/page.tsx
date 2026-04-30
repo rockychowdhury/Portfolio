@@ -6,6 +6,7 @@ import { processMarkdown } from "@/lib/processMarkdown";
 import DetailLayout from "@/components/ProjectDetail/DetailLayout";
 import DetailHeroVideo from "@/components/ProjectDetail/DetailHeroVideo";
 import DetailCTARow from "@/components/ProjectDetail/DetailCTARow";
+import ProjectDetailShell from "@/components/ProjectDetail/ProjectDetailShell";
 
 import type { Metadata } from "next";
 
@@ -92,27 +93,30 @@ export default async function ProjectDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Video */}
-      <DetailHeroVideo
-        videoSrc={project.videoPreviewLink}
-        thumbnail={project.thumbnail}
-        title={project.title}
-      />
+    <ProjectDetailShell projectTitle={project.title}>
+      <div className="min-h-screen bg-background pt-20">
+        {/* Hero Video */}
+        <DetailHeroVideo
+          videoSrc={project.videoPreviewLink}
+          thumbnail={project.thumbnail}
+          title={project.title}
+        />
 
-      {/* CTA Buttons */}
-      <DetailCTARow
-        githubLink={project.githubLink}
-        liveLink={project.liveLink}
-        youtubeLink={project.youtubeLink}
-      />
+        {/* CTA Buttons */}
+        <DetailCTARow
+          githubLink={project.githubLink}
+          liveLink={project.liveLink}
+          youtubeLink={project.youtubeLink}
+        />
 
-      {/* Main Content */}
-      <DetailLayout
-        readmeHtml={readmeHtml}
-        toc={toc}
-        project={project}
-      />
-    </div>
+        {/* Main Content */}
+        <DetailLayout
+          readmeHtml={readmeHtml}
+          toc={toc}
+          project={project}
+        />
+      </div>
+    </ProjectDetailShell>
   );
 }
+

@@ -11,8 +11,8 @@ import HoverButtons from "./HoverButtons";
 // ─── Constants ───
 const SLIDE_DURATION = 0.55;
 const DEBOUNCE_MS = 650;
-const GAP = 10;
-const VIDEO_FALLBACK_DURATION = 8; // seconds, used when no video or duration unavailable
+const GAP = 12;
+const VIDEO_FALLBACK_DURATION = 8;
 
 // ─── Per-project gradient pairs (derived from PROJECT_COLORS palette) ───
 const PROJECT_GRADIENTS = [
@@ -26,21 +26,29 @@ const PROJECT_GRADIENTS = [
   { from: "#ec4899", to: "#831843" }, // pink → dark magenta
 ];
 
-// Position presets (GSAP targets) — 10% side cards
-const POS_LEFT = { left: "0%", width: "10%", borderRadius: "0 20px 20px 0" };
+// ─── Side card widths ───
+const SIDE_WIDTH = "13%";
+const SIDE_WIDTH_NUM = 13; // numeric for calc
+
+// Position presets (GSAP targets)
+const POS_LEFT = { left: "0%", width: SIDE_WIDTH, borderRadius: "0 16px 16px 0" };
 const POS_CENTER = {
-  left: `calc(10% + ${GAP}px)`,
-  width: `calc(80% - ${GAP * 2}px)`,
-  borderRadius: "20px",
+  left: `calc(${SIDE_WIDTH_NUM}% + ${GAP}px)`,
+  width: `calc(${100 - SIDE_WIDTH_NUM * 2}% - ${GAP * 2}px)`,
+  borderRadius: "16px",
 };
-const POS_RIGHT = { left: "90%", width: "10%", borderRadius: "20px 0 0 20px" };
+const POS_RIGHT = {
+  left: `${100 - SIDE_WIDTH_NUM}%`,
+  width: SIDE_WIDTH,
+  borderRadius: "16px 0 0 16px",
+};
 
 // Side card opacity
-const SIDE_OPACITY = 0.35;
+const SIDE_OPACITY = 0.3;
 
 function getGradient(projectIndex: number) {
   const g = PROJECT_GRADIENTS[projectIndex % PROJECT_GRADIENTS.length];
-  return `linear-gradient(135deg, ${g.from}, ${g.to})`;
+  return `linear-gradient(135deg, ${g.from} 0%, ${g.to} 100%)`;
 }
 
 export default function ProjectSlider({
@@ -53,9 +61,7 @@ export default function ProjectSlider({
   const isAnimating = useRef(false);
   const lastSlideTime = useRef(0);
 
-  // Which project index each of the 3 card elements shows
   const [cardData, setCardData] = useState<[number, number, number]>([0, 0, 0]);
-  // Which card element (0, 1, 2) is currently at which position
   const roleMap = useRef<{ left: number; center: number; right: number }>({
     left: 0,
     center: 1,
@@ -66,20 +72,17 @@ export default function ProjectSlider({
   const [entryDone, setEntryDone] = useState(false);
   const [centerIndex, setCenterIndex] = useState(0);
   const [videoDuration, setVideoDuration] = useState(VIDEO_FALLBACK_DURATION);
-
-  // Track a key that resets when center changes, to restart progress animation
   const [progressKey, setProgressKey] = useState(0);
 
   const isInView = useRef(false);
   const n = projects.length;
 
-  // Card DOM refs
   const cardRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 
   // Initialize card data
   useEffect(() => {
     if (n < 3) return;
-    setCardData([(n - 1) % n, 0, 1 % n]); // left, center, right
+    setCardData([(n - 1) % n, 0, 1 % n]);
     setCenterIndex(0);
   }, [n]);
 
@@ -95,14 +98,14 @@ export default function ProjectSlider({
           setTimeout(() => setEntryDone(true), 100);
         }
       },
-      { rootMargin: "-30% 0px" }
+      { rootMargin: "-20% 0px" }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // Handle video metadata loaded — read actual duration
+  // Handle video metadata — read actual duration
   const handleVideoMetadata = useCallback(() => {
     const video = videoRef.current;
     if (video && video.duration && isFinite(video.duration)) {
@@ -110,11 +113,10 @@ export default function ProjectSlider({
     } else {
       setVideoDuration(VIDEO_FALLBACK_DURATION);
     }
-    // Reset progress animation
     setProgressKey((k) => k + 1);
   }, []);
 
-  // When center changes, reset duration to fallback until video loads
+  // When center changes, reset duration to fallback until video metadata loads
   useEffect(() => {
     const centerProject = projects[centerIndex];
     if (!centerProject?.videoPreviewLink) {
@@ -147,23 +149,20 @@ export default function ProjectSlider({
         const newCenterProjectIndex = cardData[rightIdx];
         const newRightProjectIndex = (newCenterProjectIndex + 1) % n;
 
-        // 1. Teleport left card off-screen instantly
         gsap.set(leftEl, {
           left: "102%",
-          width: "10%",
+          width: SIDE_WIDTH,
           opacity: 0,
           zIndex: 1,
-          borderRadius: "20px 0 0 20px",
+          borderRadius: POS_RIGHT.borderRadius,
         });
 
-        // 2. Update teleported card's data (invisible, no blink)
         setCardData((prev) => {
           const next = [...prev] as [number, number, number];
           next[leftIdx] = newRightProjectIndex;
           return next;
         });
 
-        // 3. Center → left (shrink + dim)
         gsap.to(centerEl, {
           ...POS_LEFT,
           opacity: SIDE_OPACITY,
@@ -172,7 +171,6 @@ export default function ProjectSlider({
           ease: "power2.inOut",
         });
 
-        // 4. Right → center (grow + brighten)
         gsap.to(rightEl, {
           ...POS_CENTER,
           opacity: 1,
@@ -181,7 +179,6 @@ export default function ProjectSlider({
           ease: "power2.inOut",
         });
 
-        // 5. Fade teleported card in at right position
         gsap.to(leftEl, {
           ...POS_RIGHT,
           opacity: SIDE_OPACITY,
@@ -204,27 +201,23 @@ export default function ProjectSlider({
         }, SLIDE_DURATION * 1000 + 80);
 
       } else {
-        // PREV direction — mirror
         const newCenterProjectIndex = cardData[leftIdx];
         const newLeftProjectIndex = (newCenterProjectIndex - 1 + n) % n;
 
-        // 1. Teleport right card off-screen left
         gsap.set(rightEl, {
-          left: "-12%",
-          width: "10%",
+          left: `-${SIDE_WIDTH_NUM + 2}%`,
+          width: SIDE_WIDTH,
           opacity: 0,
           zIndex: 1,
-          borderRadius: "0 20px 20px 0",
+          borderRadius: POS_LEFT.borderRadius,
         });
 
-        // 2. Update teleported card's data
         setCardData((prev) => {
           const next = [...prev] as [number, number, number];
           next[rightIdx] = newLeftProjectIndex;
           return next;
         });
 
-        // 3. Center → right (shrink + dim)
         gsap.to(centerEl, {
           ...POS_RIGHT,
           opacity: SIDE_OPACITY,
@@ -233,7 +226,6 @@ export default function ProjectSlider({
           ease: "power2.inOut",
         });
 
-        // 4. Left → center (grow + brighten)
         gsap.to(leftEl, {
           ...POS_CENTER,
           opacity: 1,
@@ -242,7 +234,6 @@ export default function ProjectSlider({
           ease: "power2.inOut",
         });
 
-        // 5. Fade teleported card in at left position
         gsap.to(rightEl, {
           ...POS_LEFT,
           opacity: SIDE_OPACITY,
@@ -293,17 +284,21 @@ export default function ProjectSlider({
 
   if (!projects.length || n < 3) return null;
 
-  // Derive center project for label
   const centerElIdx = roleMap.current.center;
   const centerProject = projects[cardData[centerElIdx]] || projects[0];
 
-  // ─── Render a card element ───
+  // ─── Render a single card element ───
   const renderCard = (elIdx: number) => {
     const projIdx = cardData[elIdx];
     const project = projects[projIdx] || projects[0];
     const isCenter = roleMap.current.center === elIdx;
-    const isSide = !isCenter;
     const gradient = getGradient(projIdx);
+
+    // Determine initial position preset
+    const initialPos =
+      elIdx === 0 ? POS_LEFT : elIdx === 1 ? POS_CENTER : POS_RIGHT;
+    const initialOpacity = elIdx === 1 ? 1 : SIDE_OPACITY;
+    const initialZIndex = elIdx === 1 ? 10 : 5;
 
     return (
       <div
@@ -313,9 +308,10 @@ export default function ProjectSlider({
         style={{
           willChange: "transform, opacity",
           cursor: isCenter ? "default" : "pointer",
-          ...(elIdx === 0 ? { ...POS_LEFT, borderRadius: POS_LEFT.borderRadius, zIndex: 5, opacity: SIDE_OPACITY } : {}),
-          ...(elIdx === 1 ? { ...POS_CENTER, borderRadius: POS_CENTER.borderRadius, zIndex: 10, opacity: 1 } : {}),
-          ...(elIdx === 2 ? { ...POS_RIGHT, borderRadius: POS_RIGHT.borderRadius, zIndex: 5, opacity: SIDE_OPACITY } : {}),
+          ...initialPos,
+          borderRadius: initialPos.borderRadius,
+          zIndex: initialZIndex,
+          opacity: initialOpacity,
         }}
         onClick={() => {
           if (roleMap.current.left === elIdx) slideTo("prev");
@@ -328,20 +324,25 @@ export default function ProjectSlider({
           if (roleMap.current.center === elIdx) setIsHovered(false);
         }}
       >
-        {/* ─── Gradient placeholder as base layer (always present) ─── */}
+        {/* ─── Gradient placeholder — always present as base ─── */}
         <div
-          className="absolute inset-0 z-0 flex items-center justify-center"
+          className="absolute inset-0 z-0"
           style={{ background: gradient }}
         >
-          <h3
-            className="text-white text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center px-8 select-none"
-            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
-          >
-            {project.title}
-          </h3>
+          {/* Title text — only rendered on center card to avoid clipped text on narrow side cards */}
+          {isCenter && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h3
+                className="text-white/90 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center px-12 select-none leading-tight"
+                style={{ textShadow: "0 4px 30px rgba(0,0,0,0.35)" }}
+              >
+                {project.title}
+              </h3>
+            </div>
+          )}
         </div>
 
-        {/* Video only on center card element */}
+        {/* Video — only on center card when available */}
         {isCenter && project.videoPreviewLink && (
           <div className="absolute inset-0 z-10">
             <ProjectVideo
@@ -355,7 +356,7 @@ export default function ProjectSlider({
           </div>
         )}
 
-        {/* Hover buttons only on center */}
+        {/* Hover buttons — only on center */}
         {isCenter && (
           <HoverButtons
             isVisible={isHovered}
@@ -369,45 +370,51 @@ export default function ProjectSlider({
 
   return (
     <div ref={sectionRef} className="w-full">
-      {/* ─── Slider — FULL VIEWPORT ─── */}
+      {/* ─── Slider Container — FULL VIEWPORT WIDTH ─── */}
       <motion.div
-        className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden"
-        style={{ height: "clamp(480px, 75vh, 850px)" }}
+        className="relative w-full overflow-hidden"
+        style={{ aspectRatio: "16 / 9", maxHeight: "80vh" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: entryDone ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
         {renderCard(0)}
         {renderCard(1)}
         {renderCard(2)}
 
-        {/* Left vignette mask */}
+        {/* Left edge vignette — blends side card into section background */}
         <div
           className="absolute top-0 left-0 h-full z-30 pointer-events-none"
           style={{
-            width: "120px",
-            background: "linear-gradient(to right, var(--background), transparent)",
+            width: "clamp(100px, 14vw, 200px)",
+            background:
+              "linear-gradient(to right, var(--background) 0%, var(--background) 15%, transparent 100%)",
           }}
         />
-        {/* Right vignette mask */}
+        {/* Right edge vignette */}
         <div
           className="absolute top-0 right-0 h-full z-30 pointer-events-none"
           style={{
-            width: "120px",
-            background: "linear-gradient(to left, var(--background), transparent)",
+            width: "clamp(100px, 14vw, 200px)",
+            background:
+              "linear-gradient(to left, var(--background) 0%, var(--background) 15%, transparent 100%)",
           }}
         />
       </motion.div>
 
-      {/* ─── Project Label + Line Indicators ─── */}
-      <div className="flex flex-col items-center gap-4 mt-8">
-        {/* Project name + counter in small-caps */}
-        <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60">
-          {centerProject.title} — {String(centerIndex + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
+      {/* ─── Project Label + Line Progress Indicators ─── */}
+      <div className="flex flex-col items-center gap-3 mt-6">
+        {/* Project name + counter */}
+        <p className="text-[11px] font-semibold tracking-[0.3em] uppercase text-muted-foreground/50 select-none">
+          {centerProject.title}
+          <span className="mx-2 text-muted-foreground/25">—</span>
+          {String(centerIndex + 1).padStart(2, "0")}
+          <span className="mx-1 text-muted-foreground/25">/</span>
+          {String(n).padStart(2, "0")}
         </p>
 
         {/* Line indicators */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-[6px]">
           {projects.map((_, i) => (
             <button
               key={i}
@@ -420,24 +427,24 @@ export default function ProjectSlider({
                   slideTo("prev");
                 }
               }}
-              className="relative rounded-full overflow-hidden transition-all duration-500"
+              className="relative rounded-full overflow-hidden transition-all duration-500 cursor-pointer"
               style={{
-                width: i === centerIndex ? "40px" : "20px",
-                height: "3px",
+                width: i === centerIndex ? "36px" : "16px",
+                height: "2.5px",
               }}
               aria-label={`Go to project ${i + 1}`}
             >
-              {/* Inactive background track */}
-              <div className="absolute inset-0 bg-foreground/15 rounded-full" />
+              {/* Track background */}
+              <div className="absolute inset-0 bg-foreground/12 rounded-full" />
 
-              {/* Active fill — animates left-to-right as progress */}
+              {/* Active fill — progress bar animation */}
               {i === centerIndex && (
                 <motion.div
                   key={`progress-${centerIndex}-${progressKey}`}
                   className="absolute inset-0 rounded-full"
                   style={{
                     background: "var(--foreground)",
-                    opacity: 0.7,
+                    opacity: 0.6,
                     transformOrigin: "left center",
                   }}
                   initial={{ scaleX: 0 }}
