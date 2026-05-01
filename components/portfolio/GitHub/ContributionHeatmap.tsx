@@ -68,13 +68,28 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] md:text-xs font-bold text-muted-foreground/80 uppercase tracking-widest italic"
+        className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] md:text-[11px] font-medium"
       >
-        <span>{totalContributionsInLastYear} contributions in the last year</span>
-        <span className="w-1 h-1 rounded-full bg-border/40" />
-        <span>Most active: {mostActiveDay}</span>
-        <span className="w-1 h-1 rounded-full bg-border/40" />
-        <span>Latest streak: {streak.current} days</span>
+        <div className="flex items-center gap-3 bg-muted/20 px-3 py-1.5 rounded-full border border-border/40 shadow-sm transition-colors hover:bg-muted/30">
+          <div className="flex items-center gap-1.5">
+            <span className="text-foreground font-bold tabular-nums">{totalContributionsInLastYear}</span>
+            <span className="text-muted-foreground/50 uppercase tracking-widest text-[9px] font-bold">Contributions</span>
+          </div>
+          
+          <div className="w-px h-3 bg-border/60" />
+          
+          <div className="flex items-center gap-1.5">
+            <span className="text-muted-foreground/50 uppercase tracking-widest text-[9px] font-bold">Peak</span>
+            <span className="text-foreground font-bold uppercase tracking-tight">{mostActiveDay}</span>
+          </div>
+          
+          <div className="w-px h-3 bg-border/60" />
+          
+          <div className="flex items-center gap-1.5">
+            <span className="text-muted-foreground/50 uppercase tracking-widest text-[9px] font-bold">Max Streak</span>
+            <span className="text-foreground font-bold tabular-nums">{streak.longest} Days</span>
+          </div>
+        </div>
       </motion.div>
 
       {/* 2. Heatmap Grid Wrapper */}
@@ -127,11 +142,11 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
 
       {/* 4. Legend (Bottom Right) */}
       {mounted && (
-        <div className="mt-2 flex items-center justify-end gap-2 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest italic pr-1">
+        <div className="mt-4 flex items-center justify-end gap-3 text-[9px] font-bold text-muted-foreground/30 uppercase tracking-[0.2em] pr-1">
           <span>Less</span>
           <div className="flex gap-[3px]">
             {themeColors.map(color => (
-              <div key={color} className="w-[11px] h-[11px] md:w-[13px] md:h-[13px] rounded-[2px] border border-border/5 shadow-sm" style={{ backgroundColor: color }} />
+              <div key={color} className="w-[10px] h-[10px] md:w-[12px] md:h-[12px] rounded-[2px] border border-border/10 shadow-sm" style={{ backgroundColor: color }} />
             ))}
           </div>
           <span>More</span>
