@@ -15,10 +15,6 @@ export default function Preloader({
   const [phase, setPhase] = useState<"letters" | "morph">("letters");
   const [morph, setMorph] = useState({ x: 0, y: 0, scale: 1 });
   const [progress, setProgress] = useState(0);
-  const [themeTarget, setThemeTarget] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -44,8 +40,6 @@ export default function Preloader({
     if (progress === 100) {
       const logo = logoRef.current;
       const navAnchor = document.getElementById("navbar-logo-anchor");
-      const themeBtn = document.getElementById("theme-toggle-btn");
-
       if (logo && navAnchor) {
         const logoRect = logo.getBoundingClientRect();
         const navRect = navAnchor.getBoundingClientRect();
@@ -57,14 +51,6 @@ export default function Preloader({
         const dy = (navRect.top + navRect.height / 2) - (logoRect.top + logoRect.height / 2);
 
         setMorph({ x: dx, y: dy, scale });
-      }
-
-      if (themeBtn) {
-        const r = themeBtn.getBoundingClientRect();
-        setThemeTarget({
-          x: r.left + r.width / 2,
-          y: r.top + r.height / 2,
-        });
       }
 
       setPhase("morph");
@@ -79,38 +65,21 @@ export default function Preloader({
 
   return (
     <>
-      {/* ── Dark overlay ── */}
-      {phase === "letters" && (
-        <div className="fixed inset-0 z-[9998] bg-[#09090b]" />
-      )}
-      {phase === "morph" && (
-        <motion.div
-          className="fixed inset-0 z-[9998] bg-[#09090b]"
-          initial={{
-            clipPath: `circle(${
-              typeof window !== "undefined"
-                ? Math.max(window.innerWidth, window.innerHeight) * 1.5
-                : 2000
-            }px at 50% 50%)`,
-          }}
-          animate={{
-            clipPath: themeTarget
-              ? `circle(0px at ${themeTarget.x}px ${themeTarget.y}px)`
-              : "circle(0px at 50% 50%)",
-          }}
-          transition={{
-            duration: 0.8,
-            ease: [0.76, 0, 0.24, 1] as const,
-          }}
-        />
-      )}
+      <motion.div
+        className="fixed inset-0 z-[9998] bg-[#09090b] origin-top"
+        animate={phase === "morph" ? { y: "-100%" } : { y: 0 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.76, 0, 0.24, 1],
+        }}
+      />
 
       {/* ── Logo & Loader Container ── */}
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-none">
         <div className="flex flex-col items-center gap-8">
             <motion.div
             ref={logoRef}
-            className="flex font-black uppercase text-5xl md:text-8xl tracking-tighter"
+            className="flex font-black uppercase text-5xl md:text-8xl tracking-tighter transform-gpu"
             style={{ fontFamily: "var(--font-sans)" }}
             animate={
                 phase === "morph"
@@ -130,10 +99,9 @@ export default function Preloader({
                     }
             }
             transition={{
-                duration: 0.6,
-                ease: [0.19, 1, 0.22, 1],
-                opacity: { duration: 0.2 }
-            } as any}
+                duration: 0.7,
+                ease: [0.76, 0, 0.24, 1],
+            }}
             onAnimationComplete={() => {
                 if (phase === "morph") handleMorphComplete();
             }}
