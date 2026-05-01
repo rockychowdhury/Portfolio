@@ -182,7 +182,7 @@ export default function BlogsSection() {
   return (
     <SectionWrapper
       id="blogs"
-      className="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
+      className="pt-16 lg:pt-24 pb-12 lg:pb-16 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
       onMouseMove={handleMouseMove}
     >
       {/* Background Pattern Detail: Horizontal (X-axis) Lines */}
@@ -296,7 +296,7 @@ export default function BlogsSection() {
           <div className="w-full">
             <MasonryGrid blogs={displayedBlogs} onTagClick={handleFilterToggle} />
 
-            <div className="flex flex-col items-center justify-center py-32">
+            <div className="flex flex-col items-center justify-center pt-12 lg:pt-16 pb-8 lg:pb-12">
               <div className="relative w-full flex items-center justify-center">
                 {/* Subtle Divider Line */}
                 <div className="absolute inset-x-0 h-px bg-border/10" />
