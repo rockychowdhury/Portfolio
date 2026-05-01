@@ -49,12 +49,12 @@ export default function ProjectSlider({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isMobile = windowWidth < 640;
-  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
   
-  const SIDE_WIDTH_NUM = isMobile ? 5 : isTablet ? 10 : 13;
+  const SIDE_WIDTH_NUM = isMobile ? 0 : isTablet ? 10 : 13;
   const SIDE_WIDTH = `${SIDE_WIDTH_NUM}%`;
-  const GAP = isMobile ? 6 : 12;
+  const GAP = isMobile ? 0 : 12;
 
   const getPosLeft = useCallback(() => ({ left: "0%", width: SIDE_WIDTH, borderRadius: "0 16px 16px 0" }), [SIDE_WIDTH]);
   const getPosCenter = useCallback(() => ({
@@ -352,7 +352,7 @@ export default function ProjectSlider({
     <div ref={sectionRef} className="w-full">
       <motion.div
         className="relative w-full overflow-hidden"
-        style={{ aspectRatio: isMobile ? "4 / 5" : "16 / 10", maxHeight: isMobile ? "60vh" : "80vh" }}
+        style={{ aspectRatio: isMobile ? "16 / 10" : "16 / 10", maxHeight: isMobile ? "50vh" : "80vh" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: entryDone ? 1 : 0 }}
         transition={{ duration: 0.6 }}

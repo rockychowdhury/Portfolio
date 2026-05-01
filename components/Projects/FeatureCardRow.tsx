@@ -14,7 +14,9 @@ const PROJECT_COLORS = [
 const SLIDE_DURATION = 0.5;
 const AUTO_SLIDE_INTERVAL = 5000; // 5 seconds
 const GAP = 10;
-const VISIBLE_COUNT = 5; // Cards visible at a time
+const VISIBLE_COUNT_DESKTOP = 5;
+const VISIBLE_COUNT_TABLET = 3;
+const VISIBLE_COUNT_MOBILE = 2;
 
 interface FeatureCardRowProps {
   featureCards: FeatureCardType[];
@@ -53,12 +55,21 @@ export default function FeatureCardRow({
     projectNameMap.set(p._id || p.id, p.title);
   });
 
-  // Calculate card width
+  const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT_DESKTOP);
+
+  // Calculate card width and visible count
   useEffect(() => {
     const calc = () => {
       if (!containerRef.current) return;
-      const w = (containerRef.current.clientWidth - GAP * (VISIBLE_COUNT - 1)) / VISIBLE_COUNT;
-      setCardWidth(Math.max(w, 240));
+      const width = containerRef.current.clientWidth;
+      let count = VISIBLE_COUNT_DESKTOP;
+      
+      if (width < 640) count = VISIBLE_COUNT_MOBILE;
+      else if (width < 1024) count = VISIBLE_COUNT_TABLET;
+      
+      setVisibleCount(count);
+      const w = (width - GAP * (count - 1)) / count;
+      setCardWidth(Math.max(w, width < 640 ? 180 : 240));
     };
     calc();
     window.addEventListener("resize", calc);
@@ -99,7 +110,7 @@ export default function FeatureCardRow({
 
   // ─── Auto-slide every 5 seconds ───
   useEffect(() => {
-    if (totalCards <= VISIBLE_COUNT) return;
+    if (totalCards <= visibleCount) return;
 
     autoTimerRef.current = setInterval(() => {
       slideBy(1);
@@ -108,7 +119,7 @@ export default function FeatureCardRow({
     return () => {
       if (autoTimerRef.current) clearInterval(autoTimerRef.current);
     };
-  }, [slideBy, totalCards]);
+  }, [slideBy, totalCards, visibleCount]);
 
   // ─── Sync with project slider ───
   useEffect(() => {
@@ -119,10 +130,10 @@ export default function FeatureCardRow({
   // ─── Mouse Drag ───
   const resetAutoTimer = useCallback(() => {
     if (autoTimerRef.current) clearInterval(autoTimerRef.current);
-    if (totalCards > VISIBLE_COUNT) {
+    if (totalCards > visibleCount) {
       autoTimerRef.current = setInterval(() => slideBy(1), AUTO_SLIDE_INTERVAL);
     }
-  }, [slideBy, totalCards]);
+  }, [slideBy, totalCards, visibleCount]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isSliding.current) return;
@@ -201,7 +212,7 @@ export default function FeatureCardRow({
 
   // Render enough cards: visible + 2 buffer on each side for smooth circular
   const bufferCount = 2;
-  const renderCount = VISIBLE_COUNT + bufferCount * 2;
+  const renderCount = visibleCount + bufferCount * 2;
 
   return (
     <div
