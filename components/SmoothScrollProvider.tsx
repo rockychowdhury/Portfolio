@@ -11,6 +11,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
+    // Skip Lenis on mobile/touch devices for better native performance and to avoid scroll lock issues
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                    (window.innerWidth <= 768) ||
+                    ('ontouchstart' in window);
+    
+    if (isMobile) return;
+
     const lenis = new Lenis({
       lerp: 0.06, // Ultra-fluid, weighted interpolation
       wheelMultiplier: 0.9, // Controlled, premium resistance
