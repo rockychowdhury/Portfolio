@@ -60,7 +60,7 @@ export default function Education() {
     : (heroItem ? [heroItem, ...initialCerts] : initialCerts);
 
   return (
-    <SectionWrapper id="education" className="relative py-24 lg:py-40 bg-background overflow-hidden">
+    <SectionWrapper id="education" className="relative pt-24 lg:pt-40 pb-16 lg:pb-24 bg-background overflow-hidden">
       <div className="container-main relative z-10" ref={sectionRef}>
         
         {/* Section Header */}

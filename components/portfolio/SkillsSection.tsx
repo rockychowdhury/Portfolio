@@ -634,7 +634,8 @@ export default function SkillsSection() {
 
           {/* Minimal Skill Navigator - Ultra Compact */}
           <div className="flex flex-col items-center mt-6 mb-10 w-full mx-auto" ref={titleRef}>
-            <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/40 hover:bg-secondary/50 border border-border/60 rounded-full px-5 py-2 transition-all duration-300">
+            <div className="relative flex items-center group max-w-[280px] w-full bg-secondary/20 hover:bg-secondary/30 border border-border/40 rounded-full px-4 py-2 transition-all duration-300 focus-within:border-primary/30 focus-within:bg-secondary/40">
+              <Search className="w-3.5 h-3.5 text-muted-foreground/40 mr-3 transition-colors group-focus-within:text-foreground/60" />
               <input
                 type="text"
                 placeholder="Find a technology..."

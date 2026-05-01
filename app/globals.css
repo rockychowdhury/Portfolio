@@ -220,6 +220,15 @@
   background: #999;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Selection */
 ::selection {
   background-color: #222222;

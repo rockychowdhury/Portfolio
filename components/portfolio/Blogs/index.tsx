@@ -182,7 +182,7 @@ export default function BlogsSection() {
   return (
     <SectionWrapper
       id="blogs"
-      className="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
+      className="pt-16 lg:pt-24 pb-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
       onMouseMove={handleMouseMove}
     >
       {/* Background Pattern Detail: Horizontal (X-axis) Lines */}

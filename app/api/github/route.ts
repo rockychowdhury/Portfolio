@@ -7,7 +7,8 @@ import { calculateStreaks } from "./helpers/calculateStreaks";
 import { aggregateLanguages } from "./helpers/aggregateLanguages";
 import { buildSparkline } from "./helpers/buildSparkline";
 
-export const revalidate = 3600; // Cache for 1 hour
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
