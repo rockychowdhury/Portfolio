@@ -58,12 +58,22 @@ export default function Preloader({
       }
 
       setPhase("morph");
+      
+      // Fail-safe: If for some reason onAnimationComplete doesn't fire within 2 seconds of morphing,
+      // we force unlock the scroll and finish the preloader.
+      const fallback = setTimeout(() => {
+        handleMorphComplete();
+      }, 2000);
+      
+      return () => clearTimeout(fallback);
     }
   }, [progress]);
 
   const handleMorphComplete = () => {
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
+    document.body.style.height = "";
+    document.documentElement.style.height = "";
     onComplete?.();
   };
 
@@ -71,6 +81,7 @@ export default function Preloader({
     <>
       <motion.div
         className="fixed inset-0 z-[9998] bg-[#09090b] origin-top"
+        initial={{ y: 0 }}
         animate={phase === "morph" ? { y: "-100%" } : { y: 0 }}
         transition={{
           duration: 0.6,

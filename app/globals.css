@@ -152,7 +152,7 @@
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
-    overscroll-behavior: none; /* Prevents unpolished rubber-banding */
+    /* Removed overscroll-behavior: none to prevent scroll issues on some mobile browsers */
   }
 
 
