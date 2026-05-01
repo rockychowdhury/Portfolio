@@ -28,7 +28,7 @@ export function AchievementsMarquee({ achievements }: Props) {
   );
 
   return (
-    <SectionWrapper id="achievements" className="relative w-full py-16 sm:py-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
+    <SectionWrapper id="achievements" className="relative w-full pt-12 sm:pt-16 pb-16 sm:pb-24 overflow-hidden bg-zinc-50/50 dark:bg-zinc-950/50">
       {/* Futuristic Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Grid Overlay */}
