@@ -9,30 +9,27 @@ interface FloatingCloudProps {
   isPaused?: boolean;
 }
 
-// 1. Define the "Controlled Chaos" Zone Map (x%, y%, rotation, priority)
-// Centered around 1400px width. x=50 is the center of the headline.
+// 1. Define the Symmetrical "Corner Frame" Zone Map (12 Zones)
 const GRID_ZONES = [
-  // Cluster A: Top Left Focus (Further Out)
-  { x: 12, y: 18, rot: -1.5, isInert: false, priority: 1 },
-  { x: 18, y: 10, rot: 1, isInert: false, priority: 1 },
-  { x: 5, y: 35, rot: -2, isInert: false, priority: 1 }, // New
+  // Cluster A: Top Left
+  { x: 12, y: 15, rot: -1.5, isInert: false, priority: 1 },
+  { x: 25, y: 10, rot: 1, isInert: false, priority: 1 },
+  { x: 8, y: 32, rot: -2, isInert: false, priority: 1 },
 
-  // Cluster B: Bottom Right Support (Further Out)
-  { x: 88, y: 82, rot: 1.5, isInert: false, priority: 1 },
-  { x: 82, y: 90, rot: -1, isInert: false, priority: 1 },
-  { x: 95, y: 65, rot: 2, isInert: false, priority: 1 }, // New
+  // Cluster B: Top Right (Mirror of A)
+  { x: 88, y: 15, rot: 1.5, isInert: false, priority: 1 },
+  { x: 75, y: 10, rot: -1, isInert: false, priority: 1 },
+  { x: 92, y: 32, rot: 2, isInert: false, priority: 1 },
 
-  // Cluster C: Left Mid Editorial (Further Out)
-  { x: 8, y: 55, rot: 0.5, isInert: false, priority: 5 },
-  { x: 15, y: 45, rot: -2, isInert: false, priority: 5 },
+  // Cluster C: Bottom Left
+  { x: 12, y: 85, rot: 1.5, isInert: false, priority: 1 },
+  { x: 25, y: 90, rot: -1, isInert: false, priority: 1 },
+  { x: 8, y: 68, rot: 2, isInert: false, priority: 1 },
 
-  // Cluster D: Right Mid Editorial (Further Out)
-  { x: 92, y: 45, rot: 2, isInert: false, priority: 5 },
-  { x: 85, y: 55, rot: -1.2, isInert: false, priority: 5 },
-
-  // Editorial Spares (Top/Bottom edges, away from center)
-  { x: 30, y: 8, rot: -0.5, isInert: false, priority: 3 },
-  { x: 70, y: 92, rot: 1.2, isInert: false, priority: 3 },
+  // Cluster D: Bottom Right (Mirror of C)
+  { x: 88, y: 85, rot: -1.5, isInert: false, priority: 1 },
+  { x: 75, y: 90, rot: 1, isInert: false, priority: 1 },
+  { x: 92, y: 68, rot: -2, isInert: false, priority: 1 },
 ];
 
 export default function FloatingCloud({ testimonials, isPaused = false }: FloatingCloudProps) {
