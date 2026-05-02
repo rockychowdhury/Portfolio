@@ -172,31 +172,30 @@ function SkillIcon({
   const [showTooltip, setShowTooltip] = useState(false);
   const activeTooltip = showTooltip || isHighlighted;
   const [floatDelay] = useState(() => Math.random() * FLOAT_DURATION);
-  const [breatheDelay] = useState(() => Math.random() * BREATHE_DURATION);
 
   return (
     <motion.div
-      className="absolute flex items-center justify-center transform-gpu -translate-x-1/2 -translate-y-1/2"
-      style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)` }}
+      className="absolute z-10"
+      style={{ 
+        left: "50%",
+        top: "50%",
+        x: x,
+        y: y,
+        willChange: "transform",
+      }}
       initial={{ scale: 0, opacity: 0 }}
       animate={
         isBuilt
           ? {
-            scale: [1, 1.05, 1, 1.03, 1], // Soft heart rate pulse
-            y: [0, -8, 0, -4, 0], // Organic ambient drift
+            y: [y, y - 8, y],
             opacity: 1,
+            scale: 1,
           }
           : { scale: 0, opacity: 0 }
       }
       transition={
         isBuilt
           ? {
-            scale: {
-              duration: BREATHE_DURATION,
-              repeat: Infinity,
-              delay: breatheDelay,
-              ease: "easeInOut",
-            },
             y: {
               duration: FLOAT_DURATION,
               repeat: Infinity,
@@ -264,7 +263,7 @@ function SkillIcon({
             className="absolute -top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           >
             <div className="relative">
-              <div className="bg-popover/95 backdrop-blur-xl border border-border/50 rounded-xl px-4 py-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.3)] min-w-[140px]">
+              <div className="bg-popover border border-border/50 rounded-xl px-4 py-2.5 shadow-xl min-w-[140px]">
                 <div className="flex items-center gap-2 mb-1">
                   {skill.color && (
                     <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: skill.color }} />
