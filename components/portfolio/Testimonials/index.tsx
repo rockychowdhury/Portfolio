@@ -68,7 +68,7 @@ export default function TestimonialsSection() {
 
   return (
     <section id="testimonials" className="relative w-full bg-background pt-32 pb-24 overflow-hidden">
-      <GridBackground />
+      <GridBackground isPaused={isModalOpen} />
       
       <div className="relative z-10 flex flex-col items-center">
         <div className="w-full relative">

@@ -87,10 +87,9 @@ export default function FloatingCard({
           rotate: 0,
           transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } 
         }}
-        className="group relative rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-7 shadow-2xl transition-all hover:border-white/20 hover:bg-white/[0.05]"
+        className="group relative rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-md p-7 will-change-transform transform-gpu shadow-[0_10px_25px_-10px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.03)]"
         style={{ 
           rotate: rotation,
-          boxShadow: `0 20px 40px -20px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05)`
         }}
       >
         {/* Premium Inner Glow on Hover */}
@@ -108,14 +107,14 @@ export default function FloatingCard({
           {testimonial.quote}
         </p>
 
-        <div className="flex items-center gap-4 border-t border-white/5 pt-6">
+        <div className="flex items-center gap-4 border-t border-white/10 pt-6">
           <div 
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xs font-black border transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-[13px] font-black border group-hover:scale-110 group-hover:rotate-3 shadow-lg"
             style={{ 
               backgroundColor: `${config.color}20`, 
               color: config.color,
-              borderColor: `${config.color}30`,
-              boxShadow: `0 4px 12px ${config.color}15`
+              borderColor: `${config.color}40`,
+              boxShadow: `0 8px 16px ${config.color}20`
             }}
           >
             {testimonial.avatar_url ? (
@@ -125,11 +124,11 @@ export default function FloatingCard({
             )}
           </div>
           <div className="min-w-0">
-            <h4 className="truncate text-[15px] font-black tracking-tight text-foreground transition-colors">
+            <h4 className="truncate text-[16px] font-black tracking-tight text-foreground transition-colors group-hover:text-primary/90">
               {testimonial.name}
             </h4>
-            <div className="flex items-center gap-2 text-[9px] text-muted-foreground/40 uppercase tracking-[0.25em] truncate font-black">
-              <span className="bg-white/5 px-2 py-0.5 rounded-md">{testimonial.role}</span>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] truncate font-bold">
+              <span className="bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/5">{testimonial.role}</span>
               {testimonial.linkedin_url && !isInert && (
                 <a 
                   href={testimonial.linkedin_url} 
@@ -137,7 +136,7 @@ export default function FloatingCard({
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-all duration-300 inline-flex hover:scale-125"
                 >
-                  <FaLinkedin size={12} className="opacity-50 hover:opacity-100" />
+                  <FaLinkedin size={14} className="opacity-40 hover:opacity-100" />
                 </a>
               )}
             </div>
@@ -146,7 +145,7 @@ export default function FloatingCard({
 
         {/* Premium Relationship Badge */}
         <div 
-          className="absolute top-5 right-6 flex items-center gap-2 px-3 py-1 rounded-xl border transition-all duration-500 group-hover:scale-105"
+          className="absolute top-5 right-6 flex items-center gap-2 px-3 py-1 rounded-xl border group-hover:scale-105"
           style={{ 
             backgroundColor: `${config.color}08`,
             borderColor: `${config.color}20`

@@ -12,25 +12,25 @@ interface FloatingCloudProps {
 // 1. Define the "Controlled Chaos" Zone Map (x%, y%, rotation, priority)
 // Centered around 1400px width. x=50 is the center of the headline.
 const GRID_ZONES = [
-  // Corner Framing (Occupied, framing the composition)
-  { x: 5, y: 12, rot: -2.5, isInert: false, priority: 1 },   // Top Left
-  { x: 95, y: 10, rot: 3, isInert: false, priority: 1 },    // Top Right
-  { x: 8, y: 92, rot: 1.5, isInert: false, priority: 1 },   // Bottom Left
-  { x: 92, y: 90, rot: -2, isInert: true, priority: 1 },    // Bottom Right (clipped suggestion)
+  // Corner Framing (Pushed further out to clear the center)
+  { x: 8, y: 15, rot: -2, isInert: false, priority: 1 },    // Top Left
+  { x: 92, y: 12, rot: 2, isInert: false, priority: 1 },    // Top Right
+  { x: 10, y: 85, rot: 1, isInert: false, priority: 1 },    // Bottom Left
+  { x: 90, y: 88, rot: -1.5, isInert: true, priority: 1 },  // Bottom Right
 
-  // Near-Center High Strength (Orbiting the headline - pushed further out)
-  { x: 20, y: 48, rot: 2.2, isInert: false, priority: 5 },  // Left Mid (Increased buffer)
-  { x: 80, y: 52, rot: -1.8, isInert: false, priority: 5 }, // Right Mid (Increased buffer)
-  { x: 40, y: 15, rot: -1.5, isInert: false, priority: 5 }, // Top Center Left
-  { x: 60, y: 85, rot: 2.4, isInert: false, priority: 5 },  // Bottom Center Right
+  // Mid-Distance Framing (Orbiting with more buffer)
+  { x: 15, y: 50, rot: 1.5, isInert: false, priority: 5 },  // Far Left Mid
+  { x: 85, y: 50, rot: -1.2, isInert: false, priority: 5 }, // Far Right Mid
+  { x: 40, y: 10, rot: -1, isInert: false, priority: 5 },   // Top Framing
+  { x: 60, y: 90, rot: 1.8, isInert: false, priority: 5 },  // Bottom Framing
 
   // Radial Fill & Editorial Clipping
-  { x: -8, y: 60, rot: -3, isInert: true, priority: 3 },    // Clipped Left
-  { x: 108, y: 40, rot: 2.5, isInert: true, priority: 3 },  // Clipped Right
-  { x: 15, y: 78, rot: -1, isInert: false, priority: 3 },   // Mid Left Gap
-  { x: 85, y: 22, rot: 1.2, isInert: false, priority: 3 },  // Mid Right Gap
-  { x: 45, y: 95, rot: -1.5, isInert: false, priority: 3 }, // Bottom Edge
-  { x: 55, y: 5, rot: 1, isInert: false, priority: 3 },     // Top Edge
+  { x: -5, y: 40, rot: -2, isInert: true, priority: 3 },    // Clipped Left
+  { x: 105, y: 60, rot: 2, isInert: true, priority: 3 },    // Clipped Right
+  { x: 25, y: 20, rot: -1, isInert: false, priority: 3 },   // Top Left Gap
+  { x: 75, y: 80, rot: 1, isInert: false, priority: 3 },    // Bottom Right Gap
+  { x: 35, y: 95, rot: -1, isInert: false, priority: 3 },   // Bottom Edge
+  { x: 65, y: 5, rot: 0.5, isInert: false, priority: 3 },   // Top Edge
 ];
 
 export default function FloatingCloud({ testimonials, isPaused = false }: FloatingCloudProps) {
@@ -53,13 +53,13 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
   return (
     <>
       {/* Desktop: Absolute-positioned floating cloud (md+) */}
-      <div className="relative w-full max-w-[1400px] mx-auto min-h-[900px] md:min-h-[1100px] py-12 md:py-24 overflow-visible hidden md:block">
+      <div className="relative w-full max-w-[1400px] mx-auto min-h-[750px] md:min-h-[850px] py-8 md:py-16 overflow-visible hidden md:block">
         {bloomSortedAssignments.map((assignment, bloomIndex) => {
           const { testimonial, zone } = assignment;
           return (
             <motion.div 
               key={`${testimonial.name}-${bloomIndex}`}
-              className="absolute transition-all duration-700"
+              className="absolute"
               style={{ 
                 left: `${zone.x}%`, 
                 top: `${zone.y}%`,

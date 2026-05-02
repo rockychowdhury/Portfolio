@@ -3,21 +3,20 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-export default function GridBackground() {
-  const [pulses, setPulses] = useState<{ id: number; top: string; left: string }[]>([]);
+interface GridBackgroundProps {
+  isPaused?: boolean;
+}
 
-  // Periodically add a signal pulse to a random grid cell
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const id = Date.now();
-      const top = `${Math.floor(Math.random() * 20) * 5}%`;
-      const left = `${Math.floor(Math.random() * 20) * 5}%`;
-      
-      setPulses((prev) => [...prev.slice(-10), { id, top, left }]);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
+export default function GridBackground({ isPaused = false }: GridBackgroundProps) {
+  // CSS-based pulses are more performant than React state for this background effect
+  const pulsePositions = [
+    { top: '10%', left: '15%' },
+    { top: '80%', left: '85%' },
+    { top: '40%', left: '70%' },
+    { top: '60%', left: '20%' },
+    { top: '25%', left: '45%' },
+    { top: '90%', left: '35%' },
+  ];
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -33,15 +32,17 @@ export default function GridBackground() {
         }} 
       />
 
-      {/* Pulsing Signal Effect */}
-      {pulses.map((pulse) => (
-        <motion.div
-          key={pulse.id}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: [0, 0.2, 0], scale: [0.5, 1.2, 0.8] }}
-          transition={{ duration: 3, ease: "easeInOut" }}
-          className="absolute h-[80px] w-[80px] bg-primary/20 blur-xl rounded-full"
-          style={{ top: pulse.top, left: pulse.left }}
+      {/* Pulsing Signal Effect (Pure CSS for performance) */}
+      {pulsePositions.map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute h-[80px] w-[80px] bg-primary/20 blur-xl rounded-full ${isPaused ? "" : "animate-pulse"}`}
+          style={{ 
+            top: pos.top, 
+            left: pos.left,
+            animationDelay: `${i * 1.5}s`,
+            animationDuration: '4s'
+          }}
         />
       ))}
 
