@@ -21,6 +21,7 @@ const colors = {
 export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapProps) {
   const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [colWidth, setColWidth] = useState(15);
   const { resolvedTheme } = useTheme();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -58,13 +59,21 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
   }, []);
 
   // Fix for "sticky" tooltips: Clear hover state on any scroll or resize
+  // AND update colWidth for responsive month labels
   useEffect(() => {
     const clearHover = () => setHoveredCell(null);
+    const handleUpdate = () => {
+      clearHover();
+      setColWidth(window.innerWidth < 768 ? 13 : 15);
+    };
     
+    // Initial call
+    handleUpdate();
+
     // 1. Global scroll (page scroll)
     window.addEventListener("scroll", clearHover, { passive: true });
     // 2. Global resize (layout changes)
-    window.addEventListener("resize", clearHover, { passive: true });
+    window.addEventListener("resize", handleUpdate, { passive: true });
     
     // 3. Local container scroll (horizontal scroll)
     const container = scrollContainerRef.current;
@@ -74,7 +83,7 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
 
     return () => {
       window.removeEventListener("scroll", clearHover);
-      window.removeEventListener("resize", clearHover);
+      window.removeEventListener("resize", handleUpdate);
       if (container) {
         container.removeEventListener("scroll", clearHover);
       }
@@ -150,7 +159,7 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
                 <div 
                   key={i} 
                   className="absolute text-[9px] font-bold text-muted-foreground/40 uppercase tracking-tighter"
-                  style={{ left: m.offset * 15 }} 
+                  style={{ left: m.offset * colWidth }} 
                 >
                   {m.label}
                 </div>
