@@ -57,12 +57,39 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
     }
   }, []);
 
+  // Fix for "sticky" tooltips: Clear hover state on any scroll or resize
+  useEffect(() => {
+    const clearHover = () => setHoveredCell(null);
+    
+    // 1. Global scroll (page scroll)
+    window.addEventListener("scroll", clearHover, { passive: true });
+    // 2. Global resize (layout changes)
+    window.addEventListener("resize", clearHover, { passive: true });
+    
+    // 3. Local container scroll (horizontal scroll)
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", clearHover, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener("scroll", clearHover);
+      window.removeEventListener("resize", clearHover);
+      if (container) {
+        container.removeEventListener("scroll", clearHover);
+      }
+    };
+  }, []);
+
   const totalContributionsInLastYear = stats.commits; 
   const mostActiveDay = stats.productivity?.mostActiveDay || "Tuesday";
   const themeColors = mounted && resolvedTheme === "light" ? colors.light : colors.dark;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div 
+      className="flex flex-col gap-4"
+      onMouseLeave={() => setHoveredCell(null)}
+    >
       {/* 1. Summary Line (Top) */}
       <motion.div 
         initial={{ opacity: 0 }}
