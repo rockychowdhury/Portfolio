@@ -5,6 +5,7 @@ import { motion, useInView } from "framer-motion";
 import MasterySpine from "./MasterySpine";
 import TimelineItem, { JourneyItem } from "./TimelineItem";
 import { JourneySkeleton } from "./JourneySkeleton";
+import { GridPattern } from "@/components/ui/BackgroundPatterns";
 
 // Premium easing for sections
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
@@ -54,6 +55,7 @@ const JourneySection = () => {
       id="journey"
       className="relative w-full overflow-hidden bg-background py-24 text-foreground"
     >
+      <GridPattern />
       <div className="container-main">
         {/* Animated Section Header */}
         <div className="mb-24 text-left" ref={titleRef}>

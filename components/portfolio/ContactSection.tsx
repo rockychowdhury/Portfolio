@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "fram
 import { Trash2, MapPin, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { FaWhatsapp, FaLinkedin, FaGithub, FaYoutube } from "react-icons/fa";
 import { toast } from "sonner";
+import { SlantPattern } from "@/components/ui/BackgroundPatterns";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -109,17 +110,9 @@ Looking forward to connecting.`;
       className="relative w-full overflow-hidden bg-background py-16 md:py-24 lg:py-32"
       onMouseMove={handleMouseMove}
     >
+      <SlantPattern />
       <div className="container-main relative z-10">
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
-        <div 
-          className="absolute inset-0" 
-          style={{ 
-            backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-            backgroundSize: `40px 40px` 
-          }} 
-        />
-      </div>
+      {/* Spotlight Effect */}
 
       {/* Spotlight Effect */}
       <motion.div

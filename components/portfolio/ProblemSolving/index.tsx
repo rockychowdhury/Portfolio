@@ -4,6 +4,7 @@ import SectionWrapper from "../SectionWrapper";
 import PlatformCard from "./PlatformCard";
 import NarrativeBar from "./NarrativeBar";
 import { IProblemSolvingProfile } from "@/lib/db/models/ProblemSolvingProfile";
+import { DotPattern } from "@/components/ui/BackgroundPatterns";
 
 // Premium easing for sections
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1] as const;
@@ -84,12 +85,7 @@ export default function ProblemSolvingSection() {
 
   return (
     <SectionWrapper id="problem-solving" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
-      {/* ── Background & Guidelines ── */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
-          <div className="absolute top-0 right-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
-        </div>
-      </div>
+      <DotPattern />
 
       <div className="relative container-main">
         {/* Section Headline */}

@@ -22,39 +22,21 @@ export function AchievementCard({ achievement }: Props) {
     : null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      whileHover={{ 
-        scale: 1.05, 
-        y: -2,
-        boxShadow: `0 10px 30px -10px ${meta.color}33`,
-      }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 400, 
-        damping: 30 
-      }}
+    <div
       className="relative flex items-center gap-4 shrink-0
                  h-[64px] px-5
-                 bg-white/70 dark:bg-zinc-900/70
-                 backdrop-blur-md
-                 border border-white/20 dark:border-zinc-800/50
+                 bg-white dark:bg-zinc-900
+                 border border-zinc-200 dark:border-zinc-800/50
                  rounded-2xl cursor-default select-none
-                 shadow-[0_2px_10px_rgba(0,0,0,0.05)]
-                 transition-all duration-300"
+                 transition-transform duration-300 hover:scale-[1.02]"
       style={{ 
         borderLeft: `4px solid ${meta.color}`,
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        transform: "translateZ(0)",
+        willChange: "transform",
       }}
-
     >
       {/* Glow Background (Visible on hover) */}
       <div 
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{ 
           background: `radial-gradient(circle at center, ${meta.color}11 0%, transparent 70%)` 
         }}
@@ -63,7 +45,7 @@ export function AchievementCard({ achievement }: Props) {
       {/* Icon bubble */}
       <span
         className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
-                   relative overflow-hidden border border-white/10 dark:border-zinc-700/30"
+                   relative overflow-hidden border border-zinc-100 dark:border-zinc-700/30"
         style={{ background: `${meta.bg}88` }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
@@ -91,14 +73,14 @@ export function AchievementCard({ achievement }: Props) {
       {statBadge && (
         <div className="ml-4 shrink-0">
           <span
-            className="text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20"
+            className="text-[10px] font-bold px-2 py-1 rounded-lg border border-zinc-100 dark:border-zinc-800"
             style={{ background: meta.bg, color: meta.color }}
           >
             {statBadge}
           </span>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 

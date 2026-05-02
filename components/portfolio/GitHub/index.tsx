@@ -7,6 +7,7 @@ import MeaningfulStatsRow from "./MeaningfulStatsRow";
 import ContributionHeatmap from "./ContributionHeatmap";
 import LanguageIntelligence from "./LanguageIntelligence";
 import PinnedRepoGrid from "./PinnedRepoGrid";
+import { GridPattern } from "@/components/ui/BackgroundPatterns";
 import {
   HeatmapSkeleton,
   LanguagesSkeleton,
@@ -110,12 +111,7 @@ export default function GitHubSection() {
 
   return (
     <SectionWrapper id="github" className="relative min-h-screen w-full overflow-hidden bg-background py-24 text-foreground">
-      {/* ── Background & Guidelines ── */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="mx-auto h-full max-w-[1400px] border-x border-dashed border-border/10">
-          <div className="absolute top-0 left-12 h-full w-px border-l border-dashed border-border/10 hidden lg:block" />
-        </div>
-      </div>
+      <GridPattern />
 
       <div className="relative container-main">
         {/* Section Headline */}

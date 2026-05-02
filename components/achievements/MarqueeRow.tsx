@@ -20,15 +20,11 @@ export function MarqueeRow({ achievements, direction, speed = 40 }: Props) {
   if (achievements.length === 0) return null;
 
   return (
-    <div
-      className="relative w-full py-4 overflow-hidden group"
-      style={{
-        maskImage:
-          "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-        WebkitMaskImage:
-          "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-      }}
-    >
+    <div className="relative w-full py-4 overflow-hidden group">
+      {/* Edge Fading Overlays — Much more performant than mask-image */}
+      <div className="absolute inset-y-0 left-0 w-24 z-20 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 z-20 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+
       {/* Animation Wrapper */}
       <div className="w-full">
         <div
@@ -37,8 +33,6 @@ export function MarqueeRow({ achievements, direction, speed = 40 }: Props) {
           style={{
             animation: `marquee-${direction} ${speed}s linear infinite`,
             willChange: "transform",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
             transform: "translate3d(0,0,0)",
           }}
 
