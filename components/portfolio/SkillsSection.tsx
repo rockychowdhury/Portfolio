@@ -25,8 +25,8 @@ interface Skill {
 // ── Animation Constants ──
 const BUILD_STAGGER = 0.05; // seconds between each icon
 const BUILD_DURATION = 0.5; // each icon's entrance duration
-const FLOAT_DURATION = 6; // seconds for one float cycle
-const BREATHE_DURATION = 4; // seconds for one breathe cycle
+const FLOAT_DURATION = 8; // smooth 8s cycle
+const BREATHE_DURATION = 8; // organic pulse cycle
 const SHIMMER_INTERVAL = 4000; // ms between shimmer events
 
 // ── Shape groups and their assignment ──
@@ -170,19 +170,7 @@ function SkillIcon({
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const activeTooltip = showTooltip || isHighlighted;
-  const [shimmer, setShimmer] = useState(false);
-
-  // Random shimmer
-  useEffect(() => {
-    if (!isBuilt) return;
-    const delay = Math.random() * SHIMMER_INTERVAL * 3;
-    const interval = setInterval(() => {
-      setShimmer(true);
-      setTimeout(() => setShimmer(false), 600);
-    }, SHIMMER_INTERVAL + delay);
-    return () => clearInterval(interval);
-  }, [isBuilt]);
-
+  const [floatDelay] = useState(() => Math.random() * FLOAT_DURATION);
   const [breatheDelay] = useState(() => Math.random() * BREATHE_DURATION);
 
   return (
@@ -193,7 +181,8 @@ function SkillIcon({
       animate={
         isBuilt
           ? {
-            scale: [1, 1.04, 1],
+            scale: [1, 1.05, 1, 1.03, 1], // Soft heart rate pulse
+            y: [0, -8, 0, -4, 0], // Organic ambient drift
             opacity: 1,
           }
           : { scale: 0, opacity: 0 }
@@ -205,6 +194,12 @@ function SkillIcon({
               duration: BREATHE_DURATION,
               repeat: Infinity,
               delay: breatheDelay,
+              ease: "easeInOut",
+            },
+            y: {
+              duration: FLOAT_DURATION,
+              repeat: Infinity,
+              delay: floatDelay,
               ease: "easeInOut",
             },
             opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 },
@@ -219,8 +214,7 @@ function SkillIcon({
       role="button"
     >
       <div
-        className={`relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group
-          ${shimmer ? "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]" : "border border-border/50"}
+        className={`relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group border border-border/50
           hover:scale-125 hover:shadow-2xl hover:bg-accent/40 hover:border-border
         `}
       >
@@ -236,12 +230,11 @@ function SkillIcon({
             const isTBA = skill.name === "TBA";
             return (
               <Icon
-                style={{ color: activeTooltip ? skill.color : undefined }}
+                style={{ color: isTBA ? undefined : skill.color }}
                 className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-500 
-                  ${activeTooltip ? "scale-125 grayscale-0 opacity-100" : ""}
-                  ${!activeTooltip && isTBA ? "text-muted-foreground/20 grayscale opacity-40" : ""}
-                  ${!activeTooltip && !isTBA ? "text-foreground/60 grayscale-[0.4] opacity-100" : ""}
-                  group-hover:grayscale-0 group-hover:opacity-100
+                  ${activeTooltip ? "scale-125 opacity-100" : ""}
+                  ${!activeTooltip && isTBA ? "opacity-20 grayscale text-muted-foreground/20" : "opacity-90"}
+                  group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0
                 `}
               />
             );
@@ -344,13 +337,16 @@ function ShapeGroup({
         className="relative aspect-square w-full flex items-center justify-center transform-gpu"
         animate={
           isBuilt
-            ? { y: [0, -12, 0] }
+            ? { 
+                y: [0, -15, 0],
+                rotate: [0, 1, -1, 0] // Subtle organic sway
+              }
             : {}
         }
         transition={
           isBuilt
             ? {
-              duration: FLOAT_DURATION,
+              duration: 8,
               repeat: Infinity,
               ease: "easeInOut",
               delay: floatDelay,
@@ -557,11 +553,13 @@ export default function SkillsSection() {
 
   const tickerSkills = useMemo(() => {
     // Sort all skills based on the TICKER_GROUPS_ORDER
-    return [...skills].sort((a, b) => {
-      const idxA = TICKER_GROUPS_ORDER.indexOf(a.group);
-      const idxB = TICKER_GROUPS_ORDER.indexOf(b.group);
-      return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
-    });
+    return skills
+      .filter((s) => s.name !== "TBA")
+      .sort((a, b) => {
+        const idxA = TICKER_GROUPS_ORDER.indexOf(a.group);
+        const idxB = TICKER_GROUPS_ORDER.indexOf(b.group);
+        return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+      });
   }, [skills]);
 
   const topSkills = useMemo(
@@ -706,12 +704,12 @@ export default function SkillsSection() {
                 hidden: { opacity: 0 },
                 visible: {
                   opacity: 1,
-                  transition: { staggerChildren: 0.1, delayChildren: 1.1 }
+                  transition: { staggerChildren: 0.05, delayChildren: 1.1 }
                 }
               }}
               initial="hidden"
               animate={isTitleInView ? "visible" : "hidden"}
-              className="flex items-center justify-center gap-3 md:gap-5 flex-wrap px-4 max-w-5xl"
+              className="flex items-center justify-center gap-2 md:gap-2.5 flex-wrap px-4 max-w-4xl"
             >
               {topSkills.map((s) => {
                 const Icon = getIcon(s.icon, s.icon_group);
@@ -719,32 +717,29 @@ export default function SkillsSection() {
                   <motion.div
                     key={s._id}
                     variants={{
-                      hidden: { opacity: 0, y: 20, scale: 0.9, filter: "blur(10px)" },
+                      hidden: { opacity: 0, y: 15, scale: 0.95, filter: "blur(8px)" },
                       visible: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
                     }}
                     whileHover={{ 
-                      y: -8, 
-                      scale: 1.05,
-                      transition: { duration: 0.3, ease: "easeOut" }
+                      y: -4, 
+                      scale: 1.02,
+                      transition: { duration: 0.2 }
                     }}
-                    className="relative flex items-center gap-3 px-5 py-3 rounded-[20px] bg-secondary/20 backdrop-blur-md border border-white/5 transition-all duration-500 group hover:bg-secondary/40 hover:border-white/10 cursor-default shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] overflow-hidden"
+                    className="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/15 backdrop-blur-sm border border-white/5 transition-all duration-300 group hover:bg-secondary/30 hover:border-white/10 cursor-default shadow-sm overflow-hidden"
                   >
                     {/* Brand Glow on Hover */}
                     <div 
-                      className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-700 pointer-events-none"
+                      className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500 pointer-events-none"
                       style={{ backgroundColor: s.color || 'var(--primary)' }}
                     />
                     
-                    {/* Subtle Shine Effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
                     {Icon && (
                       <Icon 
-                        className="w-6 h-6 md:w-7 md:h-7 text-muted-foreground transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" 
+                        className="w-4 h-4 md:w-4.5 md:h-4.5 text-muted-foreground transition-all duration-300 group-hover:scale-110" 
                         style={{ color: s.color }} 
                       />
                     )}
-                    <span className="text-sm md:text-lg font-black text-foreground/70 group-hover:text-foreground transition-colors tracking-tight">
+                    <span className="text-[10px] md:text-xs font-bold text-foreground/70 group-hover:text-foreground transition-colors tracking-tight">
                       {s.name}
                     </span>
                   </motion.div>

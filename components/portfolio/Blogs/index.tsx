@@ -65,10 +65,6 @@ export default function BlogsSection() {
     return Array.from(new Set(blogs.map((b) => b.platform)));
   }, [blogs]);
 
-  const tags = useMemo(() => {
-    const allTags = blogs.flatMap((b) => b.tags);
-    return Array.from(new Set(allTags)).slice(0, 8); // Top tags
-  }, [blogs]);
 
   const filteredBlogs = useMemo(() => {
     let result = blogs;
@@ -86,8 +82,7 @@ export default function BlogsSection() {
     // 2. apply platform/tag filters
     if (activeFilters.length > 0) {
       result = result.filter((blog) =>
-        activeFilters.includes(blog.platform) ||
-        blog.tags.some(tag => activeFilters.includes(tag))
+        activeFilters.includes(blog.platform)
       );
     }
 
@@ -262,7 +257,6 @@ export default function BlogsSection() {
             {!loading && (
               <FilterRow
                 platforms={platforms}
-                tags={tags}
                 activeFilters={activeFilters}
                 onFilterToggle={handleFilterToggle}
                 onClearAll={handleClearAll}

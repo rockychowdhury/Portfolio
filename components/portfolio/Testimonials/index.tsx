@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import GridBackground from "./GridBackground";
 import CenterHeadline from "./CenterHeadline";
 import FloatingCloud from "./FloatingCloud";
-import TestimonialTicker from "./TestimonialTicker";
 import SubmitModal from "./SubmitModal";
 import AlertStack, { AlertItem } from "./AlertStack";
 import { CheckCircle2, Mail } from "lucide-react";
@@ -90,7 +89,6 @@ export default function TestimonialsSection() {
           </div>
         </div>
 
-        {testimonials.length > 0 && <TestimonialTicker testimonials={testimonials} />}
       </div>
 
       <SubmitModal 

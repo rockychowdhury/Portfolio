@@ -17,15 +17,15 @@ export default function SearchBar({ query, setQuery, hasResults = true }: Search
       className="relative w-full lg:w-80 group flex justify-start"
     >
       <div 
-        className="relative flex items-center group max-w-[280px] w-full bg-secondary/20 hover:bg-secondary/30 border border-border/40 rounded-full px-4 py-2 transition-all duration-300 shadow-sm focus-within:border-primary/30 focus-within:bg-secondary/40"
+        className="relative flex items-center group max-w-[280px] w-full bg-background border border-border rounded-full px-4 py-2.5 transition-all duration-300 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/5"
       >
-        <Search className="w-3.5 h-3.5 text-muted-foreground/40 mr-3 transition-colors group-focus-within:text-foreground/60" />
+        <Search className="w-4 h-4 text-muted-foreground/60 mr-3 transition-colors group-focus-within:text-primary" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search articles..."
-          className="flex-1 bg-transparent border-none py-0.5 text-[11px] font-medium focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
+          className="flex-1 bg-transparent border-none py-0.5 text-xs font-medium focus:outline-none placeholder:text-muted-foreground/50 text-foreground"
         />
 
         <div className="flex items-center gap-3 ml-2">

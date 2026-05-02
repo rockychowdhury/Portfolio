@@ -25,7 +25,7 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
 
       <div className="relative z-10 flex flex-col gap-4">
         <div className="flex items-center gap-3">
-            <PlatformBadge platform={blog.platform} className="bg-background text-foreground" />
+            <PlatformBadge platform={blog.platform} variant="mono" />
         </div>
         
         <h3 className="text-lg md:text-xl font-bold tracking-tight leading-tight mt-4">

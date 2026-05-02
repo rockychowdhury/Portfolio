@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import FloatingCard from "./FloatingCard";
 import { ITestimonial } from "@/lib/db/models/Testimonial";
 
@@ -56,7 +57,7 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
         {bloomSortedAssignments.map((assignment, bloomIndex) => {
           const { testimonial, zone } = assignment;
           return (
-            <div 
+            <motion.div 
               key={`${testimonial.name}-${bloomIndex}`}
               className="absolute transition-all duration-700"
               style={{ 
@@ -66,6 +67,7 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
                 pointerEvents: zone.isInert ? 'none' : 'auto',
                 zIndex: zone.priority === 5 ? 30 : 10
               }}
+              whileHover={zone.isInert ? {} : { zIndex: 100 }}
             >
               <FloatingCard 
                 testimonial={testimonial} 
@@ -74,14 +76,14 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
                 isPaused={isPaused}
                 isInert={zone.isInert}
               />
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
       {/* Mobile: Vertically stacked scrollable layout (< md) */}
       <div className="flex flex-col gap-4 px-2 py-8 md:hidden">
-        {sortedTestimonials.slice(0, 6).map((testimonial, i) => (
+        {sortedTestimonials.slice(0, 3).map((testimonial, i) => (
           <FloatingCard
             key={`mobile-${testimonial.name}-${i}`}
             testimonial={testimonial}

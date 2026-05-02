@@ -5,7 +5,6 @@ import { useRef } from "react";
 
 interface FilterRowProps {
   platforms: string[];
-  tags: string[];
   activeFilters: string[];
   onFilterToggle: (filter: string) => void;
   onClearAll: () => void;
@@ -13,7 +12,6 @@ interface FilterRowProps {
 
 export default function FilterRow({
   platforms,
-  tags,
   activeFilters,
   onFilterToggle,
   onClearAll,
@@ -56,26 +54,6 @@ export default function FilterRow({
               }`}
             >
               {platform}
-            </button>
-          );
-        })}
-
-        <div className="h-4 w-px bg-border/20 mx-4 flex-shrink-0" />
-
-        {/* Tag Filters */}
-        {tags.map((tag) => {
-          const isActive = activeFilters.includes(tag);
-          return (
-            <button
-              key={tag}
-              onClick={() => onFilterToggle(tag)}
-              className={`px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex-shrink-0 whitespace-nowrap ${
-                isActive 
-                ? "bg-primary text-white" 
-                : "border border-border/40 text-muted-foreground/60 hover:border-foreground/20 hover:text-foreground"
-              }`}
-            >
-              #{tag}
             </button>
           );
         })}
