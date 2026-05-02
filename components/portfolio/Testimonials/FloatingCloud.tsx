@@ -12,25 +12,27 @@ interface FloatingCloudProps {
 // 1. Define the "Controlled Chaos" Zone Map (x%, y%, rotation, priority)
 // Centered around 1400px width. x=50 is the center of the headline.
 const GRID_ZONES = [
-  // Corner Framing (Pushed further out to clear the center)
-  { x: 8, y: 15, rot: -2, isInert: false, priority: 1 },    // Top Left
-  { x: 92, y: 12, rot: 2, isInert: false, priority: 1 },    // Top Right
-  { x: 10, y: 85, rot: 1, isInert: false, priority: 1 },    // Bottom Left
-  { x: 90, y: 88, rot: -1.5, isInert: true, priority: 1 },  // Bottom Right
+  // Cluster A: Top Left Focus (Further Out)
+  { x: 12, y: 18, rot: -1.5, isInert: false, priority: 1 },
+  { x: 18, y: 10, rot: 1, isInert: false, priority: 1 },
+  { x: 5, y: 35, rot: -2, isInert: false, priority: 1 }, // New
 
-  // Mid-Distance Framing (Orbiting with more buffer)
-  { x: 15, y: 50, rot: 1.5, isInert: false, priority: 5 },  // Far Left Mid
-  { x: 85, y: 50, rot: -1.2, isInert: false, priority: 5 }, // Far Right Mid
-  { x: 40, y: 10, rot: -1, isInert: false, priority: 5 },   // Top Framing
-  { x: 60, y: 90, rot: 1.8, isInert: false, priority: 5 },  // Bottom Framing
+  // Cluster B: Bottom Right Support (Further Out)
+  { x: 88, y: 82, rot: 1.5, isInert: false, priority: 1 },
+  { x: 82, y: 90, rot: -1, isInert: false, priority: 1 },
+  { x: 95, y: 65, rot: 2, isInert: false, priority: 1 }, // New
 
-  // Radial Fill & Editorial Clipping
-  { x: -5, y: 40, rot: -2, isInert: true, priority: 3 },    // Clipped Left
-  { x: 105, y: 60, rot: 2, isInert: true, priority: 3 },    // Clipped Right
-  { x: 25, y: 20, rot: -1, isInert: false, priority: 3 },   // Top Left Gap
-  { x: 75, y: 80, rot: 1, isInert: false, priority: 3 },    // Bottom Right Gap
-  { x: 35, y: 95, rot: -1, isInert: false, priority: 3 },   // Bottom Edge
-  { x: 65, y: 5, rot: 0.5, isInert: false, priority: 3 },   // Top Edge
+  // Cluster C: Left Mid Editorial (Further Out)
+  { x: 8, y: 55, rot: 0.5, isInert: false, priority: 5 },
+  { x: 15, y: 45, rot: -2, isInert: false, priority: 5 },
+
+  // Cluster D: Right Mid Editorial (Further Out)
+  { x: 92, y: 45, rot: 2, isInert: false, priority: 5 },
+  { x: 85, y: 55, rot: -1.2, isInert: false, priority: 5 },
+
+  // Editorial Spares (Top/Bottom edges, away from center)
+  { x: 30, y: 8, rot: -0.5, isInert: false, priority: 3 },
+  { x: 70, y: 92, rot: 1.2, isInert: false, priority: 3 },
 ];
 
 export default function FloatingCloud({ testimonials, isPaused = false }: FloatingCloudProps) {

@@ -14,11 +14,11 @@ interface FloatingCardProps {
 }
 
 const relationshipConfig = {
-  Mentor: { color: "#8B5CF6", strength: 5 },
-  Client: { color: "#10B981", strength: 5 },
-  Colleague: { color: "#3B82F6", strength: 4 },
-  Collaborator: { color: "#F59E0B", strength: 4 },
-  Classmate: { color: "#6B7280", strength: 3 },
+  Mentor: { color: "var(--primary)", strength: 5 },
+  Client: { color: "var(--primary)", strength: 5 },
+  Colleague: { color: "#94a3b8", strength: 4 },
+  Collaborator: { color: "#94a3b8", strength: 4 },
+  Classmate: { color: "#64748b", strength: 3 },
 };
 
 export default function FloatingCard({ 
@@ -29,65 +29,32 @@ export default function FloatingCard({
   isInert = false,
   isMobile = false 
 }: FloatingCardProps) {
-  const config = relationshipConfig[testimonial.relationship] || relationshipConfig.Classmate;
-  
-  // 1. Dynamic Width based on quote length
-  const quoteLength = testimonial.quote.length;
-  const widthClass = isMobile ? "w-full" : quoteLength < 100 ? "w-[260px]" : quoteLength < 200 ? "w-[300px]" : "w-[360px]";
-  
-  // 2. Subconscious Hierarchy Scale
-  const baseScale = config.strength === 5 ? 1 : 0.97;
-
-  // 3. Animation Values
-  const floatDuration = 5 + (index % 4);
-  const breathDuration = 6 + (index % 3);
-  const floatDelay = index * 0.7;
-
+  const config = relationshipConfig[testimonial.relationship as keyof typeof relationshipConfig] || relationshipConfig.Colleague;
   const initials = testimonial.name
     .split(" ")
     .map((n) => n[0])
     .join("")
-    .slice(0, 2);
+    .toUpperCase();
+
+  const widthClass = isMobile ? "w-full" : index % 3 === 0 ? "w-[320px]" : index % 3 === 1 ? "w-[360px]" : "w-[280px]";
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8, y: 30 }}
-      whileInView={{ opacity: 1, scale: baseScale, y: 0 }}
-      transition={{ 
-        delay: index * 0.08, // Radial bloom handled by index ordering in parent
-        duration: 0.8,
-        ease: [0.22, 1, 0.36, 1]
-      }}
-      whileHover={isInert ? {} : { zIndex: 100 }}
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       className={`relative z-10 ${widthClass} ${isInert ? "pointer-events-none opacity-40 grayscale-[0.5]" : ""}`}
     >
       <motion.div
-        animate={isPaused || isMobile ? {} : { 
-          y: [0, -12, 0],
-          rotate: [rotation - 0.5, rotation + 0.5, rotation - 0.5]
-        }}
-        transition={{
-          y: {
-            duration: floatDuration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: floatDelay,
-          },
-          rotate: {
-            duration: breathDuration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: floatDelay,
-          }
-        }}
-        whileHover={isInert ? {} : { 
+        whileHover={{ 
           y: -20, 
           scale: 1.05,
           rotate: 0,
+          filter: "blur(0px)",
+          opacity: 1,
           transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } 
         }}
-        className="group relative rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-md p-7 will-change-transform transform-gpu shadow-[0_10px_25px_-10px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.03)]"
+        className={`group relative rounded-[2rem] border border-white/10 bg-background/95 p-7 will-change-transform transform-gpu shadow-[0_8px_16px_-8px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.02)] transition-[filter,opacity] duration-500 ${isInert ? "blur-[2px] opacity-30" : "opacity-100"}`}
         style={{ 
           rotate: rotation,
         }}
@@ -97,8 +64,8 @@ export default function FloatingCard({
 
         {/* Decorative Quote Mark */}
         <div 
-          className="absolute -top-4 left-6 text-6xl font-serif opacity-10 transition-all duration-500 group-hover:opacity-30 group-hover:-translate-y-1"
-          style={{ color: config.color, filter: 'drop-shadow(0 0 10px currentColor)' }}
+          className="absolute top-4 left-6 text-4xl font-serif opacity-[0.03] transition-all duration-500 group-hover:opacity-10"
+          style={{ color: 'currentColor' }}
         >
           &ldquo;
         </div>
@@ -107,15 +74,9 @@ export default function FloatingCard({
           {testimonial.quote}
         </p>
 
-        <div className="flex items-center gap-4 border-t border-white/10 pt-6">
+        <div className="flex items-center gap-4 border-t border-white/5 pt-6">
           <div 
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-[13px] font-black border group-hover:scale-110 group-hover:rotate-3 shadow-lg"
-            style={{ 
-              backgroundColor: `${config.color}20`, 
-              color: config.color,
-              borderColor: `${config.color}40`,
-              boxShadow: `0 8px 16px ${config.color}20`
-            }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-[13px] font-black border border-white/10 bg-white/5 text-muted-foreground transition-all duration-500 group-hover:scale-110 shadow-sm"
           >
             {testimonial.avatar_url ? (
               <img src={testimonial.avatar_url} alt={testimonial.name} className="h-full w-full rounded-2xl object-cover" />
@@ -124,41 +85,26 @@ export default function FloatingCard({
             )}
           </div>
           <div className="min-w-0">
-            <h4 className="truncate text-[16px] font-black tracking-tight text-foreground transition-colors group-hover:text-primary/90">
+            <h4 className="truncate text-[15px] font-black tracking-tight text-foreground transition-colors">
               {testimonial.name}
             </h4>
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] truncate font-bold">
-              <span className="bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/5">{testimonial.role}</span>
-              {testimonial.linkedin_url && !isInert && (
-                <a 
-                  href={testimonial.linkedin_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-primary transition-all duration-300 inline-flex hover:scale-125"
-                >
-                  <FaLinkedin size={14} className="opacity-40 hover:opacity-100" />
-                </a>
-              )}
+            <div className="flex items-center gap-2 text-[9px] text-muted-foreground/40 uppercase tracking-[0.25em] truncate font-black">
+              <span className="bg-white/5 px-2 py-0.5 rounded-md border border-white/5">{testimonial.role}</span>
             </div>
           </div>
         </div>
 
-        {/* Premium Relationship Badge */}
         <div 
-          className="absolute top-5 right-6 flex items-center gap-2 px-3 py-1 rounded-xl border group-hover:scale-105"
-          style={{ 
-            backgroundColor: `${config.color}08`,
-            borderColor: `${config.color}20`
-          }}
+          className="absolute top-5 right-6 flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-md transition-all duration-500 group-hover:bg-white/10"
         >
           <div 
-            className="h-1.5 w-1.5 rounded-full animate-pulse" 
+            className="h-1 w-1 rounded-full" 
             style={{ 
-              backgroundColor: config.color,
-              boxShadow: `0 0 8px ${config.color}`
+              backgroundColor: config.color === "var(--primary)" ? "var(--primary)" : "#64748b",
+              boxShadow: config.color === "var(--primary)" ? `0 0 8px var(--primary)` : "none"
             }} 
           />
-          <span className="text-[8px] font-black uppercase tracking-[0.15em]" style={{ color: config.color }}>
+          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 group-hover:text-muted-foreground transition-colors">
             {testimonial.relationship}
           </span>
         </div>

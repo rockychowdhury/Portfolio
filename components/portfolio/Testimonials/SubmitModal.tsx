@@ -72,14 +72,20 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/60 backdrop-blur-[4px] transition-opacity"
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-border/50 bg-background p-8 shadow-2xl md:p-12"
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            transition={{ 
+              type: "spring", 
+              damping: 25, 
+              stiffness: 300,
+              mass: 0.8
+            }}
+            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-background p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] md:p-12 will-change-transform transform-gpu"
           >
             <button
               onClick={onClose}
