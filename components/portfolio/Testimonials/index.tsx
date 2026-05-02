@@ -63,12 +63,12 @@ export default function TestimonialsSection() {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
 
-  // Select top 14 for the cloud layout (matching GRID_ZONES count)
-  const topTestimonials = testimonials.slice(0, 14);
+  // Select top 12 for the cloud layout (matching GRID_ZONES count)
+  const topTestimonials = testimonials.slice(0, 12);
 
   return (
     <section id="testimonials" className="relative w-full bg-background pt-32 pb-24 overflow-hidden">
-      <GridBackground />
+      <GridBackground isPaused={isModalOpen} />
       
       <div className="relative z-10 flex flex-col items-center">
         <div className="w-full relative">

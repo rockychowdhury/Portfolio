@@ -9,28 +9,27 @@ interface FloatingCloudProps {
   isPaused?: boolean;
 }
 
-// 1. Define the "Controlled Chaos" Zone Map (x%, y%, rotation, priority)
-// Centered around 1400px width. x=50 is the center of the headline.
+// 1. Define the Symmetrical "Corner Frame" Zone Map (12 Zones)
 const GRID_ZONES = [
-  // Corner Framing (Occupied, framing the composition)
-  { x: 5, y: 12, rot: -2.5, isInert: false, priority: 1 },   // Top Left
-  { x: 95, y: 10, rot: 3, isInert: false, priority: 1 },    // Top Right
-  { x: 8, y: 92, rot: 1.5, isInert: false, priority: 1 },   // Bottom Left
-  { x: 92, y: 90, rot: -2, isInert: true, priority: 1 },    // Bottom Right (clipped suggestion)
+  // Cluster A: Top Left
+  { x: 12, y: 15, rot: -1.5, isInert: false, priority: 1 },
+  { x: 25, y: 10, rot: 1, isInert: false, priority: 1 },
+  { x: 8, y: 32, rot: -2, isInert: false, priority: 1 },
 
-  // Near-Center High Strength (Orbiting the headline - pushed further out)
-  { x: 20, y: 48, rot: 2.2, isInert: false, priority: 5 },  // Left Mid (Increased buffer)
-  { x: 80, y: 52, rot: -1.8, isInert: false, priority: 5 }, // Right Mid (Increased buffer)
-  { x: 40, y: 15, rot: -1.5, isInert: false, priority: 5 }, // Top Center Left
-  { x: 60, y: 85, rot: 2.4, isInert: false, priority: 5 },  // Bottom Center Right
+  // Cluster B: Top Right (Mirror of A)
+  { x: 88, y: 15, rot: 1.5, isInert: false, priority: 1 },
+  { x: 75, y: 10, rot: -1, isInert: false, priority: 1 },
+  { x: 92, y: 32, rot: 2, isInert: false, priority: 1 },
 
-  // Radial Fill & Editorial Clipping
-  { x: -8, y: 60, rot: -3, isInert: true, priority: 3 },    // Clipped Left
-  { x: 108, y: 40, rot: 2.5, isInert: true, priority: 3 },  // Clipped Right
-  { x: 15, y: 78, rot: -1, isInert: false, priority: 3 },   // Mid Left Gap
-  { x: 85, y: 22, rot: 1.2, isInert: false, priority: 3 },  // Mid Right Gap
-  { x: 45, y: 95, rot: -1.5, isInert: false, priority: 3 }, // Bottom Edge
-  { x: 55, y: 5, rot: 1, isInert: false, priority: 3 },     // Top Edge
+  // Cluster C: Bottom Left
+  { x: 12, y: 85, rot: 1.5, isInert: false, priority: 1 },
+  { x: 25, y: 90, rot: -1, isInert: false, priority: 1 },
+  { x: 8, y: 68, rot: 2, isInert: false, priority: 1 },
+
+  // Cluster D: Bottom Right (Mirror of C)
+  { x: 88, y: 85, rot: -1.5, isInert: false, priority: 1 },
+  { x: 75, y: 90, rot: 1, isInert: false, priority: 1 },
+  { x: 92, y: 68, rot: -2, isInert: false, priority: 1 },
 ];
 
 export default function FloatingCloud({ testimonials, isPaused = false }: FloatingCloudProps) {
@@ -53,13 +52,13 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
   return (
     <>
       {/* Desktop: Absolute-positioned floating cloud (md+) */}
-      <div className="relative w-full max-w-[1400px] mx-auto min-h-[900px] md:min-h-[1100px] py-12 md:py-24 overflow-visible hidden md:block">
+      <div className="relative w-full max-w-[1400px] mx-auto min-h-[750px] md:min-h-[850px] py-8 md:py-16 overflow-visible hidden md:block">
         {bloomSortedAssignments.map((assignment, bloomIndex) => {
           const { testimonial, zone } = assignment;
           return (
             <motion.div 
               key={`${testimonial.name}-${bloomIndex}`}
-              className="absolute transition-all duration-700"
+              className="absolute"
               style={{ 
                 left: `${zone.x}%`, 
                 top: `${zone.y}%`,

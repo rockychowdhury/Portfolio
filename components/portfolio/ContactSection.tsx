@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "fram
 import { Trash2, MapPin, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { FaWhatsapp, FaLinkedin, FaGithub, FaYoutube } from "react-icons/fa";
 import { toast } from "sonner";
+import { SlantPattern } from "@/components/ui/BackgroundPatterns";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -109,17 +110,9 @@ Looking forward to connecting.`;
       className="relative w-full overflow-hidden bg-background py-16 md:py-24 lg:py-32"
       onMouseMove={handleMouseMove}
     >
+      <SlantPattern />
       <div className="container-main relative z-10">
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
-        <div 
-          className="absolute inset-0" 
-          style={{ 
-            backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-            backgroundSize: `40px 40px` 
-          }} 
-        />
-      </div>
+      {/* Spotlight Effect */}
 
       {/* Spotlight Effect */}
       <motion.div
@@ -279,7 +272,7 @@ Looking forward to connecting.`;
                         <button
                           key={pill}
                           type="button"
-                          onClick={() => setFormData({ ...formData, subject: pill })}
+                          onClick={() => setFormData({ ...formData, subject: formData.subject === pill ? "" : pill })}
                           className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
                             formData.subject === pill && !["Others"].includes(formData.subject)
                               ? "border-primary bg-primary text-primary-foreground"
@@ -352,12 +345,12 @@ Looking forward to connecting.`;
                   <button
                     disabled={status === "loading"}
                     type="submit"
-                    className={`group relative flex flex-[1.5] items-center justify-center gap-3 overflow-hidden rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-widest transition-all disabled:opacity-50 ${
+                    className={`group/btn relative flex flex-[1.5] items-center justify-center gap-4 overflow-hidden rounded-xl px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-[0.98] disabled:opacity-50 ${
                       status === "success" 
                         ? "bg-green-600 text-white" 
                         : status === "error" 
                         ? "bg-red-600 text-white" 
-                        : "bg-foreground text-background hover:pr-10"
+                        : "bg-foreground text-background"
                     }`}
                   >
                     <AnimatePresence mode="wait">
@@ -369,8 +362,8 @@ Looking forward to connecting.`;
                           exit={{ opacity: 0 }}
                           className="flex items-center gap-2"
                         >
-                          <Loader2 className="animate-spin" size={18} />
-                          <span>Sending...</span>
+                          <Loader2 className="animate-spin" size={16} />
+                          <span>Sending</span>
                         </motion.div>
                       ) : status === "success" ? (
                         <motion.div
@@ -380,8 +373,8 @@ Looking forward to connecting.`;
                           exit={{ opacity: 0 }}
                           className="flex items-center gap-2"
                         >
-                          <CheckCircle2 size={18} />
-                          <span>Sent</span>
+                          <CheckCircle2 size={16} />
+                          <span>Success</span>
                         </motion.div>
                       ) : status === "error" ? (
                         <motion.div
@@ -391,29 +384,31 @@ Looking forward to connecting.`;
                           exit={{ opacity: 0 }}
                           className="flex items-center gap-2"
                         >
-                          <AlertCircle size={18} />
+                          <AlertCircle size={16} />
                           <span>Retry</span>
                         </motion.div>
                       ) : (
-                        <motion.div
-                          key="idle"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          <span>Send Message</span>
-                          <ArrowRight size={18} className="absolute right-6 translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-                        </motion.div>
+                        <div className="flex items-center gap-2">
+                          <span className="relative z-10 transition-transform duration-500 group-hover/btn:-translate-x-3">
+                            Send Message
+                          </span>
+                          <div className="absolute right-8 translate-x-12 opacity-0 transition-all duration-500 group-hover/btn:translate-x-0 group-hover/btn:opacity-100">
+                            <ArrowRight size={18} strokeWidth={3} />
+                          </div>
+                        </div>
                       )}
                     </AnimatePresence>
+                    
+                    {/* Hover Glow Effect */}
+                    <div className="absolute inset-0 z-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
                   </button>
+
                   <button
                     onClick={handleClear}
                     type="button"
-                    className="flex flex-1 items-center justify-center gap-3 rounded-full border border-border px-6 py-3.5 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-95"
+                    className="flex flex-1 items-center justify-center gap-3 rounded-xl border border-foreground/5 bg-transparent px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground transition-all hover:bg-foreground/5 hover:text-foreground active:scale-[0.98]"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={14} strokeWidth={3} className="opacity-40 group-hover:opacity-100 transition-opacity" />
                     <span>Clear</span>
                   </button>
                 </div>

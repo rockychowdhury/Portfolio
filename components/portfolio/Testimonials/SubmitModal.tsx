@@ -24,20 +24,14 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea efficiently
+  // Optimized auto-resize for textarea
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    // Use requestAnimationFrame to ensure the style update happens in the next frame
-    const resize = () => {
-      textarea.style.height = "0px"; // Reset height to get true scrollHeight
-      const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = `${scrollHeight}px`;
-    };
-
-    const rafId = requestAnimationFrame(resize);
-    return () => cancelAnimationFrame(rafId);
+    // Use a more stable resize approach to prevent layout thrashing
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
   }, [formData.quote]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,18 +72,22 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/80 transition-opacity"
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.98, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-border/50 bg-background p-8 shadow-2xl md:p-12"
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ 
+              duration: 0.3,
+              ease: [0.23, 1, 0.32, 1] // Efficient cubic-bezier for smooth reveal
+            }}
+            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-background p-8 shadow-2xl md:p-12 transform-gpu"
           >
             <button
               onClick={onClose}
-              className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -131,10 +129,10 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
                       key={rel}
                       type="button"
                       onClick={() => setFormData({ ...formData, relationship: rel })}
-                      className={`rounded-full border px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
+                      className={`rounded-full border px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                         formData.relationship === rel
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border/50 bg-secondary/20 text-muted-foreground hover:border-primary/30"
+                          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(var(--primary-rgb),0.3)]"
+                          : "border-border/50 bg-secondary/10 text-muted-foreground hover:border-primary/30 hover:bg-secondary/20"
                       }`}
                     >
                       {rel}
@@ -166,14 +164,14 @@ export default function SubmitModal({ isOpen, onClose, onSuccess }: SubmitModalP
                 <button
                   disabled={isSubmitting}
                   type="submit"
-                  className="group relative flex items-center gap-3 rounded-full bg-foreground px-8 py-4 text-xs font-bold uppercase tracking-widest text-background transition-all hover:bg-primary disabled:opacity-50"
+                  className="group relative flex items-center gap-3 rounded-full bg-foreground px-8 py-4 text-xs font-bold uppercase tracking-widest text-background transition-all hover:bg-primary hover:shadow-[0_8px_25px_-5px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : (
                     <>
-                      <span>Submit Testimonial</span>
-                      <CheckCircle2 size={16} />
+                      <span className="relative z-10">Submit Testimonial</span>
+                      <CheckCircle2 size={16} className="relative z-10 group-hover:rotate-12 transition-transform" />
                     </>
                   )}
                 </button>

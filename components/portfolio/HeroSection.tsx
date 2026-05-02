@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { GridPattern } from "@/components/ui/BackgroundPatterns";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -202,6 +203,7 @@ export default function HeroSection({
       id="hero"
       className="relative min-h-screen w-full overflow-hidden bg-background pt-20 lg:pt-0"
     >
+      <GridPattern />
       <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-col lg:flex-1 lg:justify-center pt-10 pb-6 lg:py-0">

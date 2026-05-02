@@ -162,6 +162,17 @@
     display: block;
     max-width: 100%;
   }
+
+  /* Force pointer cursor on all clickable elements */
+  a, 
+  button, 
+  [role="button"],
+  .cursor-pointer,
+  input[type="submit"],
+  input[type="button"],
+  label[for] {
+    cursor: pointer !important;
+  }
 }
 
 @layer components {

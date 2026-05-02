@@ -8,6 +8,7 @@ import MasonryGrid from "./MasonryGrid";
 import SearchBar from "./SearchBar";
 import { IBlog } from "@/lib/db/models/Blog";
 import { Loader2, ChevronsDown } from "lucide-react";
+import { SlantPattern } from "@/components/ui/BackgroundPatterns";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -177,17 +178,11 @@ export default function BlogsSection() {
   return (
     <SectionWrapper
       id="blogs"
-      className="pt-16 lg:pt-24 pb-12 lg:pb-16 relative overflow-hidden bg-secondary/5 dark:bg-zinc-900/40 border-y border-border/10"
+      className="pt-16 lg:pt-24 pb-12 lg:pb-16 relative overflow-hidden bg-background border-y border-border/10"
       onMouseMove={handleMouseMove}
     >
-      {/* Background Pattern Detail: Horizontal (X-axis) Lines */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none opacity-[0.05]"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)`,
-          backgroundSize: "100% 80px",
-        }}
-      />
+      <SlantPattern />
+      {/* Spotlight Effect */}
 
       {/* Spotlight Effect */}
       <motion.div

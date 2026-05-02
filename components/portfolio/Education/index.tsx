@@ -7,6 +7,7 @@ import SectionWrapper from "../SectionWrapper";
 import BentoGrid from "./BentoGrid";
 import ShowAllButton from "./ShowAllButton";
 import { EducationSkeleton } from "./EducationSkeleton";
+import { GridPattern } from "@/components/ui/BackgroundPatterns";
 
 export default function Education() {
   const [data, setData] = useState<ICertification[]>([]);
@@ -61,6 +62,7 @@ export default function Education() {
 
   return (
     <SectionWrapper id="education" className="relative pt-24 lg:pt-40 pb-16 lg:pb-24 bg-background overflow-hidden">
+      <GridPattern />
       <div className="container-main relative z-10" ref={sectionRef}>
         
         {/* Section Header */}

@@ -18,13 +18,13 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
         Testimonials
       </motion.div>
 
-      <div className="space-y-4 mb-8">
+      <div className="space-y-2 mb-10">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="text-4xl font-bold tracking-tight text-foreground md:text-6xl"
+          transition={{ delay: 0.1, duration: 0.8 }}
+          className="text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/70 md:text-7xl"
         >
           Trusted by people
         </motion.h2>
@@ -32,8 +32,8 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="text-4xl font-bold tracking-tight text-muted-foreground/30 md:text-6xl"
+          transition={{ delay: 0.2, duration: 0.8 }}
+          className="text-4xl font-black tracking-tighter text-muted-foreground/20 md:text-6xl"
         >
           who&apos;ve worked with me.
         </motion.h2>
@@ -61,7 +61,7 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
           viewport={{ once: true }}
           transition={{ delay: 0.4, type: "spring", damping: 15 }}
           onClick={onLeaveTestimonial}
-          className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-foreground px-8 py-4 text-xs font-black uppercase tracking-widest text-background transition-all hover:shadow-[0_0_40px_-10px_rgba(var(--primary-rgb),0.5)] md:text-sm"
+          className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-foreground px-8 py-4 text-xs font-black uppercase tracking-widest text-background transition-all hover:shadow-[0_0_40px_-10px_rgba(var(--primary-rgb),0.5)] md:text-sm cursor-pointer"
         >
           {/* Shimmer Effect */}
           <div className="absolute inset-0 w-[200%] -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />

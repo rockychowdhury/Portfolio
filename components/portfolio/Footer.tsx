@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { WavePattern } from "../ui/BackgroundPatterns";
 
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
@@ -13,9 +14,10 @@ export default function Footer() {
 
   return (
     <footer className="relative w-full overflow-hidden bg-background pt-16 pb-0">
+      <WavePattern />
       <div className="container-main">
         <div className="flex flex-col items-center gap-10">
-          <div className="flex flex-wrap items-center justify-center w-full gap-x-8 gap-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 border-t border-foreground/5 pt-12">
+          <div className="flex flex-wrap items-center justify-center w-full gap-x-8 gap-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
             <span className="text-center">{`© ${currentYear} // Rocky Chowdhury`}</span>
           </div>
 

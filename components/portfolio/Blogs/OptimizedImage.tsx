@@ -47,8 +47,8 @@ export default function OptimizedImage({
       <Image
         src={src}
         alt={alt}
-        className={`transition-all duration-700 ease-out ${
-          isLoaded ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-105 blur-lg"
+        className={`transition-all duration-500 ease-out ${
+          isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
         } ${className}`}
         onLoad={() => setIsLoaded(true)}
         onError={() => setIsLoaded(true)} // Handle broken images

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Project } from "@/types/project";
 import ProjectSlider from "./ProjectSlider";
+import { TopoPattern } from "@/components/ui/BackgroundPatterns";
 
 const headerLetters = "PROJECTS".split("");
 
@@ -59,6 +60,7 @@ export default function ProjectsSection() {
           <div className="pt-12 md:pt-10" />
 
           <section className="relative w-full pt-12 md:pt-10 pb-10 md:pb-20">
+            <TopoPattern />
             {/* Section Header — constrained */}
             <div className="container-main">
               <div className="mb-16 lg:mb-20">
