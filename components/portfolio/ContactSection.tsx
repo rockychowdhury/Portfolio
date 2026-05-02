@@ -174,31 +174,6 @@ Looking forward to connecting.`;
                     Got an idea? <br />
                     <span className="text-muted-foreground/30">Let&apos;s engineer it.</span>
                   </motion.h2>
-
-                  {/* ── Hand-drawn Curved Arrow (Desktop Only) ── */}
-                  <div className="hidden lg:block absolute -right-16 top-[-10px] pointer-events-none z-20">
-                    <svg width="180" height="100" viewBox="0 0 180 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted-foreground/20">
-                      <motion.path 
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        whileInView={{ pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
-                        d="M10 10C50 10 120 20 160 80" 
-                        stroke="currentColor" 
-                        strokeWidth="2.5" 
-                        strokeLinecap="round" 
-                      />
-                      <motion.path 
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        transition={{ duration: 0.3, delay: 2.1 }}
-                        d="M145 70L160 80L165 65" 
-                        stroke="currentColor" 
-                        strokeWidth="2.5" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                      />
-                    </svg>
-                  </div>
                 </div>
                 <motion.div 
                   initial={{ opacity: 0 }}
@@ -251,11 +226,14 @@ Looking forward to connecting.`;
           </div>
 
           {/* Right Side: Contact Form */}
-          <div className="flex-1 lg:max-w-xl">
+          <div className="flex-1 lg:max-w-xl relative group">
+            {/* Ambient Highlight Glow */}
+            <div className="absolute -inset-4 z-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="relative rounded-3xl border border-border/50 bg-secondary/10 p-6 backdrop-blur-sm md:p-10 lg:p-12"
+              className="relative z-10 rounded-3xl border border-border/50 bg-secondary/10 p-6 backdrop-blur-sm md:p-10 lg:p-12 transition-all duration-500 group-hover:border-primary/20 group-hover:bg-secondary/20"
             >
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-5">
