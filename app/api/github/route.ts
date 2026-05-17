@@ -33,11 +33,13 @@ export async function GET() {
     const isStale = now - lastUpdated > REFRESH_INTERVAL_MS;
 
     if (isStale) {
-      console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), triggering background refresh...`);
-      // Use background update
-      performUpdate(existingProfile).catch((err) =>
-        console.error("[API] Background GitHub refresh failed:", err)
-      );
+      console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), triggering refresh...`);
+      // Await the update to ensure it completes before serverless function shuts down
+      const updatedProfile = await performUpdate(existingProfile).catch((err) => {
+        console.error("[API] GitHub refresh failed:", err);
+        return existingProfile;
+      });
+      return NextResponse.json(updatedProfile);
     }
 
     // 4. Return cached immediately
