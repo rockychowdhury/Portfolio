@@ -1,0 +1,403 @@
+# 🔍 Portfolio Main-Thread Performance Audit
+
+> **Objective:** Identify every blocking operation on the main thread that causes UI lag, shaking, or screen freezing — and prescribe a fix for each.
+
+---
+
+## Executive Summary
+
+After a deep-dive through **every component** in the portfolio, I've identified **12 concrete main-thread blockers** ranked by severity. The good news: **none require an architectural rewrite**. Most are fixable with targeted optimizations (memoization, passive listeners, GPU offloading, and async scheduling).
+
+---
+
+## 🔴 Critical Blockers (High Impact on Jank)
+
+### 1. `SkillIcon` — Infinite Framer-Motion Keyframe Per Icon (~20+ simultaneous)
+
+**File:** [SkillsSection.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/SkillsSection.tsx#L177-L208)
+
+**Problem:** Each `SkillIcon` runs its own **infinite `y` keyframe animation** via Framer Motion. With 3 shape groups × ~8 icons each = **~24 independent JS-driven animation loops** running simultaneously. Framer Motion's `animate` prop with `repeat: Infinity` schedules a new `requestAnimationFrame` callback *per animated value per component*. This overwhelms the main thread.
+
+**Why it causes shaking/freezing:**
+- Each SkillIcon has its own float delay + float animation
+- The parent `ShapeGroup` ALSO has its own infinite `y + rotate` animation (line 339-355)
+- That's ~24 child animations + 3 parent animations = **~27 concurrent JS animation loops**
+
+**Fix:**
+```diff
+- // CURRENT: JS-driven infinite animation per icon
+- animate={isBuilt ? { y: [y, y - 8, y], opacity: 1, scale: 1 } : ...}
+- transition={{ y: { duration: FLOAT_DURATION, repeat: Infinity, ... } }}
+
++ // FIX: Use CSS animation instead — zero JS cost
++ animate={isBuilt ? { opacity: 1, scale: 1 } : { scale: 0, opacity: 0 }}
++ className={`absolute z-10 ${isBuilt ? 'animate-float' : ''}`}
++ style={{ animationDelay: `${floatDelay}s` }}
+```
+
+Add to `globals.css`:
+```css
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+  will-change: transform;
+}
+```
+
+**Do the same for `ShapeGroup`'s parent container float animation** (line 339-355) — convert to CSS.
+
+> **Impact: 🔥 HIGHEST — eliminates ~27 JS animation loops from main thread**
+
+---
+
+### 2. `HeroSection` — Unbounded `mousemove` Listener (fires 60+ times/sec)
+
+**File:** [HeroSection.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/HeroSection.tsx#L189-L198)
+
+**Problem:** A raw `window.addEventListener("mousemove", ...)` fires on **every mouse move** (60-120 times/sec). Each callback does `getBoundingClientRect()` (forces layout recalc) + sets two MotionValues. Combined with the spring transforms on the image, this creates continuous layout thrashing.
+
+**Fix:**
+```tsx
+useEffect(() => {
+  let rafId: number | null = null;
+  
+  const handleMouse = (e: MouseEvent) => {
+    if (rafId !== null) return; // Throttle to 1 per frame
+    rafId = requestAnimationFrame(() => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) { rafId = null; return; }
+      mouseX.set(e.clientX - rect.width / 2);
+      mouseY.set(e.clientY - rect.height / 2);
+      rafId = null;
+    });
+  };
+  
+  window.addEventListener("mousemove", handleMouse, { passive: true });
+  return () => {
+    window.removeEventListener("mousemove", handleMouse);
+    if (rafId !== null) cancelAnimationFrame(rafId);
+  };
+}, [mouseX, mouseY]);
+```
+
+> **Impact: Eliminates layout thrashing on every mouse move**
+
+---
+
+### 3. `PlatformCard` — 3D Transform + Spotlight on Every Mouse Move (×3 cards)
+
+**File:** [PlatformCard.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/ProblemSolving/PlatformCard.tsx#L72-L81)
+
+**Problem:** Each PlatformCard runs `handleMouseMove` on every pixel move, calling `getBoundingClientRect()` + setting 2 MotionValues that drive 2 springs (`springRotateX`, `springRotateY`) + a `useTransform` for spotlight gradient. With **3 cards visible**, this is 3× the work on the main thread.
+
+**Fix:** Same RAF-throttle pattern as #2. Also, add `{ passive: true }` to any mouse listeners.
+
+---
+
+### 4. `ContactSection` — `setInterval` Clock at 1000ms with React Re-render
+
+**File:** [ContactSection.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/ContactSection.tsx#L27-L38)
+
+**Problem:** The `setInterval` runs **every 1 second** and calls `setCurrentTime(...)` which triggers a **full component re-render of the entire ContactSection** (424 lines of JSX + Framer Motion). This re-render includes re-evaluating `useMotionTemplate` (line 121), all AnimatePresence blocks, and the spotlight gradient.
+
+**Fix:**
+```tsx
+// Extract clock into its own memoized component to isolate re-renders
+function LiveClock() {
+  const [currentTime, setCurrentTime] = useState("");
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit", hour12: true,
+      }).format(new Date()));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+  
+  return <span className="text-xs font-mono text-muted-foreground/60">Local Time: {currentTime || "--:-- --"}</span>;
+}
+```
+
+Then use `<LiveClock />` inline — this isolates the 1s re-render to a **tiny leaf component** instead of re-rendering the entire ContactSection.
+
+> **Impact: Prevents full 424-line component re-render every second**
+
+---
+
+### 5. `Preloader` — `setInterval` at 100ms with setState
+
+**File:** [Preloader.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/Preloader.tsx#L24-L34)
+
+**Problem:** The progress simulation runs `setInterval` at **100ms** (10 re-renders/second), each calling `setProgress(...)`. Each re-render also triggers Framer Motion to recalculate the progress bar width animation (line 151).
+
+**Fix:** Use `requestAnimationFrame` + a ref to track progress, only flushing to state when the visual difference is ≥1%:
+```tsx
+useEffect(() => {
+  const progressRef = { current: 0 };
+  let lastRendered = 0;
+  let rafId: number;
+  
+  const tick = () => {
+    if (progressRef.current >= 100) return;
+    const increment = progressRef.current < 70 ? Math.random() * 2 : Math.random() * 0.3;
+    progressRef.current = Math.min(progressRef.current + increment, 100);
+    
+    if (Math.round(progressRef.current) !== lastRendered) {
+      lastRendered = Math.round(progressRef.current);
+      setProgress(lastRendered);
+    }
+    
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(rafId);
+}, []);
+```
+
+---
+
+## 🟡 Medium Blockers
+
+### 6. `Navbar` — Scroll Handler Without Throttle
+
+**File:** [Navbar.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/Navbar.tsx#L48-L56)
+
+**Problem:** `window.addEventListener("scroll", handleScroll)` fires on **every scroll tick** (~60 times/sec during scroll). The handler computes `window.scrollY` comparisons and conditionally calls `setScrolled` and `setActiveSection`.
+
+**Fix:** Add `{ passive: true }` flag AND use RAF-throttle:
+```tsx
+useEffect(() => {
+  let ticking = false;
+  const handleScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const isScrolled = window.scrollY > 20;
+      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+      if (window.scrollY < 100) {
+        setActiveSection((prev) => (prev !== "" ? "" : prev));
+      }
+      ticking = false;
+    });
+  };
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+```
+
+---
+
+### 7. `SkillsSection` — Re-computing `searchStatus` on Every Keystroke
+
+**File:** [SkillsSection.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/SkillsSection.tsx#L529-L541)
+
+**Problem:** `searchStatus` depends on `searchQuery` (not debounced), so it re-computes **on every keystroke**, iterating the entire skills array with `.filter()` and `.toLowerCase()` comparisons.
+
+**Fix:** Make `searchStatus` depend on `debouncedQuery` instead, or compute it inline from `filteredSearch`:
+```tsx
+const searchStatus = useMemo(() => {
+  if (!debouncedQuery.trim()) return "idle";
+  return filteredSearch.length > 0 ? "found" : "not_found";
+}, [debouncedQuery, filteredSearch]);
+```
+
+This eliminates the redundant `.filter()` on every keystroke. The 300ms debounce already handles the visual feedback.
+
+---
+
+### 8. `SmoothScrollProvider` — Lenis RAF Without GSAP Ticker Integration
+
+**File:** [SmoothScrollProvider.tsx](file:///home/rocky/Projects/portfolio/components/SmoothScrollProvider.tsx#L31-L36)
+
+**Problem:** Lenis runs its own `requestAnimationFrame` loop (`raf → lenis.raf → requestAnimationFrame`), *separate from* GSAP's internal ticker. This means two independent RAF loops are competing for the same frame budget. When both fire in the same frame, they can exceed the 16ms budget and cause frame drops.
+
+**Fix:** Use GSAP's ticker to drive Lenis (single RAF loop):
+```tsx
+useEffect(() => {
+  const lenis = new Lenis({ ... });
+  lenis.on("scroll", ScrollTrigger.update);
+  
+  // Drive Lenis through GSAP's ticker — single RAF loop
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000); // GSAP ticker uses seconds, Lenis expects ms
+  });
+  gsap.ticker.lagSmoothing(0); // Prevent GSAP from throttling on lag
+  
+  return () => {
+    lenis.destroy();
+    gsap.ticker.remove(lenis.raf);
+    ScrollTrigger.getAll().forEach((st) => st.kill());
+  };
+}, []);
+```
+
+> **Impact: Eliminates duplicate RAF loop — one of the primary causes of scroll jank**
+
+---
+
+### 9. `ProjectSlider` — Blur Filter on Side Cards
+
+**File:** [ProjectSlider.tsx](file:///home/rocky/Projects/portfolio/components/Projects/ProjectSlider.tsx#L308-L325)
+
+**Problem:** Each side card renders a **120% oversized image with `filter: blur(17px) saturate(180%) brightness(1.1)`**. CSS `blur()` is extremely expensive — it forces the browser to rasterize the oversized image and apply a Gaussian blur on every composite. With 2 side cards visible, this is 2× the cost.
+
+**Fix:** Pre-blur the thumbnails at build time (ideal), or use a much smaller resolution for the blur source + `will-change: filter`:
+```tsx
+// Reduce the blur source to a tiny image
+<img
+  src={project.thumbnail}
+  alt=""
+  className="w-full h-full object-cover object-top"
+  // Load a much smaller version for the blur layer
+  sizes="100px"
+  loading="lazy"
+  draggable={false}
+/>
+```
+
+Or better — add `transform: translateZ(0)` (already there as `scale(1.25)`) and ensure `will-change: filter` is set so the blur is GPU-composited:
+```css
+style={{
+  opacity: isCenter ? 0 : 1,
+  filter: `blur(${isMobile ? 10 : 17}px) saturate(180%) brightness(1.1)`,
+  transform: "scale(1.25) translateZ(0)",
+  willChange: "filter, opacity",
+  /* containment prevents blur from leaking into layout calculations */
+  contain: "strict",
+}}
+```
+
+---
+
+### 10. `FeatureCardRow` — `projectColorMap` and `projectNameMap` Rebuilt Every Render
+
+**File:** [FeatureCardRow.tsx](file:///home/rocky/Projects/portfolio/components/Projects/FeatureCardRow.tsx#L49-L56)
+
+**Problem:** Two `Map` objects are constructed from arrays **on every render** (not memoized). When the auto-slide timer fires every 5s or during drag events, these maps are rebuilt unnecessarily.
+
+**Fix:**
+```tsx
+const projectColorMap = useMemo(() => {
+  const map = new Map<string, string>();
+  projects.forEach((p, i) => {
+    map.set(p._id || p.id, PROJECT_COLORS[i % PROJECT_COLORS.length]);
+  });
+  return map;
+}, [projects]);
+
+const projectNameMap = useMemo(() => {
+  const map = new Map<string, string>();
+  projects.forEach((p) => {
+    map.set(p._id || p.id, p.title);
+  });
+  return map;
+}, [projects]);
+```
+
+---
+
+### 11. `ContributionHeatmap` — 365+ HeatmapCells Rendered at Once
+
+**File:** [ContributionHeatmap.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/GitHub/ContributionHeatmap.tsx#L141-L153)
+
+**Problem:** Renders **~52 weeks × 7 days = ~364 `HeatmapCell` components** at once. Each cell has its own hover handlers. When scrolling through the heatmap, the browser must composite 364+ absolutely positioned elements.
+
+**Fix:** This is lower priority since heatmap cells are tiny divs, but you can:
+- Memoize `HeatmapCell` with `React.memo` 
+- Use CSS `:hover` instead of JS `onMouseEnter/onMouseLeave` for the basic hover state
+- Add `contain: content` to the heatmap container
+
+---
+
+### 12. `ActivityHeatmap` — `motion.div` with `whileInView` for ~112 Cells
+
+**File:** [ActivityHeatmap.tsx](file:///home/rocky/Projects/portfolio/components/portfolio/ProblemSolving/ActivityHeatmap.tsx#L84-L112)
+
+**Problem:** Each of the ~112 cells (16 weeks × 7 days) is a `motion.div` with `whileInView` + `whileHover`. Framer Motion creates an IntersectionObserver **per element** with `whileInView`, which is 112 observers for what should be a single visibility check.
+
+**Fix:** Check visibility at the parent level and animate children with CSS:
+```tsx
+const containerRef = useRef(null);
+const isInView = useInView(containerRef, { once: true });
+
+// Then in JSX:
+<div ref={containerRef} className="grid grid-rows-7 gap-[3px]" style={{ gridAutoFlow: 'column' }}>
+  {cells.map((cell, idx) => (
+    <div
+      key={idx}
+      className={`group relative w-3 h-3 rounded-[2px] transition-all duration-300 hover:scale-125 hover:z-10 ${
+        cell.count === 0 ? "bg-secondary/20" : ""
+      }`}
+      style={{
+        backgroundColor: cell.count !== 0 ? accentColor : undefined,
+        opacity: isInView ? (cell.count === 0 ? 1 : cell.intensity) : 0,
+        transform: isInView ? 'scale(1)' : 'scale(0.5)',
+        transitionDelay: `${Math.floor(idx / 7) * 20}ms`,
+      }}
+    >
+      {/* tooltip */}
+    </div>
+  ))}
+</div>
+```
+
+This reduces 112 IntersectionObservers → 1 and 112 `motion.div` → 112 plain `div`.
+
+---
+
+## 🟢 Low Priority / Already Handled
+
+| Item | Status |
+|------|--------|
+| Background patterns (GridPattern, BlueprintPattern, etc.) | ✅ Pure CSS backgrounds — no JS cost |
+| Marquee animations (AchievementsMarquee, SkillTicker) | ✅ CSS `animation` with `will-change: transform` and `translate3d` — GPU-composited |
+| Lenis mobile skip | ✅ Already disabled on mobile (line 15-19) |
+| `backdrop-blur` GPU hint | ✅ Already has `transform: translateZ(0)` + `will-change` in globals.css |
+| `unoptimized` hero image | ⚠️ Minor — serves full-res PNG. Consider optimized Next.js Image. |
+
+---
+
+## Priority Fix Order
+
+| Priority | Fix | Effort | Impact |
+|----------|-----|--------|--------|
+| 1 | SkillIcon float → CSS animation | 15 min | 🔥🔥🔥 Eliminates ~27 JS loops |
+| 2 | Lenis + GSAP → single RAF loop | 5 min | 🔥🔥🔥 Eliminates dual RAF |
+| 3 | Hero mousemove → RAF throttle | 5 min | 🔥🔥 Stops layout thrashing |
+| 4 | ContactSection clock → isolated component | 5 min | 🔥🔥 Stops 1/s full re-render |
+| 5 | PlatformCard mousemove → RAF throttle | 5 min | 🔥🔥 3 cards × 60fps savings |
+| 6 | Navbar scroll → passive + RAF | 5 min | 🔥 Scroll perf |
+| 7 | Preloader interval → RAF | 5 min | 🔥 Startup perf |
+| 8 | ProjectSlider blur → contain + will-change | 3 min | 🔥 Composite perf |
+| 9 | FeatureCardRow maps → useMemo | 2 min | ⚡ Minor |
+| 10 | ActivityHeatmap → single IntersectionObserver | 10 min | ⚡ Section perf |
+| 11 | searchStatus → use debouncedQuery | 2 min | ⚡ Keystroke perf |
+| 12 | HeatmapCell → React.memo | 3 min | ⚡ Scroll perf |
+
+---
+
+## Can We Solve These With Async?
+
+**Short answer: Not exactly.** These aren't async/await problems — they're **per-frame synchronous workload** problems. The main thread is overloaded with too many simultaneous animations and event handlers competing for the same 16ms frame budget.
+
+The correct solutions are:
+
+| Pattern | When to Use |
+|---------|-------------|
+| **CSS animations** (not JS) | For all infinite/decorative animations (floating, pulsing, marquees) |
+| **RAF throttling** | For high-frequency event handlers (mousemove, scroll, resize) |
+| **Component isolation** | For state updates that shouldn't re-render parent trees (clock, counters) |
+| **GPU compositing** (`will-change`, `transform`, `contain`) | For expensive visual effects (blur, backdrop-filter) |
+| **Single animation driver** (GSAP ticker driving Lenis) | When multiple animation systems compete for RAF |
+| **`useMemo` / `React.memo`** | For expensive computations that re-run on every render |
+
+> [!IMPORTANT]
+> The #1 root cause of the UI shaking is likely the **Lenis + independent RAF loop** (#8) combined with **~27 simultaneous JS-driven Framer Motion animation loops** (#1). Fixing these two alone should eliminate most visible jank.
+
+---
+
+*Shall I implement these fixes?*
