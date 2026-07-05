@@ -47,7 +47,7 @@ export default function BlogsSection() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await fetch("/api/blogs/list");
+        const res = await fetch("/api/blogs/list?featured=true");
         const data = await res.json();
         if (Array.isArray(data)) {
           setBlogs(data);

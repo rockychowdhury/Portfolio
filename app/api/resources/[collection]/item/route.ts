@@ -3,11 +3,13 @@ import connectDB from "@/lib/db/connect";
 import Project from "@/lib/db/models/Project";
 import Skill from "@/lib/db/models/Skill";
 import Blog from "@/lib/db/models/Blog";
+import Testimonial from "@/lib/db/models/Testimonial";
 
 const models: Record<string, any> = {
   projects: Project,
   skills: Skill,
   blogs: Blog,
+  testimonials: Testimonial,
 };
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ collection: string }> }) {
