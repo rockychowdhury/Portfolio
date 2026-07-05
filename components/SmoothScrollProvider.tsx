@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,7 +11,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   useEffect(() => {
+    // Disable on admin routes
+    if (pathname?.startsWith("/admin")) return;
+
     // Skip Lenis on mobile/touch devices for better native performance and to avoid scroll lock issues
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                     (window.innerWidth <= 768) ||

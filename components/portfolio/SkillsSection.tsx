@@ -202,12 +202,12 @@ function SkillIcon({
         style={{ animationDelay: `${floatDelay}s` }}
       >
       <div
-        className={`relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group border border-border/50
+        className={`relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group border border-border/50
           hover:scale-125 hover:shadow-2xl hover:bg-accent/40 hover:border-border
         `}
       >
         {skill.icon_type === "text" ? (
-          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-foreground/70 group-hover:text-foreground"
+          <span className={`text-[10px] md:text-xs font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-foreground/70 group-hover:text-foreground"
             }`}>
             {skill.icon}
           </span>
@@ -219,7 +219,7 @@ function SkillIcon({
             return (
               <Icon
                 style={{ color: isTBA ? undefined : skill.color }}
-                className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-500 
+                className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-500 
                   ${activeTooltip ? "scale-125 opacity-100" : ""}
                   ${!activeTooltip && isTBA ? "opacity-20 grayscale text-muted-foreground/20" : "opacity-90"}
                   group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0

@@ -6,13 +6,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const navLinks = [
-  { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Education", href: "#education" },
-  { label: "Blogs", href: "#blogs" },
-  { label: "Contact", href: "#contact" },
-];
+
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -27,15 +21,13 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-const moreLinks = [
-  { label: "Problem Solving", href: "#problem-solving" },
-  { label: "Open Source", href: "#github" },
-  { label: "Journey", href: "#journey" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Achievements", href: "#achievements" },
-];
-
-export default function Navbar({ preloaderDone = true }: { preloaderDone?: boolean }) {
+export default function Navbar({ 
+  preloaderDone = true,
+  features = []
+}: { 
+  preloaderDone?: boolean;
+  features?: any[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -44,6 +36,19 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
 
   const email = process.env.NEXT_PUBLIC_USER_EMAIL || "rocky20809@gmail.com";
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
+
+  // Compute dynamic nav links from database features
+  const activeFeatures = features
+    .filter(f => f.isActive)
+    .sort((a, b) => a.order - b.order)
+    .map(f => ({
+      label: f.name,
+      href: `#${f.componentId === 'problemsolving' ? 'problem-solving' : f.componentId}`
+    }));
+
+  // Split into primary and secondary links to prevent desktop navbar overflow
+  const navLinks = activeFeatures.slice(0, 5);
+  const moreLinks = activeFeatures.slice(5);
 
   useEffect(() => {
     let ticking = false;
@@ -172,11 +177,12 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             })}
             
             {/* More Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowMore(true)}
-              onMouseLeave={() => setShowMore(false)}
-            >
+            {moreLinks.length > 0 && (
+              <div 
+                className="relative"
+                onMouseEnter={() => setShowMore(true)}
+                onMouseLeave={() => setShowMore(false)}
+              >
               <button 
                 className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 cursor-pointer ${
                   moreLinks.some(l => activeSection === l.href.replace("#", "")) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -226,6 +232,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 )}
               </AnimatePresence>
             </div>
+            )}
           </div>
         </div>
 
