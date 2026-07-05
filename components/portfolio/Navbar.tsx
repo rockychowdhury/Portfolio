@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Download, Menu, X, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -97,7 +97,7 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
       observer.disconnect();
     };
-  }, []);
+  }, [features]);
 
   const copyEmail = () => {
     navigator.clipboard.writeText(email);
@@ -149,26 +149,24 @@ export default function Navbar({
           </Link>
 
           {/* Desktop Nav with Sliding Pill */}
-          <div className="hidden items-center gap-1 lg:flex bg-secondary/20 p-1 rounded-full relative">
-            {navLinks.map((link, i) => {
+          <div className="hidden items-center gap-1 lg:flex bg-secondary/50 p-1.5 rounded-full relative">
+            <LayoutGroup>
+            {navLinks.map((link) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleScroll(e, link.href)}
-                  className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 ${
+                  className={`relative z-10 px-4 py-2 text-[14px] font-medium tracking-wide transition-colors duration-300 ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
-                  style={{
-                    animation: preloaderDone ? `fadeUp 400ms ease ${400 + i * 60}ms forwards` : "none",
-                  }}
                 >
                   {link.label}
                   {isActive && (
                     <motion.div
                       layoutId="active-pill"
-                      className="absolute inset-0 z-[-1] rounded-full bg-background border border-border/50 shadow-sm"
+                      className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -184,12 +182,9 @@ export default function Navbar({
                 onMouseLeave={() => setShowMore(false)}
               >
               <button 
-                className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 cursor-pointer ${
+                className={`relative z-10 px-4 py-2 text-[14px] font-medium tracking-wide transition-colors duration-300 flex items-center gap-1 cursor-pointer ${
                   moreLinks.some(l => activeSection === l.href.replace("#", "")) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
-                style={{
-                  animation: preloaderDone ? `fadeUp 400ms ease ${400 + navLinks.length * 60}ms forwards` : "none",
-                }}
               >
                 More
                 <svg className={`w-3 h-3 transition-transform duration-300 ${showMore ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -198,7 +193,7 @@ export default function Navbar({
                 {moreLinks.some(l => activeSection === l.href.replace("#", "")) && (
                   <motion.div
                     layoutId="active-pill"
-                    className="absolute inset-0 z-[-1] rounded-full bg-background border border-border/50 shadow-sm"
+                    className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -233,6 +228,7 @@ export default function Navbar({
               </AnimatePresence>
             </div>
             )}
+            </LayoutGroup>
           </div>
         </div>
 

@@ -4,12 +4,18 @@ import Project from "@/lib/db/models/Project";
 import Skill from "@/lib/db/models/Skill";
 import Blog from "@/lib/db/models/Blog";
 import Testimonial from "@/lib/db/models/Testimonial";
+import Achievement from "@/lib/db/models/Achievement";
+import Journey from "@/lib/db/models/Journey";
+import Certification from "@/lib/db/models/Certification";
 
 const models: Record<string, any> = {
   projects: Project,
   skills: Skill,
   blogs: Blog,
   testimonials: Testimonial,
+  achievements: Achievement,
+  journey: Journey,
+  certifications: Certification,
 };
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ collection: string }> }) {
