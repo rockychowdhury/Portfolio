@@ -16,13 +16,15 @@ import BlogsSection from "@/components/portfolio/Blogs";
 import Education from "@/components/portfolio/Education";
 import AchievementsSection from "@/components/portfolio/AchievementsSection";
 import ProjectsSection from "@/sections/ProjectsSection";
-
 import JourneySection from "@/components/portfolio/Journey";
 
+let hasRunPreloader = false;
+
 export default function Home() {
-  const [preloaderDone, setPreloaderDone] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(hasRunPreloader);
 
   const handlePreloaderComplete = () => {
+    hasRunPreloader = true;
     setPreloaderDone(true);
   };
 
