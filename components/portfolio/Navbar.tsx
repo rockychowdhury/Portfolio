@@ -46,15 +46,21 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
-      
-      if (window.scrollY < 100) {
-        setActiveSection((prev) => (prev !== "" ? "" : prev));
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 20;
+        setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+        
+        if (window.scrollY < 100) {
+          setActiveSection((prev) => (prev !== "" ? "" : prev));
+        }
+        ticking = false;
+      });
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     
     // Intersection Observer for active section
     const observerOptions = {

@@ -304,13 +304,12 @@ export default function ProjectSlider({
             draggable={false}
           />
 
-          {/* 2. Blurred Overlay Layer — Animated via Opacity (Performant) */}
+          {/* 2. Blurred Overlay Layer — GPU-composited via CSS class */}
           <div
-            className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] transition-opacity duration-500 ease-out pointer-events-none z-10"
+            className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] transition-opacity duration-500 ease-out pointer-events-none z-10 blur-layer-gpu"
             style={{
               opacity: isCenter ? 0 : 1,
               filter: `blur(${isMobile ? 10 : 17}px) saturate(180%) brightness(1.1)`,
-              transform: "scale(1.25)", 
             }}
           >
             {/* Glass tint overlay */}

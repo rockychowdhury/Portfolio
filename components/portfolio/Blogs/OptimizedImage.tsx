@@ -54,6 +54,7 @@ export default function OptimizedImage({
         onError={() => setIsLoaded(true)} // Handle broken images
         priority={isPriority}
         loading={isPriority ? "eager" : "lazy"}
+        sizes={props.fill ? (props.sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw") : props.sizes}
         {...props}
       />
 

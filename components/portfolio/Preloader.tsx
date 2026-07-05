@@ -20,21 +20,35 @@ export default function Preloader({
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
-    // Simulate progress while checking for data
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+    // RAF-driven progress — only flushes to state when the displayed % changes
+    let currentProgress = 0;
+    let lastRendered = 0;
+    let rafId: number;
+    let lastTime = performance.now();
+
+    function tick(now: number) {
+      // Simulate ~100ms intervals using delta time for consistent speed
+      const delta = now - lastTime;
+      if (delta >= 100) {
+        lastTime = now;
+        if (currentProgress >= 100) return;
+        const increment = currentProgress < 70 ? Math.random() * 15 : Math.random() * 2;
+        currentProgress = Math.min(currentProgress + increment, 100);
+
+        const rounded = Math.round(currentProgress);
+        if (rounded !== lastRendered) {
+          lastRendered = rounded;
+          setProgress(rounded);
         }
-        // Slower at the end to feel more realistic
-        const increment = prev < 70 ? Math.random() * 15 : Math.random() * 2;
-        return Math.min(prev + increment, 100);
-      });
-    }, 100);
+      }
+      if (currentProgress < 100) {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+    rafId = requestAnimationFrame(tick);
 
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(rafId);
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
     };

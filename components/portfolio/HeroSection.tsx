@@ -187,14 +187,24 @@ export default function HeroSection({
   const imageY = useTransform(springY, [-500, 500], [5, -5]);
 
   useEffect(() => {
+    let rafId: number | null = null;
+    
     const handleMouse = (e: MouseEvent) => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      mouseX.set(e.clientX - rect.width / 2);
-      mouseY.set(e.clientY - rect.height / 2);
+      if (rafId !== null) return; // Throttle to 1 per frame
+      rafId = requestAnimationFrame(() => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          mouseX.set(e.clientX - rect.width / 2);
+          mouseY.set(e.clientY - rect.height / 2);
+        }
+        rafId = null;
+      });
     };
-    window.addEventListener("mousemove", handleMouse);
-    return () => window.removeEventListener("mousemove", handleMouse);
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouse);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [mouseX, mouseY]);
 
   return (

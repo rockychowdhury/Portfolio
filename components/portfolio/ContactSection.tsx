@@ -9,6 +9,32 @@ import { SlantPattern } from "@/components/ui/BackgroundPatterns";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
+// Isolated clock component — prevents 1/s re-render of the entire ContactSection
+function LiveClock() {
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    // Format immediately on mount
+    const format = () =>
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Dhaka",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date());
+
+    setCurrentTime(format());
+    const timer = setInterval(() => setCurrentTime(format()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="text-xs font-mono text-muted-foreground/60">
+      Local Time: {currentTime || "--:-- --"}
+    </span>
+  );
+}
+
 export default function ContactSection() {
   const [status, setStatus] = useState<FormStatus>("idle");
   const [formData, setFormData] = useState({
@@ -18,24 +44,11 @@ export default function ContactSection() {
     message: "",
   });
 
-  const [currentTime, setCurrentTime] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Live Clock for Dhaka (GMT+6)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone: "Asia/Dhaka",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      };
-      setCurrentTime(new Intl.DateTimeFormat("en-US", options).format(new Date()));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+
 
   // Auto-resize textarea
   useEffect(() => {
@@ -186,7 +199,7 @@ Looking forward to connecting.`;
                   <MapPin size={24} className="text-primary" />
                   <div className="flex flex-col">
                     <p className="text-xl font-medium text-foreground">Dhaka, Bangladesh <span className="text-xs font-normal text-muted-foreground/40 ml-2">GMT+6</span></p>
-                    <p className="text-xs font-mono text-muted-foreground/60">Local Time: {currentTime || "--:-- --"}</p>
+                    <LiveClock />
                   </div>
                 </div>
               </div>
