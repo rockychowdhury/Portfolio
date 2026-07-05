@@ -3,36 +3,16 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue, useInView } from "framer-motion";
 import SectionWrapper from "../SectionWrapper";
-import FilterRow from "./FilterRow";
 import MasonryGrid from "./MasonryGrid";
-import SearchBar from "./SearchBar";
 import { IBlog } from "@/lib/db/models/Blog";
-import { Loader2, ChevronsDown } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { SlantPattern } from "@/components/ui/BackgroundPatterns";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 10;
 
 export default function BlogsSection() {
   const [blogs, setBlogs] = useState<IBlog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  // Initial visible count adjustment for mobile/tablet
-  useEffect(() => {
-    const checkScreen = () => {
-      if (window.innerWidth < 1024) {
-        setVisibleCount(4);
-      } else {
-        setVisibleCount(ITEMS_PER_PAGE);
-      }
-    };
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
 
   // Spotlight Logic
   const mouseX = useMotionValue(0);
@@ -60,99 +40,6 @@ export default function BlogsSection() {
     };
     fetchBlogs();
   }, []);
-
-  // Extract unique platforms and tags from data
-  const platforms = useMemo(() => {
-    return Array.from(new Set(blogs.map((b) => b.platform)));
-  }, [blogs]);
-
-
-  const filteredBlogs = useMemo(() => {
-    let result = blogs;
-
-    // 1. apply search filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter((blog) =>
-        blog.title.toLowerCase().includes(q) ||
-        blog.subtitle.toLowerCase().includes(q) ||
-        blog.tags.some(tag => tag.toLowerCase().includes(q))
-      );
-    }
-
-    // 2. apply platform/tag filters
-    if (activeFilters.length > 0) {
-      result = result.filter((blog) =>
-        activeFilters.includes(blog.platform)
-      );
-    }
-
-    return result;
-  }, [blogs, activeFilters, searchQuery]);
-
-  const handleFilterToggle = (filter: string) => {
-    setActiveFilters((prev) =>
-      prev.includes(filter)
-        ? prev.filter((f) => f !== filter)
-        : [...prev, filter]
-    );
-    setVisibleCount(ITEMS_PER_PAGE); // Reset count on filter
-  };
-
-  const handleClearAll = () => {
-    setActiveFilters([]);
-    setSearchQuery("");
-    setVisibleCount(ITEMS_PER_PAGE);
-  };
-
-  const handleLoadMore = () => {
-    setLoadingMore(true);
-    setTimeout(() => {
-      setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
-      setLoadingMore(false);
-    }, 800);
-  };
-
-  const displayedBlogs = useMemo(() => {
-    const list = filteredBlogs;
-    if (list.length <= 4 || typeof window === "undefined" || window.innerWidth >= 1024) {
-      return list.slice(0, visibleCount);
-    }
-    
-    // On mobile, try to pick 4 different types for variety
-    const result: IBlog[] = [];
-    const usedIndices = new Set<number>();
-    
-    // 1. Always start with the first one (usually featured/hero)
-    result.push(list[0]);
-    usedIndices.add(0);
-
-    // 2. Find a dark quote or micro
-    const varietyIdx = list.findIndex((b, i) => i > 0 && (b.platform === "LinkedIn" || b.platform === "Hashnode"));
-    if (varietyIdx !== -1) {
-      result.push(list[varietyIdx]);
-      usedIndices.add(varietyIdx);
-    }
-
-    // 3. Find an overlay or medium post
-    const overlayIdx = list.findIndex((b, i) => i > 0 && !usedIndices.has(i) && (b.platform === "Medium" || b.thumbnail_url));
-    if (overlayIdx !== -1) {
-      result.push(list[overlayIdx]);
-      usedIndices.add(overlayIdx);
-    }
-
-    // 4. Fill the rest from the original order
-    for (let i = 0; i < list.length && result.length < 4; i++) {
-      if (!usedIndices.has(i)) {
-        result.push(list[i]);
-        usedIndices.add(i);
-      }
-    }
-
-    return result;
-  }, [filteredBlogs, visibleCount]);
-
-  const hasMore = visibleCount < filteredBlogs.length;
 
   const blogsTitle = "Blogs &".split(" ");
   const resourcesTitle = "Resources".split("");
@@ -235,30 +122,7 @@ export default function BlogsSection() {
           </h2>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex items-center justify-start mb-12 gap-8 border-b border-border/10 pb-6 w-full overflow-hidden"
-        >
-          <div className="flex-shrink-0">
-            <SearchBar 
-              query={searchQuery} 
-              setQuery={setSearchQuery} 
-              hasResults={searchQuery.trim() === "" || filteredBlogs.length > 0} 
-            />
-          </div>
-          <div className="flex-1 overflow-hidden min-w-0">
-            {!loading && (
-              <FilterRow
-                platforms={platforms}
-                activeFilters={activeFilters}
-                onFilterToggle={handleFilterToggle}
-                onClearAll={handleClearAll}
-              />
-            )}
-          </div>
-        </motion.div>
+
 
         {/* Content */}
         {loading ? (
@@ -281,9 +145,9 @@ export default function BlogsSection() {
               </div>
             ))}
           </div>
-        ) : displayedBlogs.length > 0 ? (
+        ) : blogs.length > 0 ? (
           <div className="w-full">
-            <MasonryGrid blogs={displayedBlogs} onTagClick={handleFilterToggle} />
+            <MasonryGrid blogs={blogs.slice(0, 10)} onTagClick={() => {}} />
 
             <div className="flex flex-col items-center justify-center pt-12 lg:pt-16 pb-8 lg:pb-12">
               <div className="relative w-full flex items-center justify-center">
@@ -291,30 +155,9 @@ export default function BlogsSection() {
                 <div className="absolute inset-x-0 h-px bg-border/10" />
                 
                 <div className="relative z-10 bg-background px-12">
-                  {hasMore ? (
-                    <motion.button
-                      onClick={handleLoadMore}
-                      disabled={loadingMore}
-                      whileHover={{ scale: 1.02 }}
-                      className="group flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/60 hover:text-foreground transition-all duration-500 cursor-pointer disabled:cursor-not-allowed"
-                    >
-                      {loadingMore ? (
-                        <Loader2 size={14} className="animate-spin text-primary" />
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-3 transition-all duration-700">
-                            <ChevronsDown size={14} className="group-hover:translate-y-1 transition-transform duration-500 opacity-60 group-hover:opacity-100 shrink-0" />
-                            <span className="group-hover:tracking-[0.8em] transition-all duration-700 whitespace-nowrap">Load More</span>
-                            <div className="w-6 h-px bg-muted-foreground/20 group-hover:w-10 group-hover:bg-primary transition-all duration-700 shrink-0" />
-                          </div>
-                        </>
-                      )}
-                    </motion.button>
-                  ) : (
-                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/10">
+                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/10">
                       End of technical archive // 2026
-                    </p>
-                  )}
+                   </p>
                 </div>
               </div>
             </div>

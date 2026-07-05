@@ -18,9 +18,9 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-white border border-border/60 overflow-hidden shadow-sm transition-all hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] dark:bg-zinc-800/80"
+      className="group relative flex flex-col  rounded-3xl bg-background border border-border/50 overflow-hidden shadow-sm transition-all hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] "
     >
-      <div className={`relative ${isPriority ? 'aspect-[16/8]' : 'aspect-video'} overflow-hidden`}>
+      <div className={`relative ${isPriority ? 'aspect-[21/9]' : 'aspect-[16/7]'} overflow-hidden`}>
         {blog.thumbnail_url && (
           <OptimizedImage 
             src={blog.thumbnail_url} 
@@ -36,7 +36,7 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
         </div>
       </div>
 
-      <div className="p-5 md:p-6">
+      <div className="p-4">
         <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4">
             {blog.tags.map((tag) => (
               <button
@@ -45,28 +45,28 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
                   e.preventDefault();
                   onTagClick(tag);
                 }}
-                className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 hover:text-primary transition-colors"
+                className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
               >
                 {tag}
               </button>
             ))}
         </div>
 
-        <h3 className={`font-bold tracking-tight text-foreground leading-tight ${isPriority ? 'text-3xl md:text-4xl mb-6' : 'text-xl md:text-2xl mb-4'}`}>
+        <h3 className={`font-bold tracking-tight text-foreground leading-tight ${isPriority ? 'text-xl font-bold mb-3' : 'text-lg font-bold mb-2'}`}>
           {blog.title}
         </h3>
         
-        <p className="text-muted-foreground/60 text-sm leading-relaxed mb-6 line-clamp-2 font-medium">
+        <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2 text-xs font-medium">
           {blog.subtitle}
         </p>
 
         <div className="flex items-center justify-between pt-4 border-t border-border/10">
-          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
+          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <Clock size={12} strokeWidth={3} /> {blog.etr} MIN
             </span>
           </div>
-          <ArrowUpRight size={16} className="text-muted-foreground/20 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+          <ArrowUpRight size={16} className="text-muted-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
         </div>
       </div>
     </motion.a>
