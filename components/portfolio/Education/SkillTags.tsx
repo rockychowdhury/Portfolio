@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface SkillTagsProps {
   skills: string;
+  isDark?: boolean;
 }
 
-export default function SkillTags({ skills }: SkillTagsProps) {
+export default function SkillTags({ skills, isDark = false }: SkillTagsProps) {
   const [expanded, setExpanded] = useState(false);
   const tagList = skills.split(" · ");
   const limit = 6;
@@ -25,7 +26,7 @@ export default function SkillTags({ skills }: SkillTagsProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ delay: idx * 0.03 }}
             layout
-            className="px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-muted-foreground/60 bg-secondary/5 border border-border/10 rounded-md hover:text-foreground hover:bg-secondary/20 transition-all duration-300"
+            className={`px-2 py-0.5 text-[10px] rounded-md transition-all duration-300 ${isDark ? "text-purple-300 bg-white/5 border border-white/10 hover:text-white" : "text-muted-foreground bg-muted/40 border border-border/60 hover:text-foreground"}`}
           >
             {tag}
           </motion.span>
@@ -35,7 +36,7 @@ export default function SkillTags({ skills }: SkillTagsProps) {
       {hasMore && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-all ml-1"
+          className={`px-2 py-0.5 text-[10px] rounded-md transition-all ml-1 ${isDark ? "text-purple-300 bg-white/5 border border-white/10 hover:text-white" : "text-muted-foreground bg-muted/40 border border-border/60 hover:text-foreground"}`}
         >
           {expanded ? "Less" : `+${tagList.length - limit}`}
         </button>
