@@ -239,9 +239,15 @@ Looking forward to connecting.`;
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="relative z-10 rounded-3xl border border-border/50 bg-secondary/10 p-6 backdrop-blur-sm md:p-10 lg:p-12 transition-all duration-500 group-hover:border-primary/20 group-hover:bg-secondary/20"
+              className="relative z-10 overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-white via-zinc-50/50 to-zinc-100/60 dark:from-zinc-900 dark:via-zinc-950/50 dark:to-black p-6 md:p-10 lg:p-12 transition-all duration-500 group-hover:border-primary/40 shadow-xl"
             >
-              <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Paper Texture Overlay */}
+              <div 
+                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.6] dark:opacity-[0.6] mix-blend-multiply dark:mix-blend-screen bg-[url('/assets/papers/whitetexture.jpg')] dark:bg-[url('/assets/papers/darktexture.jpg')]" 
+              />
+              
+              <div className="relative z-10">
+                <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-5">
                   {/* Floating Label Input: Name */}
                   <div className="group relative">
@@ -252,9 +258,9 @@ Looking forward to connecting.`;
                       placeholder=" "
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="peer w-full border-b border-border/50 bg-transparent pb-3 pt-5 text-lg font-medium outline-none transition-all focus:border-primary"
+                      className="peer w-full border-b-2 border-foreground/10 bg-transparent pb-3 pt-5 text-lg font-semibold text-foreground outline-none transition-all focus:border-primary"
                     />
-                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
+                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
                       Your Name
                     </label>
                   </div>
@@ -268,28 +274,28 @@ Looking forward to connecting.`;
                       placeholder=" "
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="peer w-full border-b border-border/50 bg-transparent pb-3 pt-5 text-lg font-medium outline-none transition-all focus:border-primary"
+                      className="peer w-full border-b-2 border-foreground/10 bg-transparent pb-3 pt-5 text-lg font-semibold text-foreground outline-none transition-all focus:border-primary"
                     />
-                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
+                    <label className="absolute left-0 top-5 -z-10 origin-[0] -translate-y-5 scale-75 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 transition-all peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-5 peer-focus:scale-75 peer-focus:text-primary">
                       Email address
                     </label>
                   </div>
 
                   {/* Subject Pill Selector */}
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
                       I&apos;m interested in...
                     </label>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       {subjectPills.map((pill) => (
                         <button
                           key={pill}
                           type="button"
                           onClick={() => setFormData({ ...formData, subject: formData.subject === pill ? "" : pill })}
-                          className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
+                          className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 ${
                             formData.subject === pill && !["Others"].includes(formData.subject)
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border/50 bg-background/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                              ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_14px_rgba(var(--primary-rgb),0.3)]"
+                              : "border-foreground/10 bg-white/20 dark:bg-black/20 backdrop-blur-md text-foreground/80 hover:border-foreground/20 hover:bg-white/50 dark:hover:bg-black/50 hover:text-foreground shadow-sm"
                           }`}
                         >
                           {pill}
@@ -301,10 +307,10 @@ Looking forward to connecting.`;
                           const isCurrentlyOthers = !subjectPills.includes(formData.subject) && formData.subject !== "";
                           setFormData({ ...formData, subject: isCurrentlyOthers ? "" : " " });
                         }}
-                        className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${
+                        className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 ${
                           !subjectPills.includes(formData.subject) && formData.subject !== ""
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border/50 bg-background/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                            ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_14px_rgba(var(--primary-rgb),0.3)]"
+                            : "border-foreground/10 bg-white/20 dark:bg-black/20 backdrop-blur-md text-foreground/80 hover:border-foreground/20 hover:bg-white/50 dark:hover:bg-black/50 hover:text-foreground shadow-sm"
                         }`}
                       >
                         Others
@@ -326,14 +332,14 @@ Looking forward to connecting.`;
                           placeholder="What is the subject?..."
                           value={formData.subject.trim()}
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value || " " })}
-                          className="w-full border-b border-border/50 bg-transparent pb-3 pt-4 text-lg font-medium outline-none focus:border-primary"
+                          className="w-full border-b-2 border-foreground/10 bg-transparent pb-3 pt-4 text-lg font-semibold text-foreground outline-none focus:border-primary"
                         />
                       </motion.div>
                     )}
                   </AnimatePresence>
 
                   <div className="group relative space-y-3">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60 transition-colors group-focus-within:text-primary">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 transition-colors group-focus-within:text-primary">
                       Message
                     </label>
                     <div className="relative">
@@ -345,9 +351,9 @@ Looking forward to connecting.`;
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         placeholder={placeholderText}
                         maxLength={1000}
-                        className="w-full resize-none rounded-2xl border border-border/50 bg-background/50 p-4 text-lg font-medium outline-none transition-all placeholder:text-[10px] md:placeholder:text-xs placeholder:italic placeholder:text-muted-foreground/30 focus:border-primary focus:bg-background"
+                        className="w-full resize-none rounded-2xl border-2 border-foreground/5 bg-white/30 dark:bg-black/20 backdrop-blur-[2px] p-5 text-lg font-medium text-foreground outline-none transition-all placeholder:text-[11px] placeholder:leading-relaxed md:placeholder:text-xs placeholder:italic placeholder:text-foreground/40 focus:border-primary focus:bg-white/50 dark:focus:bg-black/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]"
                       />
-                      <div className="absolute bottom-4 right-6 text-[10px] font-mono text-muted-foreground/40">
+                      <div className="absolute bottom-4 right-6 text-[10px] font-mono text-muted-foreground/80 bg-background/80 px-2 py-1 rounded backdrop-blur-md">
                         {formData.message.length} / 1000
                       </div>
                     </div>
@@ -358,12 +364,12 @@ Looking forward to connecting.`;
                   <button
                     disabled={status === "loading"}
                     type="submit"
-                    className={`group/btn relative flex flex-[1.5] items-center justify-center gap-4 overflow-hidden rounded-xl px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-[0.98] disabled:opacity-50 ${
+                    className={`group/btn relative flex flex-[1.5] items-center justify-center gap-4 overflow-hidden rounded-xl px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] active:scale-[0.98] disabled:opacity-50 ${
                       status === "success" 
                         ? "bg-green-600 text-white" 
                         : status === "error" 
                         ? "bg-red-600 text-white" 
-                        : "bg-foreground text-background"
+                        : "bg-foreground text-background hover:bg-foreground/90 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
                     }`}
                   >
                     <AnimatePresence mode="wait">
@@ -419,13 +425,14 @@ Looking forward to connecting.`;
                   <button
                     onClick={handleClear}
                     type="button"
-                    className="flex flex-1 items-center justify-center gap-3 rounded-xl border border-foreground/5 bg-transparent px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground transition-all hover:bg-foreground/5 hover:text-foreground active:scale-[0.98]"
+                    className="flex flex-1 items-center justify-center gap-3 rounded-xl border border-foreground/10 bg-white/20 dark:bg-black/20 backdrop-blur-sm px-8 py-5 text-[10px] font-black uppercase tracking-[0.4em] text-foreground/70 transition-all hover:bg-white/40 dark:hover:bg-black/40 hover:text-foreground active:scale-[0.98] shadow-sm"
                   >
                     <Trash2 size={14} strokeWidth={3} className="opacity-40 group-hover:opacity-100 transition-opacity" />
                     <span>Clear</span>
                   </button>
                 </div>
               </form>
+              </div>
             </motion.div>
           </div>
 

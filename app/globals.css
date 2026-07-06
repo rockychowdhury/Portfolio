@@ -147,12 +147,30 @@
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* svh fallback for older browsers */
+    --fallback-vh: 1vh;
+  }
+
+  /* Feature-test: if svh is supported, override the fallback */
+  @supports (height: 1svh) {
+    html {
+      --fallback-vh: 1svh;
+    }
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
-    /* Removed overscroll-behavior: none to prevent scroll issues on some mobile browsers */
+    -webkit-overflow-scrolling: touch;
   }
 
 

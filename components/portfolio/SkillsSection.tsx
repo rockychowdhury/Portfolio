@@ -7,7 +7,7 @@ import { Search, Info } from "lucide-react";
 import * as FaIcons from "react-icons/fa6";
 import * as VscIcons from "react-icons/vsc";
 import type { IconType } from "react-icons";
-import { BlueprintPattern } from "@/components/ui/BackgroundPatterns";
+import GridBackground from "./Testimonials/GridBackground";
 
 // ── Types ──
 interface Skill {
@@ -558,7 +558,7 @@ export default function SkillsSection() {
       id="skills"
       className="relative w-full bg-background pt-20 pb-12 md:pt-32 md:pb-16 overflow-hidden"
     >
-      <BlueprintPattern />
+      <GridBackground pulseColor="bg-purple-500/30 dark:bg-purple-500/20" />
       <div className="container-main">
 
         {/* Section Header */}
