@@ -188,7 +188,7 @@ export default function HeroSection({
 
   useEffect(() => {
     let rafId: number | null = null;
-    
+
     const handleMouse = (e: MouseEvent) => {
       if (rafId !== null) return; // Throttle to 1 per frame
       rafId = requestAnimationFrame(() => {
@@ -285,8 +285,8 @@ export default function HeroSection({
               >
                 <div className="h-px w-8 bg-foreground shrink-0" />
                 <div className="text-lg font-medium text-foreground md:text-xl flex flex-wrap items-center gap-[0.3em]">
-                  It&apos;s Rocky Chowdhury a 
-                  <div 
+                  It&apos;s Rocky Chowdhury a
+                  <div
                     className="relative flex h-[1.5em] w-[200px]"
                     style={{ perspective: "800px" }}
                   >
@@ -316,10 +316,10 @@ export default function HeroSection({
                               duration: 0.5,
                               ease: [0.23, 1, 0.32, 1],
                             }}
-                            style={{ 
-                              display: "inline-block", 
+                            style={{
+                              display: "inline-block",
                               transformOrigin: "50% 50% -8px",
-                              whiteSpace: "pre" 
+                              whiteSpace: "pre"
                             }}
                           >
                             {char}

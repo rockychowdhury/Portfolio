@@ -71,6 +71,8 @@ export default function Home() {
         // Wait a small bit for any final layout shifts (like hydration)
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth" });
+          // Clean up the URL hash cleanly without a reload so future refreshes stay at the top
+          window.history.replaceState(null, "", window.location.pathname);
         }, 100);
       }
     }
