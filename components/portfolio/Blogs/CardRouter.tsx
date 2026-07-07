@@ -44,7 +44,12 @@ export default function CardRouter({ blog, index, onTagClick }: CardRouterProps)
     return <CardC_Platform blog={blog} onTagClick={onTagClick} />;
   }
 
-  // 6. Template A: Hero (Primary template for any content WITH an image)
+  // 6. Template E: Wide Banner (Visually striking, great for Hashnode with images or specific index)
+  if (index === 3 || (blog.platform === "Hashnode" && blog.thumbnail_url)) {
+    return <CardE_WideBanner blog={blog} onTagClick={onTagClick} />;
+  }
+
+  // 7. Template A: Hero (Primary template for any content WITH an image)
   if (blog.thumbnail_url) {
     return <CardA_Hero blog={blog} onTagClick={onTagClick} />;
   }

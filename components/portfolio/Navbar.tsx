@@ -1,18 +1,12 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Download, Menu, X, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const navLinks = [
-  { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Education", href: "#education" },
-  { label: "Blogs", href: "#blogs" },
-  { label: "Contact", href: "#contact" },
-];
+
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -27,15 +21,13 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-const moreLinks = [
-  { label: "Problem Solving", href: "#problem-solving" },
-  { label: "Open Source", href: "#github" },
-  { label: "Journey", href: "#journey" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Achievements", href: "#achievements" },
-];
-
-export default function Navbar({ preloaderDone = true }: { preloaderDone?: boolean }) {
+export default function Navbar({ 
+  preloaderDone = true,
+  features = []
+}: { 
+  preloaderDone?: boolean;
+  features?: any[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -45,16 +37,35 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
   const email = process.env.NEXT_PUBLIC_USER_EMAIL || "rocky20809@gmail.com";
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
+  // Compute dynamic nav links from database features
+  const activeFeatures = features
+    .filter(f => f.isActive)
+    .sort((a, b) => a.order - b.order)
+    .map(f => ({
+      label: f.name,
+      href: `#${f.componentId === 'problemsolving' ? 'problem-solving' : f.componentId}`
+    }));
+
+  // Split into primary and secondary links to prevent desktop navbar overflow
+  const navLinks = activeFeatures.slice(0, 5);
+  const moreLinks = activeFeatures.slice(5);
+
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
-      
-      if (window.scrollY < 100) {
-        setActiveSection((prev) => (prev !== "" ? "" : prev));
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 20;
+        setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+        
+        if (window.scrollY < 100) {
+          setActiveSection((prev) => (prev !== "" ? "" : prev));
+        }
+        ticking = false;
+      });
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     
     // Intersection Observer for active section
     const observerOptions = {
@@ -86,7 +97,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
       window.removeEventListener("scroll", handleScroll);
       observer.disconnect();
     };
-  }, []);
+  }, [features]);
 
   const copyEmail = () => {
     navigator.clipboard.writeText(email);
@@ -112,8 +123,8 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
         scrolled
-          ? "top-4 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-2 py-2"
-          : "bg-transparent py-5"
+          ? "top-4 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-1.5 py-1.5"
+          : "bg-transparent py-4"
       }`}
     >
       <nav className={`flex w-full max-w-[1400px] mx-auto items-center justify-between transition-all duration-500 ${scrolled ? 'px-4' : 'px-4 xs:px-6 md:px-12 lg:px-20'}`}>
@@ -129,7 +140,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
           >
             <span
               id="navbar-logo-anchor"
-              className={`text-xl font-black uppercase tracking-tighter text-foreground ${
+              className={`text-lg font-black uppercase tracking-tighter text-foreground ${
                 preloaderDone ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -138,26 +149,24 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
           </Link>
 
           {/* Desktop Nav with Sliding Pill */}
-          <div className="hidden items-center gap-1 lg:flex bg-secondary/20 p-1 rounded-full relative">
-            {navLinks.map((link, i) => {
+          <div className="hidden items-center gap-0.5 lg:flex bg-secondary/50 p-1 rounded-full relative">
+            <LayoutGroup>
+            {navLinks.map((link) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleScroll(e, link.href)}
-                  className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 ${
+                  className={`relative z-10 px-3.5 py-1.5 text-[13px] font-medium tracking-wide transition-colors duration-300 ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
-                  style={{
-                    animation: preloaderDone ? `fadeUp 400ms ease ${400 + i * 60}ms forwards` : "none",
-                  }}
                 >
                   {link.label}
                   {isActive && (
                     <motion.div
                       layoutId="active-pill"
-                      className="absolute inset-0 z-[-1] rounded-full bg-background border border-border/50 shadow-sm"
+                      className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -166,18 +175,16 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
             })}
             
             {/* More Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowMore(true)}
-              onMouseLeave={() => setShowMore(false)}
-            >
+            {moreLinks.length > 0 && (
+              <div 
+                className="relative"
+                onMouseEnter={() => setShowMore(true)}
+                onMouseLeave={() => setShowMore(false)}
+              >
               <button 
-                className={`relative z-10 px-4 py-1.5 text-[13px] font-medium tracking-tight transition-colors duration-300 opacity-0 flex items-center gap-1 cursor-pointer ${
+                className={`relative z-10 px-3.5 py-1.5 text-[13px] font-medium tracking-wide transition-colors duration-300 flex items-center gap-1 cursor-pointer ${
                   moreLinks.some(l => activeSection === l.href.replace("#", "")) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
-                style={{
-                  animation: preloaderDone ? `fadeUp 400ms ease ${400 + navLinks.length * 60}ms forwards` : "none",
-                }}
               >
                 More
                 <svg className={`w-3 h-3 transition-transform duration-300 ${showMore ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,7 +193,7 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 {moreLinks.some(l => activeSection === l.href.replace("#", "")) && (
                   <motion.div
                     layoutId="active-pill"
-                    className="absolute inset-0 z-[-1] rounded-full bg-background border border-border/50 shadow-sm"
+                    className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -220,6 +227,8 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
                 )}
               </AnimatePresence>
             </div>
+            )}
+            </LayoutGroup>
           </div>
         </div>
 
@@ -234,11 +243,11 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
         {/* Desktop Actions */}
         <div className="hidden items-center gap-4 lg:flex">
           {/* Email Section */}
-          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/30 border border-border/30">
-            <span className="text-xs font-medium text-muted-foreground">{email}</span>
+          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-full bg-secondary/30 border border-border/30">
+            <span className="text-[11px] font-medium text-muted-foreground">{email}</span>
             <button
               onClick={copyEmail}
-              className="relative flex items-center justify-center p-1.5 rounded-full hover:bg-background transition-colors cursor-pointer"
+              className="relative flex items-center justify-center p-1 rounded-full hover:bg-background transition-colors cursor-pointer"
               title="Copy Email"
             >
               <AnimatePresence mode="wait">
@@ -272,35 +281,35 @@ export default function Navbar({ preloaderDone = true }: { preloaderDone?: boole
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-center h-10 px-4 rounded-full bg-background border border-border/50 text-foreground transition-all hover:bg-secondary hover:shadow-md"
+              className="group flex items-center justify-center h-8 px-3 rounded-full bg-background border border-border/50 text-foreground transition-all hover:bg-secondary hover:shadow-md"
               title="Download Resume"
             >
-              <Download className="size-4 mr-2 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-semibold">Resume</span>
+              <Download className="size-3.5 mr-1.5 group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-semibold">Resume</span>
             </a>
 
             <a
               href="https://linkedin.com/in/rockychowdhury1"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-center h-10 px-4 rounded-full bg-foreground text-background transition-all hover:opacity-90 hover:shadow-lg shadow-black/10"
+              className="group flex items-center justify-center h-8 px-3 rounded-full bg-foreground text-background transition-all hover:opacity-90 hover:shadow-lg shadow-black/10"
               title="LinkedIn Profile"
             >
-              <LinkedinIcon className="size-4 mr-2 group-hover:rotate-[360deg] transition-transform duration-500" />
-              <span className="text-xs font-semibold">LinkedIn</span>
+              <LinkedinIcon className="size-3.5 mr-1.5 group-hover:rotate-[360deg] transition-transform duration-500" />
+              <span className="text-[11px] font-semibold">LinkedIn</span>
             </a>
           </div>
         </div>
 
         {/* Mobile Menu Toggle */}
-        <div className="flex items-center gap-3 lg:hidden">
+        <div className="flex items-center gap-2.5 lg:hidden">
           <ThemeToggle />
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center justify-center rounded-full bg-secondary w-10 h-10 text-foreground transition-all hover:bg-secondary/80 border border-border/50"
+            className="flex items-center justify-center rounded-full bg-secondary w-9 h-9 text-foreground transition-all hover:bg-secondary/80 border border-border/50"
             aria-label="Toggle menu"
           >
-            {isOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            {isOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
         </div>
       </nav>

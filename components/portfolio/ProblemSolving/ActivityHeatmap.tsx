@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useInView } from "framer-motion";
 
 interface ActivityHeatmapProps {
   data: { [timestampOrDate: string]: number };
@@ -67,49 +67,42 @@ export default function ActivityHeatmap({
   // CSS variables for styling based on accentColor (hex)
   const isHex = accentColor.startsWith('#');
 
+  // Single IntersectionObserver at container level (replaces ~112 individual observers)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "0px" });
+
   return (
     <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
-      {/* 7 rows based on github style. Wait, mapping to 7 rows might be tricky if we don't start on Sunday. 
-          For a simple timeline, a single wrapping flex container that uses writing-mode or grid is standard.
-          Let's use CSS grid with 7 rows, auto flow column */}
+      {/* CSS grid with 7 rows, auto flow column */}
       <div 
+        ref={containerRef}
         className="grid grid-rows-7 gap-[3px]"
         style={{ gridAutoFlow: 'column' }}
       >
         {cells.map((cell, idx) => {
-          // Stagger effect
           const colIndex = Math.floor(idx / 7);
           
           return (
-            <motion.div
+            <div
               key={idx}
-              className={`group relative w-3 h-3 rounded-[2px] ${
+              className={`group relative w-3 h-3 rounded-[2px] transition-all duration-300 hover:scale-125 hover:z-10 ${
                 cell.count === 0 ? "bg-secondary/20" : ""
               }`}
               style={{
                 backgroundColor: cell.count !== 0 
                   ? (isHex ? accentColor : undefined) 
                   : undefined,
-                opacity: cell.count === 0 ? 1 : cell.intensity,
+                opacity: isInView ? (cell.count === 0 ? 1 : cell.intensity) : 0,
+                transform: isInView ? 'scale(1)' : 'scale(0.5)',
+                transitionDelay: `${colIndex * 20}ms`,
               }}
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ 
-                opacity: cell.count === 0 ? 1 : cell.intensity, 
-                scale: 1 
-              }}
-              viewport={{ once: true, margin: "0px" }}
-              transition={{ 
-                delay: colIndex * 0.02, 
-                duration: 0.3 
-              }}
-              whileHover={{ scale: 1.25, zIndex: 10 }}
             >
               {/* Tooltip */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 bg-foreground text-background border border-border/10 rounded text-[10px] whitespace-nowrap z-50 pointer-events-none shadow-xl">
                 <span className="font-bold">{cell.count}</span> submissions on {cell.date}
                 <svg className="absolute top-full left-1/2 -translate-x-1/2 text-foreground w-2 h-2" fill="currentColor" viewBox="0 0 8 8"><path d="M0 0l4 4 4-4z" /></svg>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>

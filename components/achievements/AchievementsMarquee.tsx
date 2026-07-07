@@ -43,10 +43,10 @@ export function AchievementsMarquee({ achievements }: Props) {
           <div className="h-px w-12 bg-zinc-300 dark:bg-zinc-800" />
           <p className="text-center text-[10px] font-black tracking-[0.4em] uppercase
                         text-zinc-400 dark:text-zinc-500">
-            Professional Milestones
+            Atomic Commits
           </p>
           <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
-            Achievements
+            Micro Wins
           </h2>
         </div>
       </div>

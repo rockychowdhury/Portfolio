@@ -7,7 +7,7 @@ import { Search, Info } from "lucide-react";
 import * as FaIcons from "react-icons/fa6";
 import * as VscIcons from "react-icons/vsc";
 import type { IconType } from "react-icons";
-import { BlueprintPattern } from "@/components/ui/BackgroundPatterns";
+import GridBackground from "./Testimonials/GridBackground";
 
 // ── Types ──
 interface Skill {
@@ -181,31 +181,14 @@ function SkillIcon({
         top: "50%",
         x: x,
         y: y,
-        willChange: "transform",
       }}
       initial={{ scale: 0, opacity: 0 }}
       animate={
         isBuilt
-          ? {
-            y: [y, y - 8, y],
-            opacity: 1,
-            scale: 1,
-          }
+          ? { opacity: 1, scale: 1 }
           : { scale: 0, opacity: 0 }
       }
-      transition={
-        isBuilt
-          ? {
-            y: {
-              duration: FLOAT_DURATION,
-              repeat: Infinity,
-              delay: floatDelay,
-              ease: "easeInOut",
-            },
-            opacity: { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 },
-          }
-          : { duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 }
-      }
+      transition={{ duration: BUILD_DURATION, delay: index * BUILD_STAGGER * 0.5 }}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       onFocus={() => setShowTooltip(true)}
@@ -213,13 +196,18 @@ function SkillIcon({
       tabIndex={0}
       role="button"
     >
+      {/* Inner wrapper for CSS float — separated from position transform */}
       <div
-        className={`relative flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group border border-border/50
+        className={isBuilt ? 'animate-float-icon' : ''}
+        style={{ animationDelay: `${floatDelay}s` }}
+      >
+      <div
+        className={`relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl transition-all duration-500 cursor-pointer group border border-border/50
           hover:scale-125 hover:shadow-2xl hover:bg-accent/40 hover:border-border
         `}
       >
         {skill.icon_type === "text" ? (
-          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-foreground/70 group-hover:text-foreground"
+          <span className={`text-[10px] md:text-xs font-black uppercase tracking-tighter transition-colors ${skill.name === "TBA" ? "text-muted-foreground/30" : "text-foreground/70 group-hover:text-foreground"
             }`}>
             {skill.icon}
           </span>
@@ -231,7 +219,7 @@ function SkillIcon({
             return (
               <Icon
                 style={{ color: isTBA ? undefined : skill.color }}
-                className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-500 
+                className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-500 
                   ${activeTooltip ? "scale-125 opacity-100" : ""}
                   ${!activeTooltip && isTBA ? "opacity-20 grayscale text-muted-foreground/20" : "opacity-90"}
                   group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0
@@ -287,6 +275,7 @@ function SkillIcon({
           </motion.div>
         )}
       </AnimatePresence>
+      </div>{/* end float wrapper */}
     </motion.div>
   );
 }
@@ -333,26 +322,9 @@ function ShapeGroup({
 
   return (
     <div className="flex flex-col items-center gap-12 flex-1 min-w-[280px] xs:min-w-[300px] max-w-[400px]">
-      <motion.div
-        className="relative aspect-square w-full flex items-center justify-center transform-gpu"
-        animate={
-          isBuilt
-            ? { 
-                y: [0, -15, 0],
-                rotate: [0, 1, -1, 0] // Subtle organic sway
-              }
-            : {}
-        }
-        transition={
-          isBuilt
-            ? {
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: floatDelay,
-            }
-            : {}
-        }
+      <div
+        className={`relative aspect-square w-full flex items-center justify-center transform-gpu ${isBuilt ? 'animate-float-group' : ''}`}
+        style={{ animationDelay: `${floatDelay}s` }}
       >
         {/* Skill icons placed along the shape */}
         {skills
@@ -369,7 +341,7 @@ function ShapeGroup({
               isHighlighted={highlightedIds.includes(skill._id)}
             />
           ))}
-      </motion.div>
+      </div>
 
       {/* Category Label Below - Grounded Design */}
       <div className="flex flex-col items-center gap-2.5">
@@ -527,18 +499,9 @@ export default function SkillsSection() {
   }, [debouncedQuery, skills]);
 
   const searchStatus = useMemo(() => {
-    if (!searchQuery.trim()) return "idle";
-
-    // Check if what the user CURRENTLY typed (not debounced) is matching
-    // This gives immediate visual feedback while the "lock on" (highlights) wait for debounce
-    const currentMatches = skills.filter(
-      (s) =>
-        s.name.toLowerCase().includes(searchQuery.trim().toLowerCase()) &&
-        s.name !== "TBA"
-    );
-
-    return currentMatches.length > 0 ? "found" : "not_found";
-  }, [searchQuery, skills]);
+    if (!debouncedQuery.trim()) return "idle";
+    return filteredSearch.length > 0 ? "found" : "not_found";
+  }, [debouncedQuery, filteredSearch]);
 
   const highlightedIds = useMemo(() => filteredSearch.map(s => s._id), [filteredSearch]);
 
@@ -595,7 +558,7 @@ export default function SkillsSection() {
       id="skills"
       className="relative w-full bg-background pt-20 pb-12 md:pt-32 md:pb-16 overflow-hidden"
     >
-      <BlueprintPattern />
+      <GridBackground pulseColor="bg-purple-500/30 dark:bg-purple-500/20" />
       <div className="container-main">
 
         {/* Section Header */}

@@ -16,7 +16,7 @@ export default function CardF_Micro({ blog, onTagClick }: CardProps) {
       href={blog.handle}
       target="_blank"
       whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-6 shadow-sm transition-all hover:shadow-xl dark:bg-zinc-800/80"
+      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-6 shadow-sm transition-all hover:shadow-xl "
     >
       <div className="flex items-center justify-between mb-4">
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">

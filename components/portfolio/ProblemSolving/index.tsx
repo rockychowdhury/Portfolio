@@ -193,7 +193,7 @@ export default function ProblemSolvingSection() {
             <PlatformCard 
               name="CodeChef"
               username={data?.codechef?.handle || "Loading..."}
-              iconPath="/assets/problemsolving/codechef.png"
+              iconPath="/assets/problemsolving/codechef.jpg"
               rankDisplay={data?.codechef?.stars ? `${data.codechef.stars}★ Division` : "Star Participant"}
               maxRating={data?.codechef?.maxRating || 0}
               solveCount={data?.codechef?.totalSolved || 0}

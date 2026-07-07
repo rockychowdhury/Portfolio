@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { FeatureCard as FeatureCardType, Project } from "@/types/project";
@@ -45,15 +45,22 @@ export default function FeatureCardRow({
 
   const totalCards = featureCards.length;
 
-  // Build maps
-  const projectColorMap = new Map<string, string>();
-  projects.forEach((p, i) => {
-    projectColorMap.set(p._id || p.id, PROJECT_COLORS[i % PROJECT_COLORS.length]);
-  });
-  const projectNameMap = new Map<string, string>();
-  projects.forEach((p) => {
-    projectNameMap.set(p._id || p.id, p.title);
-  });
+  // Build maps (memoized — previously rebuilt on every render)
+  const projectColorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    projects.forEach((p, i) => {
+      map.set(p._id || p.id, PROJECT_COLORS[i % PROJECT_COLORS.length]);
+    });
+    return map;
+  }, [projects]);
+
+  const projectNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    projects.forEach((p) => {
+      map.set(p._id || p.id, p.title);
+    });
+    return map;
+  }, [projects]);
 
   const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT_DESKTOP);
 

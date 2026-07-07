@@ -29,16 +29,16 @@ export default function CardD_Minimal({ blog, onTagClick }: CardProps) {
                   e.preventDefault();
                   onTagClick(tag);
                 }}
-                className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 hover:text-primary transition-colors"
+                className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
               >
                 {tag}
               </button>
             ))}
         </div>
-        <PlatformBadge platform={blog.platform} className="!bg-transparent !text-muted-foreground/40 !p-0 !text-[8px]" />
+        <PlatformBadge platform={blog.platform} className="!bg-transparent !text-muted-foreground !p-0 !text-[8px]" />
       </div>
 
-      <h3 className="text-xl font-bold text-foreground leading-tight mb-6">
+      <h3 className="text-xl font-bold text-foreground leading-tight mb-4">
         {blog.title}
       </h3>
 

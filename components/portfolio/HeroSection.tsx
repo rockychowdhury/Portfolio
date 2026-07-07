@@ -187,24 +187,34 @@ export default function HeroSection({
   const imageY = useTransform(springY, [-500, 500], [5, -5]);
 
   useEffect(() => {
+    let rafId: number | null = null;
+
     const handleMouse = (e: MouseEvent) => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      mouseX.set(e.clientX - rect.width / 2);
-      mouseY.set(e.clientY - rect.height / 2);
+      if (rafId !== null) return; // Throttle to 1 per frame
+      rafId = requestAnimationFrame(() => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          mouseX.set(e.clientX - rect.width / 2);
+          mouseY.set(e.clientY - rect.height / 2);
+        }
+        rafId = null;
+      });
     };
-    window.addEventListener("mousemove", handleMouse);
-    return () => window.removeEventListener("mousemove", handleMouse);
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouse);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [mouseX, mouseY]);
 
   return (
     <section
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen w-full overflow-hidden bg-background pt-20 lg:pt-0"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-background pt-20 lg:pt-0"
     >
       <GridPattern />
-      <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2">
+      <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2 gap-0">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-col lg:flex-1 lg:justify-center pt-10 pb-6 lg:py-0">
           {/* Vertical Label — Desktop Only */}
@@ -275,8 +285,8 @@ export default function HeroSection({
               >
                 <div className="h-px w-8 bg-foreground shrink-0" />
                 <div className="text-lg font-medium text-foreground md:text-xl flex flex-wrap items-center gap-[0.3em]">
-                  It&apos;s Rocky Chowdhury a 
-                  <div 
+                  It&apos;s Rocky Chowdhury a
+                  <div
                     className="relative flex h-[1.5em] w-[200px]"
                     style={{ perspective: "800px" }}
                   >
@@ -306,10 +316,10 @@ export default function HeroSection({
                               duration: 0.5,
                               ease: [0.23, 1, 0.32, 1],
                             }}
-                            style={{ 
-                              display: "inline-block", 
+                            style={{
+                              display: "inline-block",
                               transformOrigin: "50% 50% -8px",
-                              whiteSpace: "pre" 
+                              whiteSpace: "pre"
                             }}
                           >
                             {char}
@@ -388,7 +398,7 @@ export default function HeroSection({
         </div>
 
         {/* ── Right Content: Image ── */}
-        <div className="relative flex items-start justify-center lg:flex-1 lg:h-screen lg:items-end lg:justify-end mt-12 lg:mt-0">
+        <div className="relative flex items-start justify-center min-w-0 lg:h-[100svh] lg:items-end lg:justify-end mt-12 lg:mt-0">
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
             animate={
@@ -397,21 +407,19 @@ export default function HeroSection({
                 : { opacity: 0, scale: 1.05 }
             }
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
-            style={{ x: imageX, y: imageY }}
-            className="relative h-[45vh] xs:h-[55vh] w-[110%] right-[-5%] transition-all md:h-[85vh] lg:h-[90vh] lg:w-full lg:right-0 xl:h-[95vh] 2xl:w-full 2xl:right-0"
+            style={{ x: imageX, y: imageY, willChange: "transform" }}
+            className="relative w-full h-[45svh] xs:h-[55svh] md:h-[85svh] lg:h-[90svh] xl:h-[95svh]"
           >
             <Image
               src="/profile.png"
               alt="Rocky Chowdhury — Software Engineer"
               fill
               unoptimized
-              className="object-contain object-top lg:object-bottom scale-[1.0] 2xl:scale-[1.0] 3xl:scale-[1.4] origin-top lg:origin-bottom"
+              className="object-contain object-top lg:object-bottom 3xl:scale-[1.4] origin-top lg:origin-bottom"
               sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />
           </motion.div>
-
-
         </div>
       </div>
     </section>

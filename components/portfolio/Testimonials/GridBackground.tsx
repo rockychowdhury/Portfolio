@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 
 interface GridBackgroundProps {
   isPaused?: boolean;
+  pulseColor?: string;
 }
 
-export default function GridBackground({ isPaused = false }: GridBackgroundProps) {
+export default function GridBackground({ isPaused = false, pulseColor = "bg-primary/20" }: GridBackgroundProps) {
   // CSS-based pulses are more performant than React state for this background effect
   const pulsePositions = [
     { top: '10%', left: '15%' },
@@ -36,7 +37,7 @@ export default function GridBackground({ isPaused = false }: GridBackgroundProps
       {pulsePositions.map((pos, i) => (
         <div
           key={i}
-          className={`absolute h-[80px] w-[80px] bg-primary/20 blur-xl rounded-full ${isPaused ? "" : "animate-pulse"}`}
+          className={`absolute h-[80px] w-[80px] ${pulseColor} blur-xl rounded-full ${isPaused ? "" : "animate-pulse"}`}
           style={{ 
             top: pos.top, 
             left: pos.left,

@@ -147,12 +147,30 @@
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* svh fallback for older browsers */
+    --fallback-vh: 1vh;
+  }
+
+  /* Feature-test: if svh is supported, override the fallback */
+  @supports (height: 1svh) {
+    html {
+      --fallback-vh: 1svh;
+    }
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
-    /* Removed overscroll-behavior: none to prevent scroll issues on some mobile browsers */
+    -webkit-overflow-scrolling: touch;
   }
 
 
@@ -331,6 +349,40 @@ html.lenis body {
 
 .animate-scanline {
   animation: scanline 8s linear infinite;
+}
+
+/* ── Performance: CSS-only floating animations (replaces JS-driven Framer Motion loops) ── */
+@keyframes float-icon {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+@keyframes float-group {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(0, -15px, 0) rotate(1deg); }
+  66% { transform: translate3d(0, -8px, 0) rotate(-1deg); }
+}
+
+.animate-float-icon {
+  animation: float-icon 8s ease-in-out infinite;
+  -webkit-animation: float-icon 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-group {
+  animation: float-group 8s ease-in-out infinite;
+  -webkit-animation: float-group 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ── Performance: GPU-composited blur layer ── */
+.blur-layer-gpu {
+  transform: scale(1.25) translateZ(0);
+  -webkit-transform: scale(1.25) translateZ(0);
+  will-change: opacity, filter;
+  contain: layout paint style; /* layout+paint without size for better Safari compat */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* ─── README Prose Styles ─── */

@@ -16,17 +16,54 @@ import BlogsSection from "@/components/portfolio/Blogs";
 import Education from "@/components/portfolio/Education";
 import AchievementsSection from "@/components/portfolio/AchievementsSection";
 import ProjectsSection from "@/sections/ProjectsSection";
-
 import JourneySection from "@/components/portfolio/Journey";
 
+const sectionMap: Record<string, React.ElementType> = {
+  skills: SkillsSection,
+  projects: ProjectsSection,
+  problemsolving: ProblemSolvingSection,
+  github: GitHubSection,
+  education: Education,
+  blogs: BlogsSection,
+  achievements: AchievementsSection,
+  journey: JourneySection,
+  testimonials: TestimonialsSection,
+  contact: ContactSection,
+};
+
+let hasRunPreloader = false;
+
 export default function Home() {
-  const [preloaderDone, setPreloaderDone] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(hasRunPreloader);
+  const [features, setFeatures] = useState<any[]>([]);
+  const [loadingFeatures, setLoadingFeatures] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/features")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setFeatures(data);
+        setLoadingFeatures(false);
+      })
+      .catch(err => {
+        console.error("Failed to load features:", err);
+        setLoadingFeatures(false);
+      });
+  }, []);
 
   const handlePreloaderComplete = () => {
+    hasRunPreloader = true;
     setPreloaderDone(true);
   };
 
   useEffect(() => {
+    // Prevent the browser from trying to restore previous scroll position
+    // which causes it to jump to the footer when dynamic content loads
+    if (typeof window !== "undefined") {
+      window.history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    }
+
     if (preloaderDone && window.location.hash) {
       const id = window.location.hash.replace("#", "");
       const element = document.getElementById(id);
@@ -34,6 +71,8 @@ export default function Home() {
         // Wait a small bit for any final layout shifts (like hydration)
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth" });
+          // Clean up the URL hash cleanly without a reload so future refreshes stay at the top
+          window.history.replaceState(null, "", window.location.pathname);
         }, 100);
       }
     }
@@ -44,7 +83,7 @@ export default function Home() {
       {!preloaderDone && (
         <Preloader key="preloader" onComplete={handlePreloaderComplete} />
       )}
-      <Navbar preloaderDone={preloaderDone} />
+      <Navbar preloaderDone={preloaderDone} features={features} />
       
       <motion.main
         initial={{ opacity: 0 }}
@@ -53,16 +92,14 @@ export default function Home() {
         className={!preloaderDone ? "pointer-events-none" : ""}
       >
         <HeroSection preloaderDone={preloaderDone} />
-        <SkillsSection />
-        <ProjectsSection />
-        <ProblemSolvingSection />
-        <GitHubSection />
-        <Education />
-        <BlogsSection />
-        <AchievementsSection />
-        <JourneySection />
-        <TestimonialsSection />
-        <ContactSection />
+        {!loadingFeatures ? (
+            features.filter(f => f.isActive).map(f => {
+                const Component = sectionMap[f.componentId];
+                return Component ? <Component key={f._id || f.componentId} /> : null;
+            })
+        ) : (
+            <div className="min-h-screen" />
+        )}
         <Footer />
       </motion.main>
     </>

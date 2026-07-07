@@ -18,7 +18,7 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-white border border-border/80 overflow-hidden shadow-sm transition-all hover:shadow-xl dark:bg-zinc-800/80"
+      className="group relative flex flex-col  rounded-3xl bg-white border border-border/80 overflow-hidden shadow-sm transition-all hover:shadow-xl "
     >
       <div className="relative aspect-video overflow-hidden">
         {blog.thumbnail_url ? (
@@ -46,8 +46,8 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
         </div>
       </div>
 
-      <div className="p-5 md:p-6">
-        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mb-6 line-clamp-2">
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-foreground leading-tight mb-4 line-clamp-2 text-xs">
           {blog.title}
         </h3>
         
@@ -60,7 +60,7 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
                    e.preventDefault();
                    onTagClick(tag);
                  }}
-                 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-primary transition-colors"
+                 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
                >
                  {tag}
                </button>

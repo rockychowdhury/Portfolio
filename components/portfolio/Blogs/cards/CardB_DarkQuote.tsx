@@ -17,9 +17,9 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ scale: 1.01 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-foreground text-background p-6 md:p-8 min-h-[250px] justify-between overflow-hidden"
+      className="group relative flex flex-col  rounded-3xl bg-secondary text-foreground p-5 min-h-[180px] justify-between overflow-hidden"
     >
-      <div className="absolute top-0 right-0 p-6 md:p-8 opacity-10">
+      <div className="absolute top-0 right-0 p-5 opacity-10">
         <Quote size={60} fill="currentColor" />
       </div>
 
@@ -28,7 +28,7 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
             <PlatformBadge platform={blog.platform} variant="mono" />
         </div>
         
-        <h3 className="text-lg md:text-xl font-bold tracking-tight leading-tight mt-4">
+        <h3 className="text-base font-bold tracking-tight leading-tight mt-4">
           "{blog.title}"
         </h3>
       </div>
@@ -42,13 +42,13 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
                   e.preventDefault();
                   onTagClick(tag);
                 }}
-                className="text-[9px] font-black uppercase tracking-[0.25em] text-background/40 hover:text-background transition-colors"
+                className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
                 {tag}
               </button>
             ))}
           </div>
-          <div className="h-[2px] w-8 bg-background/20 group-hover:w-12 transition-all" />
+          <div className="h-[2px] w-8 bg-primary/50 group-hover:w-12 transition-all" />
       </div>
     </motion.a>
   );

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 interface HeatmapCellProps {
@@ -26,7 +25,9 @@ const colors = {
   light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
 };
 
-export default function HeatmapCell({ day, weekIdx, onHover, onLeave }: HeatmapCellProps) {
+// React.memo prevents re-render when parent state changes (e.g. tooltip hover on a different cell)
+// CSS transitions replace Framer Motion whileInView (eliminates ~364 IntersectionObservers)
+const HeatmapCell = React.memo(function HeatmapCell({ day, weekIdx, onHover, onLeave }: HeatmapCellProps) {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const level = getLevel(day.count);
@@ -40,28 +41,22 @@ export default function HeatmapCell({ day, weekIdx, onHover, onLeave }: HeatmapC
   const themeColors = resolvedTheme === "dark" ? colors.dark : colors.light;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.6 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{
-        duration: 0.4,
-        delay: weekIdx * 0.008,
-        type: "spring",
-        stiffness: 300,
-        damping: 20
-      }}
+    <div
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      whileHover={{ 
-        scale: 1.25, 
-        zIndex: 20,
-        transition: { duration: 0.2 }
-      }}
       style={{
         backgroundColor: themeColors[level],
+        // CSS-based staggered entry animation (replaces per-cell Framer Motion whileInView)
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? 'scale(1)' : 'scale(0.6)',
+        transitionProperty: 'opacity, transform',
+        transitionDuration: '0.4s',
+        transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // spring-like bounce
+        transitionDelay: `${weekIdx * 8}ms`,
       }}
-      className="w-[10px] h-[10px] md:w-[12px] md:h-[12px] rounded-[2px] cursor-pointer transition-colors duration-200"
+      className="w-[10px] h-[10px] md:w-[12px] md:h-[12px] rounded-[2px] cursor-pointer transition-colors duration-200 hover:scale-125 hover:z-20"
     />
   );
-}
+});
+
+export default HeatmapCell;

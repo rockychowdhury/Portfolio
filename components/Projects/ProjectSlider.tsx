@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Project } from "@/types/project";
 
 import ProjectVideo from "./ProjectVideo";
@@ -304,13 +305,12 @@ export default function ProjectSlider({
             draggable={false}
           />
 
-          {/* 2. Blurred Overlay Layer — Animated via Opacity (Performant) */}
+          {/* 2. Blurred Overlay Layer — GPU-composited via CSS class */}
           <div
-            className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] transition-opacity duration-500 ease-out pointer-events-none z-10"
+            className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] transition-opacity duration-500 ease-out pointer-events-none z-10 blur-layer-gpu"
             style={{
               opacity: isCenter ? 0 : 1,
               filter: `blur(${isMobile ? 10 : 17}px) saturate(180%) brightness(1.1)`,
-              transform: "scale(1.25)", 
             }}
           >
             {/* Glass tint overlay */}
@@ -371,35 +371,54 @@ export default function ProjectSlider({
           {String(n).padStart(2, "0")}
         </p>
 
-        <div className="flex items-center gap-[4px] md:gap-[6px]">
-          {projects.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                if (i === centerIndex) return;
-                const diff = (i - centerIndex + n) % n;
-                if (diff <= n / 2) slideTo("next"); else slideTo("prev");
-              }}
-              className="relative rounded-full overflow-hidden transition-all duration-500 cursor-pointer"
-              style={{
-                width: i === centerIndex ? (isMobile ? "24px" : "36px") : (isMobile ? "10px" : "16px"),
-                height: "2.5px",
-              }}
-              aria-label={`Go to project ${i + 1}`}
-            >
-              <div className="absolute inset-0 bg-foreground/12 rounded-full" />
-              {i === centerIndex && (
-                <motion.div
-                  key={`progress-${centerIndex}-${progressKey}`}
-                  className="absolute inset-0 rounded-full"
-                  style={{ background: "var(--foreground)", opacity: 0.6, transformOrigin: "left center" }}
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: videoDuration, ease: "linear" }}
-                />
-              )}
-            </button>
-          ))}
+        <div className="flex items-center gap-4 md:gap-6 mt-2">
+          <button
+            onClick={() => slideTo("prev")}
+            className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full border border-foreground/25 text-foreground/70 hover:bg-foreground hover:text-background transition-all duration-300 focus:outline-none cursor-pointer"
+            aria-label="Previous project"
+          >
+            <ChevronLeft size={16} strokeWidth={2} />
+          </button>
+
+          <div className="flex items-center gap-[4px] md:gap-[6px]">
+            {projects.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  if (i === centerIndex) return;
+                  const diff = (i - centerIndex + n) % n;
+                  if (diff <= n / 2) slideTo("next"); else slideTo("prev");
+                }}
+                className="relative rounded-full overflow-hidden transition-all duration-500 cursor-pointer border-none outline-none focus:outline-none p-0 m-0 bg-transparent"
+                style={{
+                  width: i === centerIndex ? (isMobile ? "40px" : "64px") : (isMobile ? "10px" : "16px"),
+                  height: "2.5px",
+                  transform: "translateZ(0)",
+                }}
+                aria-label={`Go to project ${i + 1}`}
+              >
+                <div className="absolute inset-0 bg-foreground/12" />
+                {i === centerIndex && (
+                  <motion.div
+                    key={`progress-${centerIndex}-${progressKey}`}
+                    className="absolute inset-0"
+                    style={{ background: "var(--foreground)", opacity: 0.6, transformOrigin: "left center" }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: videoDuration, ease: "linear" }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => slideTo("next")}
+            className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full border border-foreground/25 text-foreground/70 hover:bg-foreground hover:text-background transition-all duration-300 focus:outline-none cursor-pointer"
+            aria-label="Next project"
+          >
+            <ChevronRight size={16} strokeWidth={2} />
+          </button>
         </div>
       </div>
     </div>

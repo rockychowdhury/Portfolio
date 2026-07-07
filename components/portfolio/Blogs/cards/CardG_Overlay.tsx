@@ -19,7 +19,7 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
       target="_blank"
       rel="noopener noreferrer"
       whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-[2.5rem] bg-zinc-900 border border-border/80 overflow-hidden shadow-sm min-h-[340px] md:min-h-[380px]"
+      className="group relative flex flex-col  rounded-3xl bg-zinc-900 border border-border/80 overflow-hidden shadow-sm min-h-[340px] md:min-h-[380px]"
     >
       {/* Full-Bleed Background Image */}
       {blog.thumbnail_url && (
@@ -42,11 +42,11 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
            <ArrowUpRight size={18} className="text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>
 
-        <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-white leading-tight mb-6">
+        <h3 className="text-lg md:text-xl font-bold tracking-tight text-white leading-tight mb-6">
           {blog.title}
         </h3>
         
-        <p className="text-white/40 text-sm leading-relaxed mb-8 line-clamp-2 font-medium">
+        <p className="text-zinc-400 text-sm leading-relaxed mb-8 line-clamp-2 font-medium">
           {blog.subtitle}
         </p>
 
@@ -59,7 +59,7 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
                   e.preventDefault();
                   onTagClick(tag);
                 }}
-                className="text-[9px] font-black uppercase tracking-[0.25em] text-white/30 hover:text-primary transition-colors"
+                className="text-[10px] font-bold uppercase tracking-wider text-white/30 hover:text-primary transition-colors"
               >
                 {tag}
               </button>

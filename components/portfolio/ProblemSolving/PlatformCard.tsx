@@ -1,5 +1,5 @@
 import { motion, useSpring, useTransform, AnimatePresence, useMotionValue } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import MiniSparkline from "./MiniSparkline";
 import { Copy, Check, ExternalLink } from "lucide-react";
@@ -69,21 +69,35 @@ export default function PlatformCard({
     ([x, y]) => `radial-gradient(circle at ${(x as number + 0.5) * 100}% ${(y as number + 0.5) * 100}%, var(--brand-color) 0%, transparent 50%)`
   );
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Normalize coordinates from -0.5 to 0.5
-    mouseX.set((x / rect.width) - 0.5);
-    mouseY.set((y / rect.height) - 0.5);
-  };
+  // RAF-throttled mouse handler — max 1 getBoundingClientRect() per frame
+  const rafId = useRef<number | null>(null);
 
-  const handleMouseLeave = () => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (rafId.current !== null) return;
+    rafId.current = requestAnimationFrame(() => {
+      if (!cardRef.current) { rafId.current = null; return; }
+      const rect = cardRef.current.getBoundingClientRect();
+      mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+      mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+      rafId.current = null;
+    });
+  }, [mouseX, mouseY]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
     mouseX.set(0);
     mouseY.set(0);
-  };
+  }, [mouseX, mouseY]);
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -150,14 +164,14 @@ export default function PlatformCard({
       <div className="flex items-start justify-between relative z-10 mb-8" style={{ transform: "translateZ(30px)" }}>
         <div className="flex items-center gap-4">
           {/* Logo Container */}
-          <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white/5 p-3 border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
+          <div className="relative h-14 w-14 overflow-hidden rounded-2xl">
             <Image 
               src={iconPath} 
               alt={name} 
-              fill 
-              className={`object-contain p-1 filter drop-shadow-md ${isCodeChef ? 'brightness-0 invert' : ''}`}
+              fill
+              sizes="56px"
+              className={"object-contain"}
             />
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           
           <div className="flex flex-col">
