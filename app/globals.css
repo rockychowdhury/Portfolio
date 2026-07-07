@@ -375,6 +375,44 @@ html.lenis body {
   will-change: transform;
 }
 
+/* ── Spacetime Grid Animations ── */
+@keyframes gridBreathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.12; transform: scale(1); }
+  50% { opacity: 0.04; transform: scale(1.4); }
+}
+
+@keyframes gridRingSpin {
+  from { transform-origin: center; transform: rotate(0deg); }
+  to { transform-origin: center; transform: rotate(360deg); }
+}
+
+.grid-breathe {
+  animation: gridBreathe 8s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.grid-pulse {
+  animation: gridPulse 4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.grid-ring-spin {
+  animation: gridRingSpin 30s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.grid-ring-spin-reverse {
+  animation: gridRingSpin 45s linear infinite reverse;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
 /* ── Performance: GPU-composited blur layer ── */
 .blur-layer-gpu {
   transform: scale(1.25) translateZ(0);
