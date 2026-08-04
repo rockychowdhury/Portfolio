@@ -20,7 +20,7 @@ export default function GridBackground({ isPaused = false, pulseColor = "bg-prim
   ];
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
       {/* Static Grid Pattern */}
       <div 
         className="absolute inset-0 opacity-[0.04] dark:opacity-[0.08]" 

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Download, Menu, X, Copy, Check } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 
@@ -33,6 +33,8 @@ export default function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [copied, setCopied] = useState(false);
+  const isClickScrolling = useRef(false);
+  const clickScrollTimeout = useRef<any>(null);
 
   const email = process.env.NEXT_PUBLIC_USER_EMAIL || "rocky20809@gmail.com";
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
@@ -75,6 +77,8 @@ export default function Navbar({
     };
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      if (isClickScrolling.current) return;
+      
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           setActiveSection(entry.target.id);
@@ -110,6 +114,15 @@ export default function Navbar({
     setShowMore(false);
     setIsOpen(false);
     const id = href.replace("#", "");
+    
+    // Immediately set active section and ignore observer during scroll
+    setActiveSection(id);
+    isClickScrolling.current = true;
+    if (clickScrollTimeout.current) clearTimeout(clickScrollTimeout.current);
+    clickScrollTimeout.current = setTimeout(() => {
+      isClickScrolling.current = false;
+    }, 1000); // Wait for smooth scroll to finish
+
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -121,19 +134,25 @@ export default function Navbar({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
+      className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full transition-all duration-500 ease-in-out px-1.5 py-1.5 ${
         scrolled
-          ? "top-4 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-1.5 py-1.5"
-          : "bg-transparent py-4"
+          ? "border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+          : "border border-transparent bg-transparent shadow-none"
       }`}
     >
-      <nav className={`flex w-full max-w-[1400px] mx-auto items-center justify-between transition-all duration-500 ${scrolled ? 'px-4' : 'px-4 xs:px-6 md:px-12 lg:px-20'}`}>
+      <nav className="flex w-full items-center justify-between px-4 transition-all duration-500">
         <div className="flex items-center gap-10">
           {/* Logo — anchor for preloader morph target */}
           <Link 
             href="#hero" 
             onClick={(e) => {
               e.preventDefault();
+              setActiveSection("");
+              isClickScrolling.current = true;
+              if (clickScrollTimeout.current) clearTimeout(clickScrollTimeout.current);
+              clickScrollTimeout.current = setTimeout(() => {
+                isClickScrolling.current = false;
+              }, 1000);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             className="group flex items-center"
@@ -167,7 +186,7 @@ export default function Navbar({
                     <motion.div
                       layoutId="active-pill"
                       className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                   )}
                 </a>
@@ -194,7 +213,7 @@ export default function Navbar({
                   <motion.div
                     layoutId="active-pill"
                     className="absolute inset-0 z-[-1] rounded-full bg-background shadow-sm"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
               </button>

@@ -3,16 +3,17 @@
 import {
   motion,
   useMotionValue,
+  useMotionTemplate,
   useTransform,
   useSpring,
   useInView,
   animate,
   AnimatePresence,
+  type MotionValue,
 } from "framer-motion";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { GridPattern } from "@/components/ui/BackgroundPatterns";
+import React, { useEffect, useRef, useState } from "react";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -106,6 +107,134 @@ const lineGrow = {
     transition: { duration: 1, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
+// ── Spacetime Curvature Grid ──
+// A flat grid with an elliptical gravity-well distortion on the left content area.
+// Straight lines everywhere, warped into an oval "time dilation" lens on the left.
+const GRID_COLS = 32;
+const GRID_ROWS = 24;
+const VB_W = 1600;
+const VB_H = 1000;
+
+// Gravity well center — aligned to the left content area
+const WELL_CX = 380;
+const WELL_CY = 480;
+const WELL_RX = 380; // horizontal radius of distortion field
+const WELL_RY = 340; // vertical radius of distortion field
+const WELL_STRENGTH = 0.45; // max pull factor
+
+function computeGridPoint(c: number, r: number): [number, number] {
+  const u = c / (GRID_COLS - 1);
+  const v = r / (GRID_ROWS - 1);
+
+  // Regular flat grid positions (with bleed beyond viewBox)
+  let x = -80 + u * (VB_W + 160);
+  let y = -60 + v * (VB_H + 120);
+
+  // Elliptical distance from gravity well center
+  const dx = (x - WELL_CX) / WELL_RX;
+  const dy = (y - WELL_CY) / WELL_RY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // Spacetime bulge — Gaussian falloff, pushes grid outward from center
+  const factor = WELL_STRENGTH * Math.exp(-dist * dist * 0.55);
+  x -= (WELL_CX - x) * factor;
+  y -= (WELL_CY - y) * factor;
+
+  return [x, y];
+}
+
+// Pre-compute all grid points at module level (zero runtime cost)
+const GRID_POINTS: [number, number][][] = [];
+for (let r = 0; r < GRID_ROWS; r++) {
+  GRID_POINTS[r] = [];
+  for (let c = 0; c < GRID_COLS; c++) {
+    GRID_POINTS[r][c] = computeGridPoint(c, r);
+  }
+}
+
+// Build SVG path strings at module level
+const hPaths = GRID_POINTS.map((row) =>
+  row.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ")
+);
+
+const vPaths = Array.from({ length: GRID_COLS }, (_, c) =>
+  GRID_POINTS.map((row, i) => `${i === 0 ? "M" : "L"}${row[c][0].toFixed(1)},${row[c][1].toFixed(1)}`).join(" ")
+);
+
+const gridDots = GRID_POINTS.flat();
+
+// Pre-compute dot distance-based opacity at module level
+const gridDotData = GRID_POINTS.flat().map(([x, y]) => {
+  const dx = (x - WELL_CX) / WELL_RX;
+  const dy = (y - WELL_CY) / WELL_RY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const opacity = dist < 0.6 ? 0.25 : dist < 1.2 ? 0.18 : 0.08;
+  const r = dist < 0.8 ? 2.5 : 1.8;
+  return { x, y, opacity, r };
+});
+
+function SpacetimeGrid() {
+  return (
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]">
+      <svg
+        viewBox={`-80 -60 ${VB_W + 160} ${VB_H + 120}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full text-foreground grid-breathe"
+        fill="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="gridFade" cx="50%" cy="50%" r="70%" gradientUnits="objectBoundingBox">
+            <stop offset="0%" stopColor="white" stopOpacity="1" />
+            <stop offset="50%" stopColor="white" stopOpacity="0.85" />
+            <stop offset="85%" stopColor="white" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <mask id="gridMask">
+            <rect x="-80" y="-60" width={VB_W + 160} height={VB_H + 120} fill="url(#gridFade)" />
+          </mask>
+        </defs>
+
+        <g mask="url(#gridMask)">
+          {hPaths.map((d, i) => (
+            <path key={`h${i}`} d={d} stroke="currentColor" strokeWidth="0.8" opacity="0.1" />
+          ))}
+          {vPaths.map((d, i) => (
+            <path key={`v${i}`} d={d} stroke="currentColor" strokeWidth="0.8" opacity="0.1" />
+          ))}
+          {gridDotData.map((dot, i) => (
+            <circle key={i} cx={dot.x.toFixed(1)} cy={dot.y.toFixed(1)} r={dot.r} fill="currentColor" opacity={dot.opacity} />
+          ))}
+
+          {/* Animated ring at distortion epicenter */}
+          <circle
+            cx={WELL_CX}
+            cy={WELL_CY}
+            r="180"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.8"
+            strokeDasharray="8 12"
+            opacity="0.2"
+            className="grid-ring-spin"
+          />
+          <circle
+            cx={WELL_CX}
+            cy={WELL_CY}
+            r="280"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.6"
+            strokeDasharray="4 16"
+            opacity="0.25"
+            className="grid-ring-spin-reverse"
+          />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 
 export default function HeroSection({
   preloaderDone = true,
@@ -115,6 +244,9 @@ export default function HeroSection({
   const containerRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  // Spotlight position — relative to section top-left for the grid highlight
+  const spotX = useMotionValue(0);
+  const spotY = useMotionValue(0);
 
   const [stats, setStats] = useState({
     totalSolved: 0,
@@ -196,6 +328,9 @@ export default function HeroSection({
         if (rect) {
           mouseX.set(e.clientX - rect.width / 2);
           mouseY.set(e.clientY - rect.height / 2);
+          // Spotlight: position relative to section top-left
+          spotX.set(e.clientX - rect.left);
+          spotY.set(e.clientY - rect.top);
         }
         rafId = null;
       });
@@ -205,7 +340,7 @@ export default function HeroSection({
       window.removeEventListener("mousemove", handleMouse);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, spotX, spotY]);
 
   return (
     <section
@@ -213,7 +348,8 @@ export default function HeroSection({
       id="hero"
       className="relative min-h-[100svh] w-full overflow-hidden bg-background pt-20 lg:pt-0"
     >
-      <GridPattern />
+      {/* ── Spacetime Curvature Grid ── */}
+      <SpacetimeGrid />
       <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2 gap-0">
         {/* ── Left Content ── */}
         <div className="relative z-20 flex flex-col lg:flex-1 lg:justify-center pt-10 pb-6 lg:py-0">
@@ -222,7 +358,7 @@ export default function HeroSection({
             <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
               Problem Solver
             </span>
-            <div className="h-64 w-px border-l border-dashed border-border/60" />
+            <div className="h-64 w-px border-l-[1.5px] border-dashed border-foreground/40" />
             <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
               2023
             </span>
