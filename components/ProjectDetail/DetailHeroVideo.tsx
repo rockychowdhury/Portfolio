@@ -6,6 +6,8 @@ interface DetailHeroVideoProps {
   title: string;
 }
 
+import Image from "next/image";
+
 export default function DetailHeroVideo({
   videoSrc,
   thumbnail,
@@ -13,7 +15,7 @@ export default function DetailHeroVideo({
 }: DetailHeroVideoProps) {
   return (
     <div className="w-full flex justify-center pt-6 md:pt-10 pb-6 px-4">
-      <div className="relative w-full max-w-[900px] rounded-2xl overflow-hidden shadow-2xl shadow-black/10 border border-border/20">
+      <div className="relative w-full max-w-[900px] aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black/10 border border-border/20">
         {videoSrc ? (
           <video
             src={videoSrc}
@@ -22,14 +24,18 @@ export default function DetailHeroVideo({
             loop
             playsInline
             preload="auto"
-            className="w-full aspect-video object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ transform: "translateZ(0)" }}
             poster={thumbnail}
           />
         ) : (
-          <img
+          <Image
             src={thumbnail}
             alt={title}
-            className="w-full aspect-video object-cover"
+            fill
+            priority
+            sizes="(max-width: 900px) 100vw, 900px"
+            className="object-cover"
           />
         )}
       </div>

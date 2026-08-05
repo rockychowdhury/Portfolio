@@ -1,7 +1,7 @@
 "use client";
 
 import ProjectNavbar from "./ProjectNavbar";
-import Footer from "@/components/portfolio/Footer";
+import Footer from "@/components/layout/Footer";
 
 export default function ProjectDetailShell({
   projectTitle,

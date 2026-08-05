@@ -1,6 +1,6 @@
 "use client";
 
-import { TocItem } from "@/lib/extractTOC";
+import { TocItem } from "@/lib/readme/extractTOC";
 import SidebarTOC from "./SidebarTOC";
 import MobileTOCStrip from "./MobileTOCStrip";
 import RenderedReadme from "./RenderedReadme";

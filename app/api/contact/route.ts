@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | null = null;
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +36,14 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data, error } = await resend.emails.send({
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: "Email service is not configured." },
+        { status: 500 }
+      );
+    }
+
+    const { data, error } = await getResend().emails.send({
       from: `Portfolio <onboarding@resend.dev>`,
       to: process.env.RECEIVER_EMAIL || "server.info8000@gmail.com",
       replyTo: email,

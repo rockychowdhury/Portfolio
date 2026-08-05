@@ -1,0 +1,541 @@
+"use client";
+
+import {
+  motion,
+  useMotionValue,
+  useMotionTemplate,
+  useTransform,
+  useSpring,
+  useInView,
+  animate,
+  AnimatePresence,
+  type MotionValue,
+} from "framer-motion";
+import Image from "next/image";
+import { ExternalLink } from "lucide-react";
+import React, { useEffect, useRef, useState, memo } from "react";
+import { useBackgroundRefresh } from "@/lib/useBackgroundRefresh";
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
+
+// ── Animated Counter ──
+// Updates the DOM via a ref instead of React state, so counting to a large
+// number does NOT re-render the whole Hero section (incl. the large SVG grid)
+// on every animation frame.
+function AnimatedCount({
+  value,
+  duration = 2,
+  prefix = "",
+}: {
+  value: number;
+  duration?: number;
+  prefix?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (value <= 0) {
+      if (ref.current) ref.current.textContent = `${prefix}0`;
+      return;
+    }
+    const controls = animate(0, value, {
+      duration,
+      ease: [0.25, 0.4, 0.25, 1],
+      onUpdate: (v) => {
+        if (ref.current) ref.current.textContent = `${prefix}${Math.round(v)}`;
+      },
+    });
+    return () => controls.stop();
+  }, [value, duration, prefix]);
+
+  return (
+    <span ref={ref} className="tabular-nums">
+      {prefix}0
+    </span>
+  );
+}
+
+// Stagger container
+const stagger = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+// Individual item fade up
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
+  },
+};
+
+// Slide from left
+const slideLeft = {
+  hidden: { opacity: 0, x: -40 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.9, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
+  },
+};
+
+// Letter animation for "Hello"
+const helloLetters = "Hello".split("");
+const letterAnimation = {
+  hidden: { opacity: 0, y: 80, rotateX: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: {
+      duration: 0.8,
+      delay: 0.5 + i * 0.08,
+      ease: [0.25, 0.4, 0.25, 1] as const,
+    },
+  }),
+};
+
+// Line draw animation
+const lineGrow = {
+  hidden: { scaleX: 0 },
+  visible: {
+    scaleX: 1,
+    transition: { duration: 1, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] as const },
+  },
+};
+// ── Spacetime Curvature Grid ──
+// A flat grid with an elliptical gravity-well distortion on the left content area.
+// Straight lines everywhere, warped into an oval "time dilation" lens on the left.
+const GRID_COLS = 32;
+const GRID_ROWS = 24;
+const VB_W = 1600;
+const VB_H = 1000;
+
+// Gravity well center — aligned to the left content area
+const WELL_CX = 380;
+const WELL_CY = 480;
+const WELL_RX = 380; // horizontal radius of distortion field
+const WELL_RY = 340; // vertical radius of distortion field
+const WELL_STRENGTH = 0.45; // max pull factor
+
+function computeGridPoint(c: number, r: number): [number, number] {
+  const u = c / (GRID_COLS - 1);
+  const v = r / (GRID_ROWS - 1);
+
+  // Regular flat grid positions (with bleed beyond viewBox)
+  let x = -80 + u * (VB_W + 160);
+  let y = -60 + v * (VB_H + 120);
+
+  // Elliptical distance from gravity well center
+  const dx = (x - WELL_CX) / WELL_RX;
+  const dy = (y - WELL_CY) / WELL_RY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // Spacetime bulge — Gaussian falloff, pushes grid outward from center
+  const factor = WELL_STRENGTH * Math.exp(-dist * dist * 0.55);
+  x -= (WELL_CX - x) * factor;
+  y -= (WELL_CY - y) * factor;
+
+  return [x, y];
+}
+
+// Pre-compute all grid points at module level (zero runtime cost)
+const GRID_POINTS: [number, number][][] = [];
+for (let r = 0; r < GRID_ROWS; r++) {
+  GRID_POINTS[r] = [];
+  for (let c = 0; c < GRID_COLS; c++) {
+    GRID_POINTS[r][c] = computeGridPoint(c, r);
+  }
+}
+
+// Build SVG path strings at module level
+const hPaths = GRID_POINTS.map((row) =>
+  row.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ")
+);
+
+const vPaths = Array.from({ length: GRID_COLS }, (_, c) =>
+  GRID_POINTS.map((row, i) => `${i === 0 ? "M" : "L"}${row[c][0].toFixed(1)},${row[c][1].toFixed(1)}`).join(" ")
+);
+
+const gridDots = GRID_POINTS.flat();
+
+// Pre-compute dot distance-based opacity at module level
+const gridDotData = GRID_POINTS.flat().map(([x, y]) => {
+  const dx = (x - WELL_CX) / WELL_RX;
+  const dy = (y - WELL_CY) / WELL_RY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const opacity = dist < 0.6 ? 0.25 : dist < 1.2 ? 0.18 : 0.08;
+  const r = dist < 0.8 ? 2.5 : 1.8;
+  return { x, y, opacity, r };
+});
+
+const SpacetimeGrid = memo(function SpacetimeGrid() {
+  return (
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]">
+      <svg
+        viewBox={`-80 -60 ${VB_W + 160} ${VB_H + 120}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full text-foreground"
+        fill="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="gridFade" cx="50%" cy="50%" r="70%" gradientUnits="objectBoundingBox">
+            <stop offset="0%" stopColor="white" stopOpacity="1" />
+            <stop offset="50%" stopColor="white" stopOpacity="0.85" />
+            <stop offset="85%" stopColor="white" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <mask id="gridMask">
+            <rect x="-80" y="-60" width={VB_W + 160} height={VB_H + 120} fill="url(#gridFade)" />
+          </mask>
+        </defs>
+
+        <g mask="url(#gridMask)">
+          {hPaths.map((d, i) => (
+            <path key={`h${i}`} d={d} stroke="currentColor" strokeWidth="0.8" opacity="0.1" />
+          ))}
+          {vPaths.map((d, i) => (
+            <path key={`v${i}`} d={d} stroke="currentColor" strokeWidth="0.8" opacity="0.1" />
+          ))}
+          {gridDotData.map((dot, i) => (
+            <circle key={i} cx={dot.x.toFixed(1)} cy={dot.y.toFixed(1)} r={dot.r} fill="currentColor" opacity={dot.opacity} />
+          ))}
+
+          {/* Static rings at distortion epicenter (no infinite rotation to avoid per-frame compositing) */}
+          <circle
+            cx={WELL_CX}
+            cy={WELL_CY}
+            r="180"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.8"
+            strokeDasharray="8 12"
+            opacity="0.2"
+          />
+          <circle
+            cx={WELL_CX}
+            cy={WELL_CY}
+            r="280"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.6"
+            strokeDasharray="4 16"
+            opacity="0.25"
+          />
+        </g>
+      </svg>
+    </div>
+  );
+});
+
+
+import { usePreloader } from "@/components/layout/PreloaderContext";
+
+export default function HeroSection() {
+  const { preloaderDone } = usePreloader();
+  const containerRef = useRef<HTMLElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  // Spotlight position — relative to section top-left for the grid highlight
+  const spotX = useMotionValue(0);
+  const spotY = useMotionValue(0);
+
+  // Cached stats from MongoDB immediately (first paint), then non-blocking
+  // background refresh from live APIs that live-updates the counters.
+  const { data: bgStats } = useBackgroundRefresh<{
+    totalSolved: number;
+    projectCount: number;
+  }>({
+    url: "/api/stats",
+    initial: null,
+    enabled: preloaderDone,
+  });
+  const stats = bgStats ?? { totalSolved: 0, projectCount: 0 };
+  const statsLoaded = !!bgStats;
+
+  // Title Carousel
+  const titles = ["Software Engineer", "Full Stack dev", "Problem Solver"];
+  const [titleIndex, setTitleIndex] = useState(0);
+
+  useEffect(() => {
+    if (!preloaderDone) return;
+    const interval = setInterval(() => {
+      setTitleIndex((prev) => (prev + 1) % titles.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [preloaderDone]);
+
+  const resumeUrl =
+    process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
+
+  // Animated counters (ref-based — no per-frame React re-render)
+  const solvedTarget = preloaderDone && statsLoaded ? stats.totalSolved : 0;
+  const projectTarget = preloaderDone && statsLoaded ? stats.projectCount : 0;
+
+  // Smooth spring for subtle mouse parallax on image
+  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+  const imageX = useTransform(springX, [-500, 500], [5, -5]);
+  const imageY = useTransform(springY, [-500, 500], [5, -5]);
+
+  useEffect(() => {
+    let rafId: number | null = null;
+
+    const handleMouse = (e: MouseEvent) => {
+      if (rafId !== null) return; // Throttle to 1 per frame
+      rafId = requestAnimationFrame(() => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          mouseX.set(e.clientX - rect.width / 2);
+          mouseY.set(e.clientY - rect.height / 2);
+          // Spotlight: position relative to section top-left
+          spotX.set(e.clientX - rect.left);
+          spotY.set(e.clientY - rect.top);
+        }
+        rafId = null;
+      });
+    };
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouse);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, [mouseX, mouseY, spotX, spotY]);
+
+  return (
+    <section
+      ref={containerRef}
+      id="hero"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-background pt-20 lg:pt-0"
+    >
+      {/* ── Spacetime Curvature Grid ── */}
+      <SpacetimeGrid />
+      <div className="container-main flex h-full flex-col lg:grid lg:grid-cols-2 gap-0">
+        {/* ── Left Content ── */}
+        <div className="relative z-20 flex flex-col lg:flex-1 lg:justify-center pt-10 pb-6 lg:py-0">
+          {/* Vertical Label — Desktop Only */}
+          <div className="absolute top-1/2 -left-12 hidden -translate-y-1/2 flex-col items-center gap-8 lg:flex">
+            <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
+              Problem Solver
+            </span>
+            <div className="h-64 w-px border-l-[1.5px] border-dashed border-foreground/40" />
+            <span className="text-[12px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/60 [writing-mode:vertical-lr] rotate-180">
+              2023
+            </span>
+          </div>
+
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate={preloaderDone ? "visible" : "hidden"}
+            className="lg:pl-12 lg:pt-24 xl:pt-32"
+          >
+            {/* Stats Row — pushed down */}
+            <motion.div
+              variants={fadeUp}
+              className="mb-8 mt-4 flex flex-wrap items-start gap-12 lg:mb-12 lg:mt-8 md:gap-20"
+            >
+              <div>
+                <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                  <AnimatedCount value={solvedTarget} prefix="+" />
+                </span>
+                <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                  DSA Problems Solved
+                </p>
+              </div>
+              <div>
+                <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
+                  {projectTarget > 0 ? <AnimatedCount value={projectTarget} prefix="+" /> : "—"}
+                </span>
+                <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                  Full-Stack Projects Shipped
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Main Heading */}
+            <div className="relative">
+              <h1
+                className="flex font-medium text-fluid-hero text-foreground"
+                style={{ perspective: "600px" }}
+              >
+                {helloLetters.map((letter, i) => (
+                  <motion.span
+                    key={i}
+                    custom={i}
+                    variants={letterAnimation}
+                    initial="hidden"
+                    animate={preloaderDone ? "visible" : "hidden"}
+                    className="inline-block"
+                  >
+                    {letter}
+                  </motion.span>
+                ))}
+              </h1>
+
+              <motion.div
+                variants={slideLeft}
+                initial="hidden"
+                animate={preloaderDone ? "visible" : "hidden"}
+                className="mt-6 lg:mt-10 flex items-center gap-4"
+              >
+                <div className="h-px w-8 bg-foreground shrink-0" />
+                <div className="text-lg font-medium text-foreground md:text-xl flex flex-wrap items-center gap-[0.3em]">
+                  It&apos;s Rocky Chowdhury a
+                  <div
+                    className="relative flex h-[1.5em] w-[200px]"
+                    style={{ perspective: "800px" }}
+                  >
+                    <AnimatePresence mode="popLayout">
+                      <motion.div
+                        key={titleIndex}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={{
+                          hidden: { opacity: 1 },
+                          visible: { opacity: 1, transition: { staggerChildren: 0.035 } },
+                          exit: { opacity: 1, transition: { staggerChildren: 0.035 } }
+                        }}
+                        className="absolute left-0 top-0 bottom-0 flex items-center whitespace-nowrap font-bold text-foreground"
+                        style={{ transformStyle: "preserve-3d" }}
+                      >
+                        {titles[titleIndex].split("").map((char, i) => (
+                          <motion.span
+                            key={i}
+                            variants={{
+                              hidden: { rotateX: -90, y: 15, opacity: 0 },
+                              visible: { rotateX: 0, y: 0, opacity: 1 },
+                              exit: { rotateX: 90, y: -15, opacity: 0 }
+                            }}
+                            transition={{
+                              duration: 0.5,
+                              ease: [0.23, 1, 0.32, 1],
+                            }}
+                            style={{
+                              display: "inline-block",
+                              transformOrigin: "50% 50% -8px",
+                              whiteSpace: "pre"
+                            }}
+                          >
+                            {char}
+                          </motion.span>
+                        ))}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Recruiter CTAs */}
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={preloaderDone ? "visible" : "hidden"}
+                className="mt-8 lg:mt-12 flex flex-wrap lg:flex-nowrap gap-4"
+              >
+                <a
+                  href="https://linkedin.com/in/rockychowdhury1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex items-center gap-3 px-7 py-3 bg-foreground text-background rounded-full font-bold text-sm overflow-hidden transition-all hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.3)] hover:-translate-y-1 active:scale-[0.98] whitespace-nowrap"
+                >
+                  <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                  <LinkedinIcon className="size-4 relative z-10" />
+                  <span className="relative z-10">LinkedIn</span>
+                  <span className="relative z-10 text-[10px] opacity-60 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">↗</span>
+                </a>
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex items-center gap-3 px-7 py-3 bg-transparent border border-foreground/10 text-foreground rounded-full font-bold text-sm overflow-hidden transition-all hover:border-foreground/30 hover:bg-foreground/[0.02] hover:-translate-y-1 active:scale-[0.98] whitespace-nowrap"
+                >
+                  <span className="absolute inset-0 bg-foreground/[0.03] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                  <ExternalLink className="size-4 relative z-10 group-hover:rotate-12 transition-transform" />
+                  <span className="relative z-10">Resume</span>
+                </a>
+              </motion.div>
+            </div>
+
+            {/* Scroll Indicator — pushed inward with pl-12 */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 2 }}
+              className="mt-20 xl:mt-28 hidden lg:flex items-center gap-4 pl-20"
+            >
+              <div className="relative flex flex-col items-center">
+                <motion.div
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="w-5 h-9 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-1.5"
+                >
+                  <motion.div
+                    animate={{ opacity: [1, 0, 1], height: [4, 8, 4] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="w-1 bg-muted-foreground/40 rounded-full"
+                  />
+                </motion.div>
+                <span className="absolute -bottom-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
+                  Scroll
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* ── Right Content: Image ── */}
+        <div className="relative flex items-start justify-center min-w-0 lg:h-[100svh] lg:items-end lg:justify-end mt-12 lg:mt-0">
+          <motion.div
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={
+              preloaderDone
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 0, scale: 1.05 }
+            }
+            transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
+            style={{ x: imageX, y: imageY, willChange: "transform" }}
+            className="relative w-full h-[45svh] xs:h-[55svh] md:h-[85svh] lg:h-[90svh] xl:h-[95svh]"
+          >
+            <Image
+              src="/profile.png"
+              alt="Rocky Chowdhury — Software Engineer"
+              fill
+              priority
+              className="object-contain object-top lg:object-bottom 3xl:scale-[1.4] origin-top lg:origin-bottom"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

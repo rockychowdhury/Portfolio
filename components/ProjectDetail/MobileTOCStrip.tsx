@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useCallback } from "react";
-import { TocItem } from "@/lib/extractTOC";
+import { TocItem } from "@/lib/readme/extractTOC";
+import { smoothScrollTo } from "@/lib/lenis";
 
 interface MobileTOCStripProps {
   toc: TocItem[];
@@ -13,7 +14,7 @@ export default function MobileTOCStrip({ toc }: MobileTOCStripProps) {
   const handleClick = useCallback((slug: string) => {
     const el = document.getElementById(slug);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      smoothScrollTo(el);
     }
   }, []);
 

@@ -1,68 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Schema, model, models } from "mongoose";
+import type {
+  ILeetCodeProfile,
+  ICodeforcesProfile,
+  ICodeChefProfile,
+  IProblemSolvingGitHubProfile,
+  IProblemSolvingProfile,
+} from "@/types/problem-solving";
 
-export interface ILeetCodeProfile {
-  handle: string;
-  solved: {
-    all: number;
-    easy: number;
-    medium: number;
-    hard: number;
-  };
-  totalActiveDays: number;
-  longestStreak: number;
-  contests: {
-    attended: number;
-    rating: number;
-    maxRating: number;
-    globalRanking: number;
-    topPercentage: number;
-  };
-  topTags: string[];
-  heatmap: { [timestamp: string]: number }; // Maps Unix timestamp to submission count
-  ratingGraph: number[];
-}
-
-export interface ICodeforcesProfile {
-  handle: string;
-  rating: number;
-  maxRating: number;
-  title: string;
-  totalContests: number;
-  bestRank: number | null;
-  totalSolved: number;
-  ratingGraph: number[]; // Array of ratings across contest history
-}
-
-export interface ICodeChefProfile {
-  handle: string;
-  rating: number;
-  maxRating: number;
-  stars: number;
-  totalContests: number;
-  totalSolved: number;
-  ratingGraph: number[]; // Array of ratings across contest history
-}
-
-export interface IGitHubProfile {
-  handle: string;
-  repos: number;
-  followers: number;
-  contributions: number;
-  allTimeContributions: number;
-  currentYearContributions: number;
-  previousYearContributions: number;
-  topLanguage: string;
-  heatmap: { [date: string]: number }; // Maps YYYY-MM-DD to contribution count
-}
-
-export interface IProblemSolvingProfile {
-  leetcode: ILeetCodeProfile;
-  codeforces: ICodeforcesProfile;
-  codechef: ICodeChefProfile;
-  github: IGitHubProfile;
-  lastUpdated: Date;
-}
+export type { ILeetCodeProfile, ICodeforcesProfile, ICodeChefProfile, IProblemSolvingProfile };
+// Re-export with the original name for backward compatibility
+export type { IProblemSolvingGitHubProfile as IGitHubProfile };
 
 const ProblemSolvingSchema = new Schema<IProblemSolvingProfile>(
   {

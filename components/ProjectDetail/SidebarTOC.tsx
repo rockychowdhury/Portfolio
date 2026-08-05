@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { TocItem } from "@/lib/extractTOC";
+import { TocItem } from "@/lib/readme/extractTOC";
+import { smoothScrollTo } from "@/lib/lenis";
 
 interface SidebarTOCProps {
   toc: TocItem[];
@@ -44,7 +45,7 @@ export default function SidebarTOC({ toc }: SidebarTOCProps) {
   const handleClick = useCallback((slug: string) => {
     const el = document.getElementById(slug);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      smoothScrollTo(el);
     }
   }, []);
 

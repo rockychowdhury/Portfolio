@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db/connect";
 import Testimonial from "@/lib/db/models/Testimonial";
 
-export const revalidate = 0; // Fresh data is better for reviews
+export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET() {
   try {

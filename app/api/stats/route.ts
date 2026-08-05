@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import dbConnect from "@/lib/db/connect";
 import Project from "@/lib/db/models/Project";
 import StatsCache from "@/lib/db/models/StatsCache";
@@ -8,6 +8,8 @@ import {
   fetchCodeChefProfile,
 } from "@/lib/api/platforms/fetchers";
 
+// Always run on request so the `?refresh=true` branch is never served from
+// Next.js's route cache; staleness is handled inside MongoDB (stale-while-revalidate).
 export const dynamic = "force-dynamic";
 
 const STALE_INTERVAL = 60 * 60 * 1000; // 1 hour
@@ -20,20 +22,32 @@ export async function GET(request: NextRequest) {
 
     // 1. Get cached
     const cached = await StatsCache.findOne();
-    const isStale = cached && Date.now() - new Date(cached.updatedAt).getTime() > STALE_INTERVAL;
 
-    // 2. Immediate response if cached and not forced refresh
-    if (cached && !refresh) {
-      if (isStale) {
-        // Trigger background refresh
-        performUpdate().catch((e) => console.error("Background Stats update failed:", e));
-      }
+    // 2. No cache yet — must block on the first fetch
+    if (!cached) {
+      const stats = await performUpdate();
+      return NextResponse.json(stats);
+    }
+
+    const isStale = Date.now() - new Date(cached.updatedAt).getTime() > STALE_INTERVAL;
+
+    // 3. Fresh and not forced — return cached immediately
+    if (!isStale && !refresh) {
       return NextResponse.json(cached);
     }
 
-    // 3. If forced refresh or no cache, perform update and wait
-    const stats = await performUpdate();
-    return NextResponse.json(stats);
+    // 4. Stale or forced — return the cached doc now, refresh MongoDB in the
+    //    background via after(), so the UI is never blocked on platform APIs.
+    const response = NextResponse.json(cached);
+    response.headers.set("x-refresh-scheduled", "1");
+    after(async () => {
+      try {
+        await performUpdate();
+      } catch (e) {
+        console.error("Background Stats update failed:", e);
+      }
+    });
+    return response;
   } catch (error) {
     console.error("Stats API error:", error);
     return NextResponse.json(

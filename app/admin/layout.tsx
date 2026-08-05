@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LayoutDashboard, Settings, Layers, Code, User, FileText, Briefcase, Award, GraduationCap, MessagesSquare, CheckSquare } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -44,8 +44,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-8 relative">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">
+        <div className="w-full max-w-[1400px] mx-auto pb-12">
             {children}
         </div>
       </main>

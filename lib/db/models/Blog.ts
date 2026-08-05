@@ -1,18 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IBlog } from "@/types/blog";
 
-export interface IBlog {
-  _id: string;
-  title: string;
-  subtitle: string;
-  handle: string;
-  platform: "LinkedIn" | "YouTube" | "Medium" | "Dev.to" | "Hashnode";
-  thumbnail_url?: string;
-  tags: string[];
-  etr: number;
-  is_featured: boolean;
-  is_approved: boolean; // For manual review
-  date_added: Date;
-}
+export type { IBlog };
 
 const BlogSchema = new Schema<IBlog>(
   {

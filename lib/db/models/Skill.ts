@@ -1,16 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { ISkill } from "@/types/skill";
 
-export interface ISkill {
-  name: string;
-  icon: string;
-  icon_group: string; // 'si', 'lu', 'bi', etc.
-  icon_type: "icon" | "text";
-  description: string;
-  group: string;
-  is_top_skill: boolean;
-  order: number;
-  color?: string; // Brand hex color
-}
+export type { ISkill };
 
 const SkillSchema = new Schema<ISkill>(
   {

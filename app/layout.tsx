@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   },
 };
 
-import { ThemeProvider } from "@/components/theme-provider";
-import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
+import { ThemeProvider } from "@/components/layout/theme-provider";
+import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
 
 export default function RootLayout({
   children,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db/connect";
 import Certification from "@/lib/db/models/Certification";
 
-export const revalidate = 0;
+export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET(request: Request) {
   try {
