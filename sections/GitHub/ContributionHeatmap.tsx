@@ -103,6 +103,7 @@ export default function ContributionHeatmap({ heatmap, stats, streak }: HeatmapP
       <motion.div 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
         transition={{ delay: 0.5 }}
         className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] md:text-[11px] font-medium"
       >

@@ -134,7 +134,7 @@ export default function Navbar({ features }: { features: any[] }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full transition-all duration-500 ease-in-out px-1.5 py-1.5 ${
         scrolled
-          ? "border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+          ? "border border-border/40 bg-background/90 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
           : "border border-transparent bg-transparent shadow-none"
       }`}
     >

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowUpRight, Clock } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -13,12 +12,11 @@ interface CardProps {
 
 export default function CardA_Hero({ blog, onTagClick, isPriority = false }: CardProps & { isPriority?: boolean }) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ y: -4 }}
-      className="group relative flex flex-col  rounded-3xl bg-background border border-border/50 overflow-hidden shadow-sm transition-all hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] "
+      className="group relative flex flex-col  rounded-3xl bg-background border border-border/50 overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] "
     >
       <div className={`relative ${isPriority ? 'aspect-[21/9]' : 'aspect-[16/7]'} overflow-hidden`}>
         {blog.thumbnail_url && (
@@ -69,6 +67,6 @@ export default function CardA_Hero({ blog, onTagClick, isPriority = false }: Car
           <ArrowUpRight size={16} className="text-muted-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
         </div>
       </div>
-    </motion.a>
+    </a>
   );
 }

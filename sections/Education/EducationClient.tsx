@@ -108,8 +108,8 @@ export default function EducationClient({ initialData }: { initialData: ICertifi
       </div>
 
       {/* Background Decorative Elements */}
-      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />
-      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-2xl pointer-events-none -z-10" />
+      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-2xl pointer-events-none -z-10" />
     </SectionWrapper>
   );
 }

@@ -21,7 +21,7 @@ export default function MobileTOCStrip({ toc }: MobileTOCStripProps) {
   if (toc.length === 0) return null;
 
   return (
-    <div className="lg:hidden sticky top-16 z-30 bg-background/95 backdrop-blur-md border-b border-border/30 -mx-4 px-4 py-3">
+    <div className="lg:hidden sticky top-16 z-30 bg-background/95 border-b border-border/30 -mx-4 px-4 py-3">
       <div
         ref={scrollRef}
         className="flex gap-2 overflow-x-auto scrollbar-hide"

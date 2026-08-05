@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import type { IBlog } from "@/types/blog";
 
@@ -12,11 +11,10 @@ interface CardProps {
 
 export default function CardF_Micro({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
-      whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-6 shadow-sm transition-all hover:shadow-xl "
+      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl "
     >
       <div className="flex items-center justify-between mb-4">
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
@@ -40,9 +38,9 @@ export default function CardF_Micro({ blog, onTagClick }: CardProps) {
             className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-primary transition-colors"
           >
             #{tag}
-          </button>
-        ))}
-      </div>
-    </motion.a>
+            </button>
+          ))}
+        </div>
+    </a>
   );
 }

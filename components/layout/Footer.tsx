@@ -28,20 +28,11 @@ export default function Footer() {
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            whileHover={{ y: -5, scale: 1.1 }}
-            className="absolute bottom-12 right-6 md:right-12 z-50 group flex flex-col items-center gap-3 transition-colors cursor-pointer"
+            className="absolute bottom-12 right-6 md:right-12 z-50 group flex flex-col items-center gap-3 transition-transform duration-300 hover:-translate-y-1 hover:scale-105 cursor-pointer"
           >
             <div className="relative h-10 w-6 rounded-full border-2 border-foreground/20 p-1 bg-background/50 backdrop-blur-sm group-hover:border-foreground/40 transition-colors shadow-lg">
-              <motion.div
-                animate={{
-                  y: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="mx-auto h-2 w-1 rounded-full bg-foreground/40 group-hover:bg-foreground/60"
+              <div
+                className="animate-scroll-bob mx-auto h-2 w-1 rounded-full bg-foreground/40 group-hover:bg-foreground/60"
               />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground/30 group-hover:text-foreground/60 transition-colors">
@@ -66,7 +57,7 @@ export default function Footer() {
       </div>
 
       {/* Subtle Background Glow */}
-      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
     </footer>
   );
 }

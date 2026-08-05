@@ -46,18 +46,10 @@ export default function FloatingCard({
       viewport={{ once: true, margin: "-100px" }}
       className={`relative z-10 ${widthClass} ${isInert ? "pointer-events-none opacity-40 grayscale-[0.5]" : ""}`}
     >
-      <motion.div
-        whileHover={{ 
-          y: -20, 
-          scale: 1.05,
-          rotate: 0,
-          filter: "blur(0px)",
-          opacity: 1,
-          transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } 
-        }}
-        className={`group relative rounded-[2rem] border border-white/10 bg-background/95 p-7 will-change-transform transform-gpu shadow-[0_8px_16px_-8px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.02)] transition-[filter,opacity] duration-500 ${isInert ? "blur-[2px] opacity-30" : "opacity-100"}`}
+      <div
+        className={`group relative rounded-[2rem] border border-white/10 bg-background/95 p-7 shadow-[0_8px_16px_-8px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.02)] transition-[filter,opacity,transform] duration-500 hover:-translate-y-4 hover:scale-[1.03] ${isInert ? "blur-[2px] opacity-30" : "opacity-100"}`}
         style={{ 
-          rotate: rotation,
+          transform: `rotate(${rotation}deg)`,
         }}
       >
         {/* Premium Inner Glow on Hover */}
@@ -109,7 +101,7 @@ export default function FloatingCard({
             {testimonial.relationship}
           </span>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

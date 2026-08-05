@@ -26,7 +26,7 @@ export default function AlertStack({ alerts, onDismiss }: AlertStackProps) {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="flex w-full items-start gap-4 rounded-2xl border border-white/10 bg-black/90 p-4 text-white shadow-2xl backdrop-blur-md pointer-events-auto"
+            className="flex w-full items-start gap-4 rounded-2xl border border-white/10 bg-black/90 p-4 text-white shadow-xl backdrop-blur-sm pointer-events-auto"
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
               {alert.icon}

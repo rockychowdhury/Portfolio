@@ -141,7 +141,7 @@ export default function PlatformCard({
       transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
     >
       {/* ── Background & Borders ── */}
-      <div className="absolute inset-0 rounded-3xl border border-white/5 bg-[#0a0a0a]/90 backdrop-blur-xl overflow-hidden -z-10 shadow-inner">
+      <div className="absolute inset-0 rounded-3xl border border-white/5 bg-[#0a0a0a]/95 overflow-hidden -z-10 shadow-inner">
         {/* Spotlight Follower */}
         <motion.div 
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -153,7 +153,7 @@ export default function PlatformCard({
         />
         {/* Subtle Brand Glow */}
         <div 
-          className="absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[100px] opacity-20 pointer-events-none"
+          className="absolute -top-32 -right-32 w-64 h-64 rounded-full blur-2xl opacity-20 pointer-events-none"
           style={{ backgroundColor: color }}
         />
         {/* Noise Texture */}

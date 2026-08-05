@@ -34,8 +34,8 @@ export function AchievementsMarquee({ achievements }: Props) {
       {/* Futuristic Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Ambient Glows */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[128px]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-2xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-2xl" />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 mb-8 sm:mb-12">

@@ -117,11 +117,10 @@ export default function BentoCertCard({ item, index, isVisible = true }: Props) 
           delay: 1.0 + index * 0.1,
           ease: [0.215, 0.61, 0.355, 1],
         }}
-        whileHover={{ y: -6 }}
         className="h-full"
       >
         <div
-          className={`group relative h-full flex flex-col overflow-hidden rounded-[22px] transition-all duration-300 ${theme.surface} ${theme.hoverShadow}`}
+          className={`group relative h-full flex flex-col overflow-hidden rounded-[22px] transition-all duration-300 hover:-translate-y-1 ${theme.surface} ${theme.hoverShadow}`}
           style={{ backgroundImage: theme.mesh }}
         >
           {/* Mesh Pattern Overlay */}

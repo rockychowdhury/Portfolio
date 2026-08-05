@@ -44,15 +44,11 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
 
 
       <div className="relative">
-        {/* Premium Pulse Effect — paused when off-screen */}
-        <motion.div
-          animate={inView ? { scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] } : { scale: 1, opacity: 0.3 }}
-          transition={{
-            duration: 3,
-            repeat: inView ? Infinity : 0,
-            ease: "easeInOut"
-          }}
-          className="absolute inset-0 -z-10 rounded-full bg-primary/20 blur-xl"
+        {/* Premium Pulse Effect — CSS compositor animation, paused when off-screen */}
+        <div
+          className={`absolute inset-0 -z-10 rounded-full bg-primary/20 blur-xl ${
+            inView ? "animate-center-pulse" : "opacity-30"
+          }`}
         />
 
         <motion.button

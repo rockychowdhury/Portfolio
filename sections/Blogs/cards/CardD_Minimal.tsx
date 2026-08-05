@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowUpRight, Calendar } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -13,12 +12,11 @@ interface CardProps {
 
 export default function CardD_Minimal({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ y: -4 }}
-      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-8 shadow-sm transition-all hover:shadow-xl dark:bg-zinc-800/80"
+      className="group relative flex flex-col rounded-3xl bg-white border border-border/80 p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-zinc-800/80"
     >
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -48,6 +46,6 @@ export default function CardD_Minimal({ blog, onTagClick }: CardProps) {
          </div>
          <ArrowUpRight size={16} className="text-muted-foreground/20 group-hover:text-primary transition-colors duration-300" />
       </div>
-    </motion.a>
+    </a>
   );
 }

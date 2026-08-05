@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useElementInView } from "@/lib/useElementInView";
 
 interface GridBackgroundProps {
@@ -51,11 +50,11 @@ export default function GridBackground({ isPaused = false, pulseColor = "bg-prim
         />
       ))}
 
-      {/* Subtle Breathing Overlay */}
-      <motion.div 
-        animate={paused ? { opacity: 0.02 } : { opacity: [0.02, 0.05, 0.02] }}
-        transition={{ duration: 8, repeat: paused ? 0 : Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-transparent"
+      {/* Subtle Breathing Overlay — CSS compositor animation, paused off-screen */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-transparent ${
+          paused ? "opacity-[0.02]" : "animate-ambient-breathe"
+        }`}
       />
     </div>
   );

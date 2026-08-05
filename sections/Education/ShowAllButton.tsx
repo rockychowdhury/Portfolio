@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ChevronsDown, ChevronsUp } from "lucide-react";
 
 interface ShowAllButtonProps {
@@ -17,10 +16,9 @@ export default function ShowAllButton({ isExpanded, onClick, count }: ShowAllBut
         <div className="absolute inset-x-0 h-px bg-border/10" />
         
         <div className="relative z-10 bg-background px-12">
-          <motion.button
+          <button
             onClick={onClick}
-            whileHover={{ scale: 1.02 }}
-            className="group flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/60 hover:text-foreground transition-all duration-500 cursor-pointer"
+            className="group flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/60 hover:text-foreground transition-all duration-500 hover:scale-[1.02] cursor-pointer"
           >
             {isExpanded ? (
               <div className="flex items-center gap-3 transition-all duration-700">
@@ -37,7 +35,7 @@ export default function ShowAllButton({ isExpanded, onClick, count }: ShowAllBut
                 <div className="w-6 h-px bg-muted-foreground/20 group-hover:w-10 group-hover:bg-primary transition-all duration-700 shrink-0" />
               </div>
             )}
-          </motion.button>
+          </button>
         </div>
       </div>
     </div>

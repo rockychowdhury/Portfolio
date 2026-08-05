@@ -96,6 +96,7 @@ export default function MiniSparkline({
           fill={`url(#gradient-${color.replace('#', '')})`}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.5 }}
         />
 
@@ -163,7 +164,7 @@ export default function MiniSparkline({
                 : 'translate(-50%, -140%)'
           }}
         >
-          <div className="px-3 py-1.5 rounded-lg bg-background/95 backdrop-blur-md border border-border/20 shadow-2xl flex items-center gap-2 min-w-max">
+          <div className="px-3 py-1.5 rounded-lg bg-background/95 backdrop-blur-sm border border-border/20 shadow-lg flex items-center gap-2 min-w-max">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
             <span className="text-sm font-black tabular-nums text-foreground">
               {points[activeIndex].value.toLocaleString()}

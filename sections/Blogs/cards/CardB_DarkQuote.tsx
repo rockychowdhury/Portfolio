@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -12,12 +11,11 @@ interface CardProps {
 
 export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ scale: 1.01 }}
-      className="group relative flex flex-col  rounded-3xl bg-secondary text-foreground p-5 min-h-[180px] justify-between overflow-hidden"
+      className="group relative flex flex-col  rounded-3xl bg-secondary text-foreground p-5 min-h-[180px] justify-between overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
     >
       <div className="absolute top-0 right-0 p-5 opacity-10">
         <Quote size={60} fill="currentColor" />
@@ -50,6 +48,6 @@ export default function CardB_DarkQuote({ blog, onTagClick }: CardProps) {
           </div>
           <div className="h-[2px] w-8 bg-primary/50 group-hover:w-12 transition-all" />
       </div>
-    </motion.a>
+    </a>
   );
 }

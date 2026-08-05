@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -14,12 +13,11 @@ interface CardProps {
 
 export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ y: -4 }}
-      className="group relative flex flex-col  rounded-3xl bg-zinc-900 border border-border/80 overflow-hidden shadow-sm min-h-[340px] md:min-h-[380px]"
+      className="group relative flex flex-col  rounded-3xl bg-zinc-900 border border-border/80 overflow-hidden shadow-sm transition-transform duration-300 hover:-translate-y-1 min-h-[340px] md:min-h-[380px]"
     >
       {/* Full-Bleed Background Image */}
       {blog.thumbnail_url && (
@@ -38,7 +36,7 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
       {/* Content Overlay */}
       <div className="relative z-20 mt-auto p-8 flex flex-col h-full justify-end">
         <div className="flex items-center justify-between mb-6">
-           <PlatformBadge platform={blog.platform} className="!bg-white/10 !backdrop-blur-md" />
+           <PlatformBadge platform={blog.platform} className="!bg-white/10 !backdrop-blur-sm" />
            <ArrowUpRight size={18} className="text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>
 
@@ -70,6 +68,6 @@ export default function CardG_Overlay({ blog, onTagClick }: CardProps) {
           </div>
         </div>
       </div>
-    </motion.a>
+    </a>
   );
 }

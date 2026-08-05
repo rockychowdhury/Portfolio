@@ -62,6 +62,7 @@ const TimelineItem = ({ item, index }: { item: JourneyItem; index: number }) => 
               key={i}
               initial={{ opacity: 0, y: 5 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.2 + (i * 0.1) }}
               className="text-sm md:text-base text-muted-foreground/80 leading-relaxed flex gap-3"
             >

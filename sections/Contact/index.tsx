@@ -148,6 +148,7 @@ Looking forward to connecting.`;
                 <motion.span 
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   className="text-xs font-bold uppercase tracking-[0.3em] text-primary"
                 >
                   Get in touch
@@ -157,6 +158,7 @@ Looking forward to connecting.`;
                 <motion.div 
                   initial={{ opacity: 0, x: -10 }}
                   whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
                   className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60"
                 >
                   <span className="relative flex h-2 w-2">
@@ -172,6 +174,7 @@ Looking forward to connecting.`;
                   <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
                     className="text-[clamp(2.5rem,6vw,4.5rem)] font-light tracking-tight text-foreground"
                   >
@@ -182,6 +185,7 @@ Looking forward to connecting.`;
                 <motion.div 
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
                   className="flex items-center gap-3 text-xs md:text-sm font-medium text-muted-foreground/60"
                 >
@@ -213,6 +217,7 @@ Looking forward to connecting.`;
                       rel="noopener noreferrer"
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
                       className={`group/link flex items-center gap-3 text-muted-foreground transition-all ${link.color}`}
                     >
@@ -232,11 +237,12 @@ Looking forward to connecting.`;
           {/* Right Side: Contact Form */}
           <div className="flex-1 lg:max-w-xl relative group">
             {/* Ambient Highlight Glow */}
-            <div className="absolute -inset-4 z-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="absolute -inset-4 z-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               className="relative z-10 overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-white via-zinc-50/50 to-zinc-100/60 dark:from-zinc-900 dark:via-zinc-950/50 dark:to-black p-6 md:p-10 lg:p-12 transition-all duration-500 group-hover:border-primary/40 shadow-xl"
             >
               {/* Paper Texture Overlay */}

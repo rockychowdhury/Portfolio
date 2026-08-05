@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -13,15 +12,11 @@ interface CardProps {
 
 export default function CardE_WideBanner({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -6 }}
-      className="group relative flex flex-col rounded-3xl bg-secondary/30 border border-border/50 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 break-inside-avoid w-full"
+      className="group relative flex flex-col rounded-3xl bg-secondary/30 border border-border/50 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 break-inside-avoid w-full"
     >
       {/* Top Image */}
       <div className="relative w-full aspect-[21/9] overflow-hidden">
@@ -69,7 +64,7 @@ export default function CardE_WideBanner({ blog, onTagClick }: CardProps) {
       </div>
 
       {/* Background decoration */}
-      <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-primary/5 blur-[100px] rounded-full" />
-    </motion.a>
+      <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-primary/5 blur-2xl rounded-full" />
+    </a>
   );
 }

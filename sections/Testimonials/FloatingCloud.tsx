@@ -58,7 +58,7 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
           return (
             <motion.div 
               key={`${testimonial.name}-${bloomIndex}`}
-              className="absolute"
+              className="absolute hover:z-[100]"
               style={{ 
                 left: `${zone.x}%`, 
                 top: `${zone.y}%`,
@@ -66,7 +66,6 @@ export default function FloatingCloud({ testimonials, isPaused = false }: Floati
                 pointerEvents: zone.isInert ? 'none' : 'auto',
                 zIndex: zone.priority === 5 ? 30 : 10
               }}
-              whileHover={zone.isInert ? {} : { zIndex: 100 }}
             >
               <FloatingCard 
                 testimonial={testimonial} 

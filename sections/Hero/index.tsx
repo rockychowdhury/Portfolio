@@ -485,25 +485,11 @@ export default function HeroSection() {
               className="mt-20 xl:mt-28 hidden lg:flex items-center gap-4 pl-20"
             >
               <div className="relative flex flex-col items-center">
-                <motion.div
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="w-5 h-9 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-1.5"
-                >
-                  <motion.div
-                    animate={{ opacity: [1, 0, 1], height: [4, 8, 4] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="w-1 bg-muted-foreground/40 rounded-full"
+                <div className="w-5 h-9 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-1.5">
+                  <div
+                    className="animate-scroll-bob w-1 h-2 bg-muted-foreground/40 rounded-full"
                   />
-                </motion.div>
+                </div>
                 <span className="absolute -bottom-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
                   Scroll
                 </span>

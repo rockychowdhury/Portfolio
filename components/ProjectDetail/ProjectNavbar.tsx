@@ -25,8 +25,16 @@ export default function ProjectNavbar({ projectTitle }: { projectTitle: string }
   const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 20);
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -37,7 +45,7 @@ export default function ProjectNavbar({ projectTitle }: { projectTitle: string }
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
         scrolled
-          ? "top-4 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full border border-border/40 bg-background/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-2 py-2"
+          ? "top-4 mx-auto w-[95%] lg:w-[90%] max-w-[1400px] rounded-full border border-border/40 bg-background/90 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] px-2 py-2"
           : "bg-transparent py-5"
       }`}
     >

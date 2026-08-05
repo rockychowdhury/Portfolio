@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Play, ArrowUpRight } from "lucide-react";
 import PlatformBadge from "../PlatformBadge";
 import type { IBlog } from "@/types/blog";
@@ -13,12 +12,11 @@ interface CardProps {
 
 export default function CardC_Platform({ blog, onTagClick }: CardProps) {
   return (
-    <motion.a
+    <a
       href={blog.handle}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ y: -4 }}
-      className="group relative flex flex-col  rounded-3xl bg-white border border-border/80 overflow-hidden shadow-sm transition-all hover:shadow-xl "
+      className="group relative flex flex-col  rounded-3xl bg-white border border-border/80 overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl "
     >
       <div className="relative aspect-video overflow-hidden">
         {blog.thumbnail_url ? (
@@ -69,6 +67,6 @@ export default function CardC_Platform({ blog, onTagClick }: CardProps) {
            <ArrowUpRight size={16} className="text-muted-foreground/20 group-hover:text-primary transition-colors duration-300" />
         </div>
       </div>
-    </motion.a>
+    </a>
   );
 }

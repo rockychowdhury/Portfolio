@@ -60,7 +60,7 @@ export default function HeatmapTooltip({ cell }: HeatmapTooltipProps) {
         pointerEvents: "none",
         zIndex: 9999,
       }}
-      className="bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-xl p-4 flex flex-col gap-3 min-w-[200px]"
+      className="bg-card/95 backdrop-blur-sm border border-border shadow-lg rounded-xl p-4 flex flex-col gap-3 min-w-[200px]"
     >
       <div className="flex flex-col gap-1">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">

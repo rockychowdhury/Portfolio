@@ -403,6 +403,49 @@ html.lenis body {
   will-change: transform;
 }
 
+/* ── Performance: CSS-only bob for scroll indicators (replaces Framer Motion repeat loops) ── */
+@keyframes scroll-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+@keyframes scroll-dot-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.animate-scroll-bob {
+  animation: scroll-bob 2s ease-in-out infinite;
+  -webkit-animation: scroll-bob 2s ease-in-out infinite;
+}
+
+.animate-scroll-dot-opacity {
+  animation: scroll-dot-opacity 2s ease-in-out infinite;
+  -webkit-animation: scroll-dot-opacity 2s ease-in-out infinite;
+}
+
+/* ── Performance: CSS-only breathing overlay (replaces Framer Motion repeat loop) ── */
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.05; }
+}
+
+.animate-ambient-breathe {
+  animation: ambient-breathe 8s ease-in-out infinite;
+  -webkit-animation: ambient-breathe 8s ease-in-out infinite;
+}
+
+/* ── Performance: CSS-only pulse for the testimonial center glow ── */
+@keyframes center-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.6; }
+}
+
+.animate-center-pulse {
+  animation: center-pulse 3s ease-in-out infinite;
+  -webkit-animation: center-pulse 3s ease-in-out infinite;
+}
+
 /* ── Spacetime Grid Animations ── */
 @keyframes gridBreathe {
   0%, 100% { opacity: 1; }
