@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import connectDB from "@/lib/db/connect";
 import Project from "@/lib/db/models/Project";
-import { fetchReadme } from "@/lib/fetchReadme";
-import { processMarkdown } from "@/lib/processMarkdown";
+import { fetchReadme } from "@/lib/readme/fetch";
+import { processMarkdown } from "@/lib/readme/processMarkdown";
 import DetailLayout from "@/components/ProjectDetail/DetailLayout";
 import DetailHeroVideo from "@/components/ProjectDetail/DetailHeroVideo";
 import DetailCTARow from "@/components/ProjectDetail/DetailCTARow";

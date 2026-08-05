@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useCallback } from "react";
-import { TocItem } from "@/lib/extractTOC";
+import { TocItem } from "@/lib/readme/extractTOC";
 
 interface MobileTOCStripProps {
   toc: TocItem[];

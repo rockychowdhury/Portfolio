@@ -25,11 +25,48 @@ const SCHEMAS: Record<string, any> = {
   ],
   blogs: [
     { key: "title", label: "Title", type: "text" },
-    { key: "brief", label: "Brief", type: "textarea" },
-    { key: "coverImage", label: "Cover Image URL", type: "text" },
-    { key: "slug", label: "Slug", type: "text" },
-    { key: "url", label: "Original Hashnode URL", type: "text" },
-    { key: "readTime", label: "Read Time", type: "text" },
+    { key: "subtitle", label: "Subtitle", type: "text" },
+    { key: "handle", label: "Slug/Handle", type: "text" },
+    { key: "platform", label: "Platform", type: "select", options: ["LinkedIn", "YouTube", "Medium", "Dev.to", "Hashnode"] },
+    { key: "thumbnail_url", label: "Thumbnail URL", type: "text" },
+    { key: "etr", label: "Estimated Read Time (min)", type: "number" },
+    { key: "is_featured", label: "Featured", type: "checkbox" },
+    { key: "is_approved", label: "Approved", type: "checkbox" },
+  ],
+  achievements: [
+    { key: "title", label: "Title", type: "text" },
+    { key: "organization", label: "Organization", type: "text" },
+    { key: "category", label: "Category", type: "select", options: ["education", "certification", "project", "competitive_programming", "academic_honor", "leadership"] },
+    { key: "date", label: "Display Date", type: "text" },
+    { key: "img_url", label: "Image URL", type: "text" },
+    { key: "strength", label: "Strength (1-5)", type: "number" },
+  ],
+  education: [
+    { key: "title", label: "Title / Degree / Cert", type: "text" },
+    { key: "issuer", label: "Issuer / Institution", type: "text" },
+    { key: "type", label: "Type", type: "select", options: ["education", "certification"] },
+    { key: "issue_date", label: "Issue Date", type: "text" },
+    { key: "credential_url", label: "Credential URL", type: "text" },
+    { key: "image_url", label: "Image URL", type: "text" },
+    { key: "order", label: "Order", type: "number" },
+  ],
+  journey: [
+    { key: "role", label: "Role", type: "text" },
+    { key: "company", label: "Company / Organization", type: "text" },
+    { key: "year", label: "Timeframe / Year", type: "text" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "location", label: "Location", type: "text" },
+    { key: "type", label: "Type", type: "select", options: ["work", "education", "milestone"] },
+    { key: "order", label: "Order", type: "number" },
+  ],
+  testimonials: [
+    { key: "name", label: "Name", type: "text" },
+    { key: "role", label: "Role", type: "text" },
+    { key: "company", label: "Company", type: "text" },
+    { key: "content", label: "Testimonial Content", type: "textarea" },
+    { key: "avatar_url", label: "Avatar URL", type: "text" },
+    { key: "is_featured", label: "Featured", type: "checkbox" },
+    { key: "is_approved", label: "Approved", type: "checkbox" },
   ],
 };
 
@@ -56,7 +93,7 @@ export default function CollectionAdmin({ params }: { params: Promise<{ collecti
     if (schema) fetchItems();
   }, [collection]);
 
-  if (!schema) return <div>Invalid collection. Supported: projects, skills, blogs.</div>;
+  if (!schema) return <div>Invalid collection. Supported: projects, skills, blogs, achievements, education, journey, testimonials.</div>;
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

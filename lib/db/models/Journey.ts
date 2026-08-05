@@ -1,14 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IJourney } from "@/types/journey";
 
-export interface IJourney {
-  title: string;
-  organization: string;
-  duration: string;
-  description: string[];
-  startDate: Date;
-  icon?: string;
-  type: "work" | "education" | "leadership" | "achievement";
-}
+export type { IJourney };
 
 const JourneySchema = new Schema<IJourney>(
   {

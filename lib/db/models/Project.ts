@@ -1,17 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IProject } from "@/types/project";
 
-export interface IProject {
-  _id?: string;
-  title: string;
-  description: string;         // Internal reference only — never rendered in UI
-  readmeLink: string;           // Raw GitHub README URL for the details page
-  thumbnail: string;            // Static image URL — shown before video loads
-  githubLink: string;           // CTA — links to GitHub repo
-  liveLink: string;             // CTA — "Open" button target
-  videoPreviewLink: string;     // Direct video file URL (MP4/WebM) — autoplay when in focus
-  youtubeLink: string;          // CTA — YouTube demo video
-  order: number;                // Controls left-to-right render order (ascending)
-}
+export type { IProject };
 
 const ProjectSchema = new Schema<IProject>(
   {

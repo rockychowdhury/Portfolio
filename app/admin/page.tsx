@@ -3,7 +3,7 @@ import Project from "@/lib/db/models/Project";
 import Skill from "@/lib/db/models/Skill";
 import Blog from "@/lib/db/models/Blog";
 import Achievement from "@/lib/db/models/Achievement";
-import { Feature } from "@/lib/db/models/Feature";
+import Feature from "@/lib/db/models/Feature";
 import Testimonial from "@/lib/db/models/Testimonial";
 
 import { 

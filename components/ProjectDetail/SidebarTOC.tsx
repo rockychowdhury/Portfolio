@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { TocItem } from "@/lib/extractTOC";
+import { TocItem } from "@/lib/readme/extractTOC";
 
 interface SidebarTOCProps {
   toc: TocItem[];

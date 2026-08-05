@@ -1,22 +1,19 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import Navbar from "@/components/portfolio/Navbar";
-import HeroSection from "@/components/portfolio/HeroSection";
-import SkillsSection from "@/components/portfolio/SkillsSection";
-import SectionWrapper from "@/components/portfolio/SectionWrapper";
-import Preloader from "@/components/portfolio/Preloader";
-import ProblemSolvingSection from "@/components/portfolio/ProblemSolving";
-import GitHubSection from "@/components/portfolio/GitHub";
-import Footer from "@/components/portfolio/Footer";
-import ContactSection from "@/components/portfolio/ContactSection";
-import TestimonialsSection from "@/components/portfolio/Testimonials";
-import BlogsSection from "@/components/portfolio/Blogs";
-import Education from "@/components/portfolio/Education";
-import AchievementsSection from "@/components/portfolio/AchievementsSection";
-import ProjectsSection from "@/sections/ProjectsSection";
-import JourneySection from "@/components/portfolio/Journey";
+import { getFeatures } from "@/lib/db/data/features";
+import Navbar from "@/components/layout/Navbar";
+import HeroSection from "@/sections/Hero";
+import SkillsSection from "@/sections/Skills";
+import ProblemSolvingSection from "@/sections/ProblemSolving";
+import GitHubSection from "@/sections/GitHub";
+import Footer from "@/components/layout/Footer";
+import ContactSection from "@/sections/Contact";
+import TestimonialsSection from "@/sections/Testimonials";
+import BlogsSection from "@/sections/Blogs";
+import Education from "@/sections/Education";
+import AchievementsSection from "@/sections/Achievements";
+import ProjectsSection from "@/sections/Projects";
+import JourneySection from "@/sections/Journey";
+import { PreloaderProvider } from "@/components/layout/PreloaderContext";
+import { Suspense } from "react";
 
 const sectionMap: Record<string, React.ElementType> = {
   skills: SkillsSection,
@@ -31,78 +28,27 @@ const sectionMap: Record<string, React.ElementType> = {
   contact: ContactSection,
 };
 
-let hasRunPreloader = false;
-
-export default function Home() {
-  const [preloaderDone, setPreloaderDone] = useState(hasRunPreloader);
-  const [features, setFeatures] = useState<any[]>([]);
-  const [loadingFeatures, setLoadingFeatures] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/features")
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setFeatures(data);
-        setLoadingFeatures(false);
-      })
-      .catch(err => {
-        console.error("Failed to load features:", err);
-        setLoadingFeatures(false);
-      });
-  }, []);
-
-  const handlePreloaderComplete = () => {
-    hasRunPreloader = true;
-    setPreloaderDone(true);
-  };
-
-  useEffect(() => {
-    // Prevent the browser from trying to restore previous scroll position
-    // which causes it to jump to the footer when dynamic content loads
-    if (typeof window !== "undefined") {
-      window.history.scrollRestoration = "manual";
-      window.scrollTo(0, 0);
-    }
-
-    if (preloaderDone && window.location.hash) {
-      const id = window.location.hash.replace("#", "");
-      const element = document.getElementById(id);
-      if (element) {
-        // Wait a small bit for any final layout shifts (like hydration)
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth" });
-          // Clean up the URL hash cleanly without a reload so future refreshes stay at the top
-          window.history.replaceState(null, "", window.location.pathname);
-        }, 100);
-      }
-    }
-  }, [preloaderDone]);
+export default async function Home() {
+  // Fetch features on the server (Data Access Layer)
+  const features = await getFeatures();
+  const activeFeatures = features.filter(f => f.isActive);
 
   return (
-    <>
-      {!preloaderDone && (
-        <Preloader key="preloader" onComplete={handlePreloaderComplete} />
-      )}
-      <Navbar preloaderDone={preloaderDone} features={features} />
+    <PreloaderProvider>
+      <Navbar features={activeFeatures} />
       
-      <motion.main
-        initial={{ opacity: 0 }}
-        animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-        className={!preloaderDone ? "pointer-events-none" : ""}
-      >
-        <HeroSection preloaderDone={preloaderDone} />
-        {!loadingFeatures ? (
-            features.filter(f => f.isActive).map(f => {
-                const Component = sectionMap[f.componentId];
-                return Component ? <Component key={f._id || f.componentId} /> : null;
-            })
-        ) : (
-            <div className="min-h-screen" />
-        )}
-        <Footer />
-      </motion.main>
-    </>
+      <HeroSection />
+      
+      {activeFeatures.map(f => {
+          const Component = sectionMap[f.componentId];
+          return Component ? (
+            <Suspense key={f._id || f.componentId} fallback={<div className="min-h-[50vh]" />}>
+              <Component />
+            </Suspense>
+          ) : null;
+      })}
+      
+      <Footer />
+    </PreloaderProvider>
   );
 }
-

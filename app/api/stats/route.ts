@@ -8,7 +8,7 @@ import {
   fetchCodeChefProfile,
 } from "@/lib/api/platforms/fetchers";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Cache for 1 hour
 
 const STALE_INTERVAL = 60 * 60 * 1000; // 1 hour
 

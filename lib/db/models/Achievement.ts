@@ -1,17 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IAchievement } from "@/types/achievement";
 
-export interface IAchievement {
-  category: string;
-  title: string;
-  organization: string;
-  date: string; // "MMM YYYY" format
-  date_sortable: Date;
-  details?: Record<string, any>;
-  tags?: string[];
-  img_url?: string;
-  handle?: string;
-  strength?: number; // 1-5
-}
+export type { IAchievement };
 
 const AchievementSchema = new Schema<IAchievement>(
   {

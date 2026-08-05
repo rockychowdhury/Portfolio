@@ -1,0 +1,1 @@
+export const siteConfig = { name: "Portfolio", description: "Personal Portfolio" };

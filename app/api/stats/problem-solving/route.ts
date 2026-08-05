@@ -8,7 +8,7 @@ import {
   fetchGitHubStats,
 } from "@/lib/api/platforms/fetchers";
 
-export const revalidate = 0; // Dynamic route
+export const revalidate = 3600; // Cache for 1 hour; internal staleness logic handles refresh
 
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour cache
 

@@ -7,8 +7,7 @@ import { calculateStreaks } from "./helpers/calculateStreaks";
 import { aggregateLanguages } from "./helpers/aggregateLanguages";
 import { buildSparkline } from "./helpers/buildSparkline";
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
+export const revalidate = 3600; // Cache for 1 hour; internal staleness logic handles refresh
 
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 

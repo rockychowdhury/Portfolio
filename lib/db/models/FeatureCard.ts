@@ -1,15 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IFeatureCard } from "@/types/feature-card";
 
-export interface IFeatureCard {
-  _id?: string;
-  projectId: string;       // References parent project's slug id (e.g. "petcareplus")
-  headline: string;        // e.g. "Real-time Queue with Redis"
-  subtext: string;         // One concise sentence explaining the problem or impact
-  image: string;           // Visual — screenshot, diagram, or icon illustration
-  ctaLabel: string;        // e.g. "See how →" or "Read more"
-  ctaLink: string;         // Links to the relevant section of the project detail page
-  order: number;
-}
+export type { IFeatureCard };
 
 const FeatureCardSchema = new Schema<IFeatureCard>(
   {

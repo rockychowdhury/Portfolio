@@ -1,14 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import type { IStatsCache } from "@/types/stats-cache";
 
-export interface IStatsCache {
-  totalSolved: number;
-  projectCount: number;
-  breakdown: {
-    leetcode: number;
-    codeforces: number;
-    codechef: number;
-  };
-}
+export type { IStatsCache };
 
 const StatsCacheSchema = new Schema<IStatsCache>(
   {

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/connect";
 
-export const dynamic = "force-dynamic";
-import { Feature } from "@/lib/db/models/Feature";
+export const revalidate = 3600; // Cache for 1 hour
+import Feature from "@/lib/db/models/Feature";
 
 const DEFAULT_FEATURES = [
   { name: "Skills", componentId: "skills", order: 1, isActive: true },
