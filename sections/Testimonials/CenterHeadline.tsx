@@ -1,14 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useElementInView } from "@/lib/useElementInView";
 
 interface CenterHeadlineProps {
   onLeaveTestimonial: () => void;
 }
 
 export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlineProps) {
+  const { ref, inView } = useElementInView<HTMLDivElement>("50px 0px");
+
   return (
-    <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto py-20 px-4">
+    <div ref={ref} className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto py-20 px-4">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -41,15 +44,12 @@ export default function CenterHeadline({ onLeaveTestimonial }: CenterHeadlinePro
 
 
       <div className="relative">
-        {/* Premium Pulse Effect */}
+        {/* Premium Pulse Effect — paused when off-screen */}
         <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
+          animate={inView ? { scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] } : { scale: 1, opacity: 0.3 }}
           transition={{
             duration: 3,
-            repeat: Infinity,
+            repeat: inView ? Infinity : 0,
             ease: "easeInOut"
           }}
           className="absolute inset-0 -z-10 rounded-full bg-primary/20 blur-xl"

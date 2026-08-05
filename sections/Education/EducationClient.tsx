@@ -8,6 +8,7 @@ import BentoGrid from "./BentoGrid";
 import ShowAllButton from "./ShowAllButton";
 import { EducationSkeleton } from "./EducationSkeleton";
 import { GridPattern } from "@/components/ui/BackgroundPatterns";
+import { smoothScrollTo } from "@/lib/lenis";
 
 export default function EducationClient({ initialData }: { initialData: ICertification[] }) {
   const [data] = useState<ICertification[]>(initialData);
@@ -97,7 +98,7 @@ export default function EducationClient({ initialData }: { initialData: ICertifi
                 onClick={() => {
                   setShowAll(!showAll);
                   if (showAll) {
-                    sectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                    smoothScrollTo(sectionRef.current!);
                   }
                 }} 
                 count={remainingCerts.length} 

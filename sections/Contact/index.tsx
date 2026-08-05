@@ -48,6 +48,14 @@ export default function ContactSection() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
+  const spotlightBackground = useMotionTemplate`
+    radial-gradient(
+      650px circle at ${mouseX}px ${mouseY}px,
+      rgba(var(--primary-rgb), 0.05),
+      transparent 80%
+    )
+  `;
+
 
 
   // Auto-resize textarea
@@ -126,19 +134,9 @@ Looking forward to connecting.`;
       <SlantPattern />
       <div className="container-main relative z-10">
       {/* Spotlight Effect */}
-
-      {/* Spotlight Effect */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              rgba(var(--primary-rgb), 0.05),
-              transparent 80%
-            )
-          `,
-        }}
+        style={{ background: spotlightBackground }}
       />
 
       <div className="flex flex-col gap-12 lg:flex-row lg:items-center">

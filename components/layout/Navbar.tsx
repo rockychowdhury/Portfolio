@@ -5,6 +5,7 @@ import { Download, Menu, X, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { smoothScrollTo } from "@/lib/lenis";
 
 
 
@@ -122,7 +123,7 @@ export default function Navbar({ features }: { features: any[] }) {
 
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      smoothScrollTo(element);
     }
   };
 
@@ -150,7 +151,7 @@ export default function Navbar({ features }: { features: any[] }) {
               clickScrollTimeout.current = setTimeout(() => {
                 isClickScrolling.current = false;
               }, 1000);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              smoothScrollTo(0);
             }}
             className="group flex items-center"
           >

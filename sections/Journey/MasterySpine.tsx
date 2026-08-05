@@ -16,6 +16,7 @@ const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivE
   });
 
   const opacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  const tipTop = useTransform(pathLength, (p) => `${p * 100}%`);
 
   return (
     <div className="absolute left-[20px] top-4 bottom-4 w-px pointer-events-none">
@@ -31,7 +32,7 @@ const MasterySpine = ({ containerRef }: { containerRef: React.RefObject<HTMLDivE
       {/* Subtle indicator at the tip ( glowing spark ) */}
       <motion.div
         style={{ 
-          top: useTransform(pathLength, (p) => `${p * 100}%`),
+          top: tipTop,
           opacity 
         }}
         className="absolute left-[-3.5px] w-[8px] h-[8px] rounded-full bg-background border-[2px] border-foreground shadow-[0_0_15px_rgba(var(--foreground),0.8)] z-20"

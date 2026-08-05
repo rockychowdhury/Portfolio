@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useElementInView } from "@/lib/useElementInView";
 
 interface GridBackgroundProps {
   isPaused?: boolean;
@@ -9,6 +9,10 @@ interface GridBackgroundProps {
 }
 
 export default function GridBackground({ isPaused = false, pulseColor = "bg-primary/20" }: GridBackgroundProps) {
+  const { ref, inView } = useElementInView<HTMLDivElement>("50px 0px");
+  // Pause all ambient motion when the section is off-screen or explicitly paused
+  const paused = isPaused || !inView;
+
   // CSS-based pulses are more performant than React state for this background effect
   const pulsePositions = [
     { top: '10%', left: '15%' },
@@ -20,7 +24,7 @@ export default function GridBackground({ isPaused = false, pulseColor = "bg-prim
   ];
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
+    <div ref={ref} className="absolute inset-0 z-0 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
       {/* Static Grid Pattern */}
       <div 
         className="absolute inset-0 opacity-[0.04] dark:opacity-[0.08]" 
@@ -37,7 +41,7 @@ export default function GridBackground({ isPaused = false, pulseColor = "bg-prim
       {pulsePositions.map((pos, i) => (
         <div
           key={i}
-          className={`absolute h-[80px] w-[80px] ${pulseColor} blur-xl rounded-full ${isPaused ? "" : "animate-pulse"}`}
+          className={`absolute h-[80px] w-[80px] ${pulseColor} blur-xl rounded-full ${paused ? "" : "animate-pulse"}`}
           style={{ 
             top: pos.top, 
             left: pos.left,
@@ -49,8 +53,8 @@ export default function GridBackground({ isPaused = false, pulseColor = "bg-prim
 
       {/* Subtle Breathing Overlay */}
       <motion.div 
-        animate={{ opacity: [0.02, 0.05, 0.02] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        animate={paused ? { opacity: 0.02 } : { opacity: [0.02, 0.05, 0.02] }}
+        transition={{ duration: 8, repeat: paused ? 0 : Infinity, ease: "easeInOut" }}
         className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-transparent"
       />
     </div>

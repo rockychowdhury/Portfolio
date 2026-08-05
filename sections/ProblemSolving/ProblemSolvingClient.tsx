@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import SectionWrapper from "@/components/layout/SectionWrapper";
 import PlatformCard from "./PlatformCard";
 import NarrativeBar from "./NarrativeBar";
 import type { IProblemSolvingProfile } from "@/types/problem-solving";
+import { useBackgroundRefresh } from "@/lib/useBackgroundRefresh";
 import { DotPattern } from "@/components/ui/BackgroundPatterns";
 
 // Premium easing for sections
@@ -26,7 +27,10 @@ const letterAnimation = {
 };
 
 export default function ProblemSolvingSection({ initialData }: { initialData: IProblemSolvingProfile | null }) {
-  const [data] = useState<IProblemSolvingProfile | null>(initialData);
+  const { data } = useBackgroundRefresh<IProblemSolvingProfile | null>({
+    url: "/api/stats/problem-solving",
+    initial: initialData,
+  });
 
   const ref = useRef<HTMLDivElement>(null);
   const titleRef = useRef(null);

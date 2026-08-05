@@ -8,6 +8,7 @@ import * as FaIcons from "react-icons/fa6";
 import * as VscIcons from "react-icons/vsc";
 import type { IconType } from "react-icons";
 import GridBackground from "@/sections/Testimonials/GridBackground";
+import { useElementInView } from "@/lib/useElementInView";
 
 // ── Types ──
 interface Skill {
@@ -158,6 +159,7 @@ function SkillIcon({
   y,
   index,
   isBuilt,
+  floatEnabled = false,
   floatPhase,
   isHighlighted = false,
 }: {
@@ -166,6 +168,7 @@ function SkillIcon({
   y: number;
   index: number;
   isBuilt: boolean;
+  floatEnabled?: boolean;
   floatPhase: number;
   isHighlighted?: boolean;
 }) {
@@ -198,7 +201,7 @@ function SkillIcon({
     >
       {/* Inner wrapper for CSS float — separated from position transform */}
       <div
-        className={isBuilt ? 'animate-float-icon' : ''}
+        className={floatEnabled ? 'animate-float-icon' : ''}
         style={{ animationDelay: `${floatDelay}s` }}
       >
       <div
@@ -299,6 +302,10 @@ function ShapeGroup({
 }) {
   const [isBuilt, setIsBuilt] = useState(false);
 
+  // Continuous visibility — float animations only run while this group is on-screen
+  const { ref: floatRef, inView: floatInView } = useElementInView<HTMLDivElement>("100px 0px");
+  const floatEnabled = isBuilt && floatInView;
+
   useEffect(() => {
     if (isInView && !isBuilt) {
       const totalBuildTime = skills.length * BUILD_STAGGER * 500 + BUILD_DURATION * 500;
@@ -323,7 +330,8 @@ function ShapeGroup({
   return (
     <div className="flex flex-col items-center gap-12 flex-1 min-w-[280px] xs:min-w-[300px] max-w-[400px]">
       <div
-        className={`relative aspect-square w-full flex items-center justify-center transform-gpu ${isBuilt ? 'animate-float-group' : ''}`}
+        ref={floatRef}
+        className={`relative aspect-square w-full flex items-center justify-center transform-gpu ${floatEnabled ? 'animate-float-group' : ''}`}
         style={{ animationDelay: `${floatDelay}s` }}
       >
         {/* Skill icons placed along the shape */}
@@ -337,6 +345,7 @@ function ShapeGroup({
               y={positions[i]?.y ?? 0}
               index={i}
               isBuilt={isInView}
+              floatEnabled={floatEnabled}
               floatPhase={floatDelay}
               isHighlighted={highlightedIds.includes(skill._id)}
             />

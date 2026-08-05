@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useElementInView } from "@/lib/useElementInView";
 
 interface LanguageBarProps {
   language: {
@@ -13,8 +14,10 @@ interface LanguageBarProps {
 }
 
 export default function LanguageBar({ language, index }: LanguageBarProps) {
+  const { ref, inView } = useElementInView<HTMLDivElement>("50px 0px");
+
   return (
-    <div className="flex flex-col gap-2 group">
+    <div ref={ref} className="flex flex-col gap-2 group">
       <div className="flex justify-between items-end">
         <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">
           {language.name}
@@ -42,14 +45,12 @@ export default function LanguageBar({ language, index }: LanguageBarProps) {
           className="absolute inset-y-0 left-0 h-full"
         />
 
-        {/* Shimmer Sweep */}
+        {/* Shimmer Sweep — paused when off-screen */}
         <motion.div
-          animate={{
-            x: ["-100%", "200%"],
-          }}
+          animate={inView ? { x: ["-100%", "200%"] } : { x: "-100%" }}
           transition={{
             duration: 3,
-            repeat: Infinity,
+            repeat: inView ? Infinity : 0,
             repeatDelay: 2,
             ease: "easeInOut",
           }}

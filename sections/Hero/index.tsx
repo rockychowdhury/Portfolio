@@ -13,7 +13,8 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
+import { useBackgroundRefresh } from "@/lib/useBackgroundRefresh";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -28,28 +29,41 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-// ── Animated Counter Hook ──
-function useAnimatedCounter(target: number, duration = 2) {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => Math.round(v));
-  const [display, setDisplay] = useState(0);
+// ── Animated Counter ──
+// Updates the DOM via a ref instead of React state, so counting to a large
+// number does NOT re-render the whole Hero section (incl. the large SVG grid)
+// on every animation frame.
+function AnimatedCount({
+  value,
+  duration = 2,
+  prefix = "",
+}: {
+  value: number;
+  duration?: number;
+  prefix?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const unsubscribe = rounded.on("change", (v) => setDisplay(v));
-    return () => unsubscribe();
-  }, [rounded]);
-
-  useEffect(() => {
-    if (target > 0) {
-      const controls = animate(count, target, {
-        duration,
-        ease: [0.25, 0.4, 0.25, 1],
-      });
-      return () => controls.stop();
+    if (value <= 0) {
+      if (ref.current) ref.current.textContent = `${prefix}0`;
+      return;
     }
-  }, [target, count, duration]);
+    const controls = animate(0, value, {
+      duration,
+      ease: [0.25, 0.4, 0.25, 1],
+      onUpdate: (v) => {
+        if (ref.current) ref.current.textContent = `${prefix}${Math.round(v)}`;
+      },
+    });
+    return () => controls.stop();
+  }, [value, duration, prefix]);
 
-  return display;
+  return (
+    <span ref={ref} className="tabular-nums">
+      {prefix}0
+    </span>
+  );
 }
 
 // Stagger container
@@ -173,13 +187,13 @@ const gridDotData = GRID_POINTS.flat().map(([x, y]) => {
   return { x, y, opacity, r };
 });
 
-function SpacetimeGrid() {
+const SpacetimeGrid = memo(function SpacetimeGrid() {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]">
       <svg
         viewBox={`-80 -60 ${VB_W + 160} ${VB_H + 120}`}
         preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full text-foreground grid-breathe"
+        className="absolute inset-0 w-full h-full text-foreground"
         fill="none"
         aria-hidden="true"
       >
@@ -206,7 +220,7 @@ function SpacetimeGrid() {
             <circle key={i} cx={dot.x.toFixed(1)} cy={dot.y.toFixed(1)} r={dot.r} fill="currentColor" opacity={dot.opacity} />
           ))}
 
-          {/* Animated ring at distortion epicenter */}
+          {/* Static rings at distortion epicenter (no infinite rotation to avoid per-frame compositing) */}
           <circle
             cx={WELL_CX}
             cy={WELL_CY}
@@ -216,7 +230,6 @@ function SpacetimeGrid() {
             strokeWidth="0.8"
             strokeDasharray="8 12"
             opacity="0.2"
-            className="grid-ring-spin"
           />
           <circle
             cx={WELL_CX}
@@ -227,13 +240,12 @@ function SpacetimeGrid() {
             strokeWidth="0.6"
             strokeDasharray="4 16"
             opacity="0.25"
-            className="grid-ring-spin-reverse"
           />
         </g>
       </svg>
     </div>
   );
-}
+});
 
 
 import { usePreloader } from "@/components/layout/PreloaderContext";
@@ -247,11 +259,18 @@ export default function HeroSection() {
   const spotX = useMotionValue(0);
   const spotY = useMotionValue(0);
 
-  const [stats, setStats] = useState({
-    totalSolved: 0,
-    projectCount: 0,
+  // Cached stats from MongoDB immediately (first paint), then non-blocking
+  // background refresh from live APIs that live-updates the counters.
+  const { data: bgStats } = useBackgroundRefresh<{
+    totalSolved: number;
+    projectCount: number;
+  }>({
+    url: "/api/stats",
+    initial: null,
+    enabled: preloaderDone,
   });
-  const [statsLoaded, setStatsLoaded] = useState(false);
+  const stats = bgStats ?? { totalSolved: 0, projectCount: 0 };
+  const statsLoaded = !!bgStats;
 
   // Title Carousel
   const titles = ["Software Engineer", "Full Stack dev", "Problem Solver"];
@@ -268,48 +287,9 @@ export default function HeroSection() {
   const resumeUrl =
     process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
-  // Animated counters
-  const solvedCount = useAnimatedCounter(
-    preloaderDone && statsLoaded ? stats.totalSolved : 0,
-    2.5
-  );
-  const projectCount = useAnimatedCounter(
-    preloaderDone && statsLoaded ? stats.projectCount : 0,
-    2
-  );
-
-  // Phase 1: Fetch cached stats from MongoDB (instant)
-  // Phase 2: Background refresh from live APIs, update UI smoothly
-  useEffect(() => {
-    // 1. Load cached stats
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.totalSolved > 0 || data.projectCount > 0) {
-          setStats({
-            totalSolved: data.totalSolved,
-            projectCount: data.projectCount,
-          });
-        }
-        setStatsLoaded(true);
-      })
-      .catch(() => {
-        setStatsLoaded(true);
-      });
-
-    // 2. Background refresh — update cache and UI
-    fetch("/api/stats?refresh=true")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.totalSolved > 0) {
-          setStats({
-            totalSolved: data.totalSolved,
-            projectCount: data.projectCount,
-          });
-        }
-      })
-      .catch(() => { }); // silent fail — cached data remains
-  }, []);
+  // Animated counters (ref-based — no per-frame React re-render)
+  const solvedTarget = preloaderDone && statsLoaded ? stats.totalSolved : 0;
+  const projectTarget = preloaderDone && statsLoaded ? stats.projectCount : 0;
 
   // Smooth spring for subtle mouse parallax on image
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
@@ -376,7 +356,7 @@ export default function HeroSection() {
             >
               <div>
                 <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
-                  +{solvedCount}
+                  <AnimatedCount value={solvedTarget} prefix="+" />
                 </span>
                 <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
                   DSA Problems Solved
@@ -384,7 +364,7 @@ export default function HeroSection() {
               </div>
               <div>
                 <span className="text-4xl xs:text-5xl font-light tracking-tight text-foreground md:text-6xl tabular-nums">
-                  {projectCount > 0 ? `+${projectCount}` : "—"}
+                  {projectTarget > 0 ? <AnimatedCount value={projectTarget} prefix="+" /> : "—"}
                 </span>
                 <p className="mt-2 text-[10px] md:text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
                   Full-Stack Projects Shipped

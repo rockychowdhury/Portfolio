@@ -25,6 +25,14 @@ export default function BlogsClient({ initialData }: { initialData: IBlog[] }) {
     mouseY.set(clientY - top);
   }
 
+  const spotlightBackground = useMotionTemplate`
+    radial-gradient(
+      650px circle at ${mouseX}px ${mouseY}px,
+      rgba(var(--primary-rgb), 0.05),
+      transparent 80%
+    )
+  `;
+
   const blogsTitle = "Blogs &".split(" ");
   const resourcesTitle = "Resources".split("");
 
@@ -79,19 +87,9 @@ export default function BlogsClient({ initialData }: { initialData: IBlog[] }) {
     >
       <SlantPattern />
       {/* Spotlight Effect */}
-
-      {/* Spotlight Effect */}
       <motion.div
-        className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 hover:opacity-100" // Note: Section no longer has group, using hover internally where possible or just leaving it
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              rgba(var(--primary-rgb), 0.05),
-              transparent 80%
-            )
-          `,
-        }}
+        className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 hover:opacity-100"
+        style={{ background: spotlightBackground }}
       />
 
       <div className="container-main">

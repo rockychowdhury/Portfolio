@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { WavePattern } from "../ui/BackgroundPatterns";
+import { smoothScrollTo } from "@/lib/lenis";
 
 const premiumEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1];
 
@@ -9,7 +10,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    smoothScrollTo(0);
   };
 
   return (

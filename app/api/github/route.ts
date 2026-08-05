@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import connectDB from "@/lib/db/connect";
 import GitHubProfile from "@/lib/db/models/GitHubProfile";
 import { fetchGitHubStats } from "@/lib/api/platforms/fetchers";
@@ -7,11 +7,15 @@ import { calculateStreaks } from "./helpers/calculateStreaks";
 import { aggregateLanguages } from "./helpers/aggregateLanguages";
 import { buildSparkline } from "./helpers/buildSparkline";
 
-export const revalidate = 3600; // Cache for 1 hour; internal staleness logic handles refresh
+// Always run on request so the `?refresh=true` branch is never served from
+// Next.js's route cache; staleness is handled inside MongoDB (stale-while-revalidate).
+export const dynamic = "force-dynamic";
 
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const refresh = request.nextUrl.searchParams.get("refresh") === "true";
+
   try {
     await connectDB();
 
@@ -25,24 +29,29 @@ export async function GET() {
       return NextResponse.json(newProfile);
     }
 
-    // 3. Check for staleness
+    // 3. Fresh and not forced — return cached immediately
     const now = Date.now();
     const lastUpdatedRaw = existingProfile.lastUpdated || existingProfile.updatedAt;
     const lastUpdated = new Date(lastUpdatedRaw).getTime();
     const isStale = now - lastUpdated > REFRESH_INTERVAL_MS;
 
-    if (isStale) {
-      console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), triggering refresh...`);
-      // Await the update to ensure it completes before serverless function shuts down
-      const updatedProfile = await performUpdate(existingProfile).catch((err) => {
-        console.error("[API] GitHub refresh failed:", err);
-        return existingProfile;
-      });
-      return NextResponse.json(updatedProfile);
+    if (!isStale && !refresh) {
+      return NextResponse.json(existingProfile);
     }
 
-    // 4. Return cached immediately
-    return NextResponse.json(existingProfile);
+    // 4. Stale or forced — return the cached doc now, refresh MongoDB in the
+    //    background via after(), so the UI is never blocked on GitHub APIs.
+    console.log(`[API] GitHub profile is stale (${((now - lastUpdated) / 1000 / 60).toFixed(1)}m old), scheduling background refresh...`);
+    const response = NextResponse.json(existingProfile);
+    response.headers.set("x-refresh-scheduled", "1");
+    after(async () => {
+      try {
+        await performUpdate(existingProfile);
+      } catch (err) {
+        console.error("[API] GitHub refresh failed:", err);
+      }
+    });
+    return response;
   } catch (error) {
     console.error("[API] GitHub fetch failed:", error);
     return NextResponse.json(

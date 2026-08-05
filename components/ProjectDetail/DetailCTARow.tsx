@@ -2,6 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 import { FaGithub, FaYoutube } from "react-icons/fa";
+import { smoothScrollTo } from "@/lib/lenis";
 
 interface DetailCTARowProps {
   githubLink: string;
@@ -60,7 +61,7 @@ export default function DetailCTARow({
           // Scroll to testimonials or open modal
           const testimonialsSection = document.getElementById("testimonials");
           if (testimonialsSection) {
-            testimonialsSection.scrollIntoView({ behavior: "smooth" });
+            smoothScrollTo(testimonialsSection);
           }
         }}
         className="flex items-center gap-2 h-11 px-6 rounded-full border border-border/60 bg-background text-foreground/70 font-semibold text-sm transition-all hover:bg-secondary hover:text-foreground"

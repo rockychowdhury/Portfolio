@@ -3,12 +3,23 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Preloader from "./Preloader";
 import { motion } from "framer-motion";
+import { smoothScrollTo } from "@/lib/lenis";
 
 interface PreloaderContextType {
   preloaderDone: boolean;
 }
 
 const PreloaderContext = createContext<PreloaderContextType>({ preloaderDone: true });
+
+const PRELOADER_KEY = "hasRunPreloader";
+
+function getTodayKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
 export function usePreloader() {
   return useContext(PreloaderContext);
@@ -20,21 +31,23 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setIsMounted(true);
-    const hasRun = sessionStorage.getItem("hasRunPreloader");
-    if (!hasRun) {
+    // Show the preloader once per day (per browser session), instead of only
+    // on the very first visit to the tab.
+    const lastRun = sessionStorage.getItem(PRELOADER_KEY);
+    if (lastRun !== getTodayKey()) {
       setPreloaderDone(false);
     }
   }, []);
 
   const handleComplete = () => {
-    sessionStorage.setItem("hasRunPreloader", "true");
+    sessionStorage.setItem(PRELOADER_KEY, getTodayKey());
     setPreloaderDone(true);
   };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.history.scrollRestoration = "manual";
-      if (!isMounted) window.scrollTo(0, 0);
+      if (!isMounted) smoothScrollTo(0, { immediate: true });
     }
 
     if (preloaderDone && window.location.hash) {
@@ -42,7 +55,7 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
       const element = document.getElementById(id);
       if (element) {
         setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth" });
+          smoothScrollTo(element);
           window.history.replaceState(null, "", window.location.pathname);
         }, 100);
       }

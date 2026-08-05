@@ -1,7 +1,6 @@
 "use client";
 
 // components/SmoothScrollProvider.tsx
-"use client";
 
 import { useEffect, ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -27,11 +26,19 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     if (isMobile) return;
 
     const lenis = new Lenis({
-      lerp: 0.06, // Ultra-fluid, weighted interpolation
+      lerp: 0.09, // Balanced smoothing — low enough to feel smooth, high enough to avoid a laggy "crawl"
       wheelMultiplier: 0.9, // Controlled, premium resistance
       touchMultiplier: 1.5,
       infinite: false,
+      smoothWheel: true,
+      syncTouch: false,
     });
+
+    // Expose the instance globally so anchor scrolls route through Lenis
+    // instead of native scrollIntoView (which would fight Lenis and stutter).
+    (window as any).__lenis = lenis;
+    // Snap to top on initial mount / route change
+    lenis.scrollTo(0, { immediate: true });
 
     // Integration with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
@@ -42,14 +49,18 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       lenis.raf(time * 1000); // GSAP ticker uses seconds, Lenis expects ms
     };
     gsap.ticker.add(tickerCallback);
-    gsap.ticker.lagSmoothing(0); // Prevent GSAP from throttling on lag
+    // Keep lag smoothing ON so a single slow frame doesn't hard-stutter the scroll
+    gsap.ticker.lagSmoothing(500, 33);
 
     return () => {
       gsap.ticker.remove(tickerCallback);
+      if ((window as any).__lenis === lenis) {
+        delete (window as any).__lenis;
+      }
       lenis.destroy();
       ScrollTrigger.getAll().forEach((st) => st.kill());
     };
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }

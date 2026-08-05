@@ -34,6 +34,7 @@ export default function DetailHeroVideo({
             alt={title}
             fill
             priority
+            sizes="(max-width: 900px) 100vw, 900px"
             className="object-cover"
           />
         )}

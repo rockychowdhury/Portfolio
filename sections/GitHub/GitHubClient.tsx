@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useBackgroundRefresh } from "@/lib/useBackgroundRefresh";
 import SectionWrapper from "@/components/layout/SectionWrapper";
 import MeaningfulStatsRow from "./MeaningfulStatsRow";
 import ContributionHeatmap from "./ContributionHeatmap";
@@ -33,7 +34,10 @@ const letterAnimation = {
 };
 
 export default function GitHubClient({ initialData }: { initialData: any }) {
-  const [data] = useState<any>(initialData);
+  const { data } = useBackgroundRefresh<any>({
+    url: "/api/github",
+    initial: initialData,
+  });
   const titleRef = useRef(null);
   const isTitleInView = useInView(titleRef, { once: true, margin: "-10%" });
 
@@ -112,57 +116,54 @@ export default function GitHubClient({ initialData }: { initialData: any }) {
         </div>
 
         {/* Main Content Sections */}
-        <div className="relative z-10 flex flex-col gap-16 md:gap-24">
-          {/* 1. Metrics / Meaningful Stats */}
-          <div className="flex flex-col gap-10">
-            {data ? (
-              <MeaningfulStatsRow
-                metrics={data.metrics}
-                streak={data.streak}
-                heatmap={data.heatmap}
-              />
-            ) : (
-              <MetricsSkeleton />
-            )}
-          </div>
+        <div className="relative z-10 flex flex-col gap-12 md:gap-32">
+          {/* 1. Meaningful Stats Row */}
+          {data ? (
+            <MeaningfulStatsRow
+              metrics={data.metrics}
+              streak={data.streak}
+              heatmap={data.heatmap}
+            />
+          ) : (
+            <MetricsSkeleton />
+          )}
 
-          {/* 2. Contribution Heatmap */}
-          <div className="flex flex-col gap-8">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/40">
-              Contribution Activity
-            </h3>
-            {data ? (
-              <ContributionHeatmap
-                heatmap={data.heatmap}
-                stats={data.metrics}
-                streak={data.streak}
-              />
-            ) : (
-              <HeatmapSkeleton />
-            )}
-          </div>
+          {/* 2. Two-column Layout: Heatmap & Language Intelligence */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20">
+            {/* Left Column: Heatmap */}
+            <div className="lg:col-span-8 flex flex-col gap-12">
+              {data ? (
+                <ContributionHeatmap
+                  heatmap={data.heatmap}
+                  stats={data.metrics}
+                  streak={data.streak}
+                />
+              ) : (
+                <HeatmapSkeleton />
+              )}
 
-          {/* 3. Languages + Pinned Repos */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            <div className="flex flex-col gap-8">
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/40">
-                Language Breakdown
-              </h3>
+              {/* Pinned Repositories: High Fidelity Header */}
+              <div className="flex flex-col gap-5 pt-6 border-t border-border/10">
+                <div className="flex items-center gap-3">
+                  <div className="h-px w-6 bg-primary/30" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 flex items-center gap-2">
+                    Featured Repositories
+                  </h3>
+                </div>
+                {data ? (
+                  <PinnedRepoGrid repos={data.pinned} />
+                ) : (
+                  <PinnedReposSkeleton />
+                )}
+              </div>
+            </div>
+
+            {/* Right Column: Language Intelligence */}
+            <div className="lg:col-span-4">
               {data ? (
                 <LanguageIntelligence languages={data.languages} />
               ) : (
                 <LanguagesSkeleton />
-              )}
-            </div>
-
-            <div className="flex flex-col gap-8">
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/40">
-                Highlighted Repositories
-              </h3>
-              {data ? (
-                <PinnedRepoGrid repos={data.pinned} />
-              ) : (
-                <PinnedReposSkeleton />
               )}
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import connectDB from "@/lib/db/connect";
 import ProblemSolvingProfile from "@/lib/db/models/ProblemSolvingProfile";
 import {
@@ -8,11 +8,15 @@ import {
   fetchGitHubStats,
 } from "@/lib/api/platforms/fetchers";
 
-export const revalidate = 3600; // Cache for 1 hour; internal staleness logic handles refresh
+// Always run on request so the `?refresh=true` branch is never served from
+// Next.js's route cache; staleness is handled inside MongoDB (stale-while-revalidate).
+export const dynamic = "force-dynamic";
 
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour cache
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const refresh = request.nextUrl.searchParams.get("refresh") === "true";
+
   try {
     await connectDB();
 
@@ -31,15 +35,24 @@ export async function GET() {
     const lastUpdated = new Date(existingProfile.lastUpdated).getTime();
     const isStale = now - lastUpdated > REFRESH_INTERVAL_MS;
 
-    if (isStale) {
-      console.log("Profile is stale, updating from APIs...");
-      // WAIT for the update to ensure the user gets fresh data and DB is synced
-      const updatedProfile = await performUpdate(existingProfile);
-      return NextResponse.json(updatedProfile);
+    // Fresh and not forced — return cached immediately
+    if (!isStale && !refresh) {
+      return NextResponse.json(existingProfile);
     }
 
-    // 4. Return cached one if fresh
-    return NextResponse.json(existingProfile);
+    // Stale or forced — return the cached doc now, refresh MongoDB in the
+    // background via after(), so the UI is never blocked on platform APIs.
+    console.log("Profile is stale, scheduling background update...");
+    const response = NextResponse.json(existingProfile);
+    response.headers.set("x-refresh-scheduled", "1");
+    after(async () => {
+      try {
+        await performUpdate(existingProfile);
+      } catch (err) {
+        console.error("Background problem-solving refresh failed:", err);
+      }
+    });
+    return response;
   } catch (error) {
     console.error("Problem solving stats API error:", error);
     return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 });
