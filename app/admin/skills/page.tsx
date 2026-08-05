@@ -2,19 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Plus, Edit2, Trash2, X } from "lucide-react";
-import * as SiIcons from "react-icons/si";
-import * as LuIcons from "lucide-react";
-import * as FaIcons from "react-icons/fa6";
-import * as VscIcons from "react-icons/vsc";
-import type { IconType } from "react-icons";
+import { getIcon } from "@/lib/iconRegistry";
 
-// Icon resolver identical to frontend
-function getIcon(iconName: string, iconGroup: string): IconType | null {
-  if (iconGroup === "si") return (SiIcons as Record<string, IconType>)[iconName] || null;
-  if (iconGroup === "lu") return (LuIcons as unknown as Record<string, IconType>)[iconName] || null;
-  if (iconGroup === "fa") return (FaIcons as Record<string, IconType>)[iconName] || null;
-  if (iconGroup === "vsc") return (VscIcons as Record<string, IconType>)[iconName] || null;
-  return null;
+function AdminIcon({ iconName, iconGroup, className, style }: {
+  iconName: string;
+  iconGroup: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (() => {
+    const Icon = getIcon(iconName, iconGroup);
+    if (!Icon) {
+      return (
+        <span className="text-xs text-muted-foreground" style={style}>?</span>
+      );
+    }
+    return <Icon className={className} style={style} />;
+  })();
 }
 
 export default function SkillsAdmin() {
@@ -79,7 +83,8 @@ export default function SkillsAdmin() {
   };
 
   // Preview Icon Component for the form
-  const PreviewIcon = getIcon(currentItem.icon, currentItem.icon_group);
+  const previewIcon = currentItem.icon;
+  const previewGroup = currentItem.icon_group;
 
   const filteredSkills = filterGroup === "all" ? skills : skills.filter((s) => s.group === filterGroup);
 
@@ -115,7 +120,6 @@ export default function SkillsAdmin() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {filteredSkills.map((skill) => {
-            const Icon = getIcon(skill.icon, skill.icon_group);
             return (
               <div key={skill._id} className="relative group bg-background/50 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md hover:border-primary/50 transition-all overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-background/80 backdrop-blur-md rounded-md border border-border/50 p-1">
@@ -126,10 +130,8 @@ export default function SkillsAdmin() {
                 <div className="w-12 h-12 flex items-center justify-center mb-3 rounded-lg bg-secondary/20">
                   {skill.icon_type === "text" ? (
                     <span className="font-bold text-lg" style={{ color: skill.color }}>{skill.icon}</span>
-                  ) : Icon ? (
-                    <Icon className="size-6" style={{ color: skill.color }} />
                   ) : (
-                    <span className="text-xs text-muted-foreground">?</span>
+                    <AdminIcon iconName={skill.icon} iconGroup={skill.icon_group} className="size-6" style={{ color: skill.color }} />
                   )}
                 </div>
                 <h3 className="font-semibold text-sm truncate w-full">{skill.name}</h3>
@@ -181,10 +183,8 @@ export default function SkillsAdmin() {
                   <div className="w-10 h-10 rounded-lg border border-border/50 bg-secondary/20 flex items-center justify-center shrink-0 mb-0.5">
                      {currentItem.icon_type === "text" ? (
                        <span className="font-bold text-sm" style={{ color: currentItem.color }}>{currentItem.icon}</span>
-                     ) : PreviewIcon ? (
-                       <PreviewIcon className="size-5" style={{ color: currentItem.color }} /> 
                      ) : (
-                       <span className="text-xs text-muted-foreground">?</span>
+                       <AdminIcon iconName={previewIcon} iconGroup={previewGroup} className="size-5" style={{ color: currentItem.color }} />
                      )}
                   </div>
                 </div>

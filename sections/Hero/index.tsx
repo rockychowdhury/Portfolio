@@ -71,8 +71,8 @@ const stagger = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.3,
+      staggerChildren: 0.05,
+      delayChildren: 0,
     },
   },
 };
@@ -83,7 +83,7 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
+    transition: { duration: 0.4, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
@@ -93,7 +93,7 @@ const slideLeft = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.9, delay: 0.8, ease: [0.25, 0.4, 0.25, 1] as const },
+    transition: { duration: 0.5, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
@@ -106,8 +106,8 @@ const letterAnimation = {
     y: 0,
     rotateX: 0,
     transition: {
-      duration: 0.8,
-      delay: 0.5 + i * 0.08,
+      duration: 0.5,
+      delay: 0.1 + i * 0.05,
       ease: [0.25, 0.4, 0.25, 1] as const,
     },
   }),
@@ -118,7 +118,7 @@ const lineGrow = {
   hidden: { scaleX: 0 },
   visible: {
     scaleX: 1,
-    transition: { duration: 1, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] as const },
+    transition: { duration: 0.5, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 // ── Spacetime Curvature Grid ──

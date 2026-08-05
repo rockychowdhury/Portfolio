@@ -1,12 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, useInView, useMotionValue, useMotionTemplate, AnimatePresence } from "framer-motion";
-import * as SiIcons from "react-icons/si";
-import * as LuIcons from "lucide-react";
 import { Search, Info } from "lucide-react";
-import * as FaIcons from "react-icons/fa6";
-import * as VscIcons from "react-icons/vsc";
-import type { IconType } from "react-icons";
+import { getIcon } from "@/lib/iconRegistry";
 import GridBackground from "@/sections/Testimonials/GridBackground";
 import { useElementInView } from "@/lib/useElementInView";
 
@@ -50,25 +46,8 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 // ── Icon resolver ──
-function getIcon(iconName: string, iconGroup: string): IconType | null {
-  if (iconGroup === "si") {
-    const icons = SiIcons as Record<string, IconType>;
-    return icons[iconName] || null;
-  }
-  if (iconGroup === "lu") {
-    const icons = LuIcons as unknown as Record<string, IconType>;
-    return icons[iconName] || null;
-  }
-  if (iconGroup === "fa") {
-    const icons = FaIcons as Record<string, IconType>;
-    return icons[iconName] || null;
-  }
-  if (iconGroup === "vsc") {
-    const icons = VscIcons as Record<string, IconType>;
-    return icons[iconName] || null;
-  }
-  return null;
-}
+// Uses the curated registry in lib/iconRegistry.ts so only icons that are
+// actually referenced are bundled (no wildcard react-icons/lucide imports).
 
 // ── Geometric position calculators ──
 function getCirclePositions(count: number, radius: number) {

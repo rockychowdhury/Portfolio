@@ -70,7 +70,7 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={preloaderDone ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+        transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
         className={!preloaderDone ? "pointer-events-none" : ""}
       >
         {children}

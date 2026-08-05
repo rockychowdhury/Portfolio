@@ -48,10 +48,10 @@ export default function Preloader({
           clearInterval(interval);
           setTimeout(() => {
              setTerminalState("loading");
-          }, 300); // slight pause simulating user hitting 'Enter'
+          }, 150); // slight pause simulating user hitting 'Enter'
         }
-      }, 40); // Fast, smooth typing
-    }, 400); // Delay typing slightly so it aligns nicely with ROCKY letters fading in
+      }, 22); // Fast, smooth typing
+    }, 200); // Delay typing slightly so it aligns nicely with ROCKY letters fading in
 
     return () => {
       clearTimeout(timeout);
@@ -90,13 +90,13 @@ export default function Preloader({
     function tick(now: number) {
       const delta = now - lastTime;
       
-      // Update every ~40ms for fast but stable rendering
-      if (delta >= 40) {
+      // Update every ~25ms for fast but stable rendering
+      if (delta >= 25) {
         lastTime = now;
         
         if (currentProgress < 100) {
           // Progress logic
-          const increment = currentProgress < 85 ? Math.random() * 6 : Math.random() * 2;
+          const increment = currentProgress < 85 ? Math.random() * 10 : Math.random() * 3;
           currentProgress = Math.min(currentProgress + increment, 100);
 
           const rounded = Math.round(currentProgress);
@@ -171,10 +171,10 @@ export default function Preloader({
         
         const fallback = setTimeout(() => {
           handleMorphComplete();
-        }, 2000);
+        }, 900);
         
         return () => clearTimeout(fallback);
-      }, 500); // Wait 500ms at 100% before morphing
+      }, 150); // Wait 150ms at 100% before morphing
 
       return () => clearTimeout(timeout);
     }
@@ -195,7 +195,7 @@ export default function Preloader({
         initial={{ y: 0 }}
         animate={phase === "morph" ? { y: "-100%" } : { y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.45,
           ease: [0.76, 0, 0.24, 1],
         }}
       />
@@ -224,7 +224,7 @@ export default function Preloader({
                     }
             }
             transition={{
-                duration: 0.7,
+                duration: 0.5,
                 ease: [0.76, 0, 0.24, 1],
             }}
             onAnimationComplete={() => {
